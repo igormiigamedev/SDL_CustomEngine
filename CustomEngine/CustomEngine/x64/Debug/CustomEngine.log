@@ -1,0 +1,8 @@
+﻿  Engine.cpp
+C:\Study\EngineSDL\CustomEngine\CustomEngine\Source\Object\GameObject.h(14,17): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  (compiling source file 'Source/Core/Engine.cpp')
+  
+C:\Study\EngineSDL\CustomEngine\CustomEngine\Source\Object\GameObject.h(15,17): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+  (compiling source file 'Source/Core/Engine.cpp')
+  
+  CustomEngine.vcxproj -> C:\Study\EngineSDL\CustomEngine\x64\Debug\CustomEngine.exe
