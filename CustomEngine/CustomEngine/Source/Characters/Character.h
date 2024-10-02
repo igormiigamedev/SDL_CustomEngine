@@ -15,8 +15,8 @@ class Character : public GameObject
 		virtual void Clean() = 0;
 		virtual void Update(float dt) = 0;
 
-protected:
-	std::string m_Name;
+	protected:
+		std::string m_Name;
 
 };
 

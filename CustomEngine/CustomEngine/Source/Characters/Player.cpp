@@ -2,12 +2,6 @@
 #include "../Graphics/TextureManager.h"
 #include "SDL.h"
 
-
-//Player::Player()
-//{
-//	//ctor
-//}
-
 Player::Player(Properties* props) : Character(props)
 {
 	m_Row = 1;
@@ -17,7 +11,7 @@ Player::Player(Properties* props) : Character(props)
 
 void Player::Draw()
 {
-	TextureManager::GetInstance()->DrawFrame(m_TextureID, m_Transform->X, m_Transform->Y, m_Width, m_Height, m_Row, m_Frame); 
+	TextureManager::GetInstance()->DrawFrame(m_TextureID, m_Transform->X, m_Transform->Y, (m_Width/ m_FrameCount), (m_Height/ m_Row), m_Row, m_Frame);
 }
 
 void Player::Clean()

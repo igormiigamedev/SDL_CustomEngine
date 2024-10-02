@@ -14,7 +14,7 @@ bool Engine::Init() {
         return false;
     }
 
-    m_Window = SDL_CreateWindow("Custom Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREN_HEIGHT, 0);
+    m_Window = SDL_CreateWindow("Custom Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, 0);
     if (m_Window == nullptr) {
         SDL_Log("Failed to create Window: %s", SDL_GetError());
         return false;
@@ -28,7 +28,10 @@ bool Engine::Init() {
 
     // load texture
     TextureManager::GetInstance()->Load("Player", "Assets/PlayerWalk.png");
-    player = new Player(new Properties("Player", 50, 600, 120, 207));
+    int player_texture_width = 240;
+    int player_texture_height = 207;
+
+    player = new Player(new Properties("Player", 50, (SCREEN_HEIGHT - (player_texture_height + 100) ), player_texture_width, player_texture_height));
 
     /*Vector2D v1(1, 1), v2(1, 1), v3;
     v3 = v1 + v2;
