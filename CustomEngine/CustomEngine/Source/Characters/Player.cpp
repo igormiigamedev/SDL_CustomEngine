@@ -1,17 +1,16 @@
 #include "Player.h"
 #include "../Graphics/TextureManager.h"
-#include "SDL.h"
+//#include "SDL.h"
 
 Player::Player(Properties* props) : Character(props)
 {
-	m_Row = 1;
-	m_FrameCount = 2;
-	m_AnimSpeed = 90;
+	m_Animation = new Animation();
+	m_Animation->SetProps(m_TextureID, 1, 2, 80, SDL_FLIP_HORIZONTAL);
 }
 
 void Player::Draw()
 {
-	TextureManager::GetInstance()->DrawFrame(m_TextureID, m_Transform->X, m_Transform->Y, (m_Width/ m_FrameCount), (m_Height/ m_Row), m_Row, m_Frame);
+	m_Animation->Draw(m_Transform->X, m_Transform->Y, m_Width, m_Height);
 }
 
 void Player::Clean()
@@ -21,5 +20,5 @@ void Player::Clean()
 
 void Player::Update(float dt)
 {
-	m_Frame = (SDL_GetTicks() / m_AnimSpeed) % m_FrameCount;
+	m_Animation->Update();
 }
