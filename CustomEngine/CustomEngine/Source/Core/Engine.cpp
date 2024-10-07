@@ -2,6 +2,7 @@
 #include "../Graphics/TextureManager.h"
 #include "../Physics/Transform.h"
 #include "../Characters/Player.h"
+#include "../Inputs/InputHandler.h"
 
 
 Engine* Engine::s_Instance = nullptr;
@@ -33,24 +34,17 @@ bool Engine::Init() {
 
     player = new Player(new Properties("Player", 50, (SCREEN_HEIGHT - (player_texture_height + 100)), player_texture_width, player_texture_height));
 
-    /*Vector2D v1(1, 1), v2(1, 1), v3;
-    v3 = v1 + v2;
-
-    Transform tf(2, 2);
-
-    tf.Log("Transform: ");
-    v3.Log("V3: ");*/
-
     return m_IsRunning = true;
 }
 
-void Engine::Update() 
-{
+void Engine::Update() {
+    if (InputHandler::GetInstance()->GetKeyDown(SDL_SCANCODE_SPACE)) {
+        SDL_Log("Key Space pushed!");
+    }
     player->Update(0);
 }
 
-void Engine::Render() 
-{
+void Engine::Render() {
     SDL_SetRenderDrawColor(m_Renderer, 124, 218, 254, 255);
     SDL_RenderClear(m_Renderer);
 
@@ -59,13 +53,7 @@ void Engine::Render()
 }
 
 void Engine::Events() {
-    SDL_Event event;
-    SDL_PollEvent(&event);
-    switch (event.type) {
-    case SDL_QUIT:
-        Quit();
-        break;
-    }
+    InputHandler::GetInstance()->Listen();
 }
 
 bool Engine::Clean() {

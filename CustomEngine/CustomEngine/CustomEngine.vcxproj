@@ -134,6 +134,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Inputs\InputHandler.cpp" />
+    <ClCompile Include="Source\Animation\Animation.cpp" />
     <ClCompile Include="CustomEngine.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Source\Characters\Player.cpp" />
@@ -141,6 +143,9 @@
     <ClCompile Include="Source\Graphics\TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Source\Inputs\InputHandler.h" />
+    <ClInclude Include="Source\Physics\RigidBody.h" />
+    <ClInclude Include="Source\Animation\Animation.h" />
     <ClInclude Include="Source\Characters\Player.h" />
     <ClInclude Include="Source\Characters\Character.h" />
     <ClInclude Include="Source\Object\GameObject.h" />
