@@ -19,6 +19,7 @@ class Player : public Character
 
 		Animation* m_Animation;
 		RigidBody* m_RigidBody;
+		int playerDirection = 1;
 
 };
 

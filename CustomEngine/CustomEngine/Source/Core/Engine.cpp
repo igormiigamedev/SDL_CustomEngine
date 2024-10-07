@@ -28,19 +28,19 @@ bool Engine::Init() {
     }
 
     // load texture
-    TextureManager::GetInstance()->Load("Player", "Assets/PlayerWalk.png");
+    // TODO - Jump Handler
+    /*TextureManager::GetInstance()->Load("Player_Jump", "Assets/PlayerJump.png");*/
+
+    TextureManager::GetInstance()->Load("Player_Walk", "Assets/PlayerWalk.png");
     int player_texture_width = 240;
     int player_texture_height = 207;
 
-    player = new Player(new Properties("Player", 50, (SCREEN_HEIGHT - (player_texture_height + 100)), player_texture_width, player_texture_height));
+    player = new Player(new Properties("Player_Walk", 50, (SCREEN_HEIGHT - (player_texture_height + 100)), player_texture_width, player_texture_height));
 
     return m_IsRunning = true;
 }
 
 void Engine::Update() {
-    if (InputHandler::GetInstance()->GetKeyDown(SDL_SCANCODE_SPACE)) {
-        SDL_Log("Key Space pushed!");
-    }
     player->Update(0);
 }
 
