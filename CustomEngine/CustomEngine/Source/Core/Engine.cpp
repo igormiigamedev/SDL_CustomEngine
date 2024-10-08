@@ -3,6 +3,7 @@
 #include "../Physics/Transform.h"
 #include "../Characters/Player.h"
 #include "../Inputs/InputHandler.h"
+#include "../Timer/Timer.h"
 
 
 Engine* Engine::s_Instance = nullptr;
@@ -41,7 +42,8 @@ bool Engine::Init() {
 }
 
 void Engine::Update() {
-    player->Update(0);
+    float dt = Timer::GetInstance()->GetDeltaTime();
+    player->Update(dt);
 }
 
 void Engine::Render() {

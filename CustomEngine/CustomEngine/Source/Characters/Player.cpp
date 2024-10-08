@@ -42,7 +42,7 @@ void Player::Update(float dt){
 
 	m_RigidBody->ApplyForceX(6 * playerDirection);
 
-	m_RigidBody->Update(0.6); //TODO (delta time) - dt
+	m_RigidBody->Update(dt);
 	m_Transform->X += m_RigidBody->GetPosition().X;
 
 	// TODO - Jump Handler
