@@ -19,7 +19,7 @@ void Player::Clean(){
 }
 
 void Player::Update(float dt){
-
+	//std::cout << "Valor de dt: " << dt << std::endl;
 	/*m_Animation->SetProps("Player_Walk", 1, 2, 100);*/ //Player_Walk
 	
 	// TODO - Jump Handler
@@ -31,6 +31,7 @@ void Player::Update(float dt){
 		m_Animation->SetProps("Player_Walk", 1, 2, 100);
 		m_RigidBody->UnSetForceY();
 	}*/
+	
 	if (m_Transform->X >= (SCREEN_WIDTH - 120)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
 		playerDirection = BACKWARD;
 		m_Animation->SetProps("Player_Walk", 1, 2, 100, SDL_FLIP_HORIZONTAL);
@@ -40,14 +41,13 @@ void Player::Update(float dt){
 		m_Animation->SetProps("Player_Walk", 1, 2, 100);
 	}
 
-	m_RigidBody->ApplyForceX(6 * playerDirection);
-
+	m_RigidBody->ApplyForceX(12 * playerDirection);
 	m_RigidBody->Update(dt);
-	m_Transform->X += m_RigidBody->GetPosition().X;
+	m_Transform->X += m_RigidBody->GetDeltaPosition().X;
 
 	// TODO - Jump Handler
-	//if ((m_Transform->Y + m_RigidBody->GetPosition().Y) < (SCREEN_HEIGHT - 280)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
-	//	m_Transform->Y += m_RigidBody->GetPosition().Y;
+	//if ((m_Transform->Y + m_RigidBody->GetDeltaPosition().Y) < (SCREEN_HEIGHT - 280)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
+	//	m_Transform->Y += m_RigidBody->GetDeltaPosition().Y;
 	//}
 
 	m_Animation->Update();

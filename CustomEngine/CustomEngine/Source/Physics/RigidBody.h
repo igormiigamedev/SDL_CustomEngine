@@ -36,7 +36,7 @@ class RigidBody
 
 		//Getters
 		inline float GetMass() { return m_Mass; }
-		inline Vector2D GetPosition() { return m_Position; }
+		inline Vector2D GetDeltaPosition() { return m_Position; }
 		inline Vector2D GetVelocity() { return m_Velocity; }
 		inline Vector2D GetAcceleration() { return m_Acceleration; }
 			
