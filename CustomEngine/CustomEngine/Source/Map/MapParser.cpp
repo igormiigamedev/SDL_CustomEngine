@@ -1,7 +1,9 @@
 #include "MapParser.h"
 
+MapParser* MapParser::s_Instance = nullptr;
+
 bool MapParser::Load(){
-	return Parse("level1", "assets/Maps/map.tmx");
+	return Parse("MAP", "Assets/Maps/map.tmx");
 }
 
 bool MapParser::Parse(std::string id, std::string source){
@@ -101,4 +103,9 @@ TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TileSetList tileSet
 }
 
 void MapParser::Clean(){
+	std::map<std::string, GameMap*>::iterator it;
+	for (it = m_MapDict.begin(); it != m_MapDict.end(); it++) {
+		it->second = nullptr;
+	}
+	m_MapDict.clear();
 }
