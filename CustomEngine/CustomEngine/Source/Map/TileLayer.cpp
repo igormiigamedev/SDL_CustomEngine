@@ -1,5 +1,6 @@
 #include "TileLayer.h"
 #include "../Graphics/TextureManager.h"
+#include <iostream>
 
 
 TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMap tileMap, TileSetList tileSets):
@@ -11,18 +12,19 @@ TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMap tileMap, 
 }
 
 void TileLayer::Render(){
-	for (unsigned int i = 0; i < m_RowCount; i++) {
-		for (unsigned int j = 0; j < m_ColCount; j++) {
-			int tileID = m_TileMap[i][j];
+	for (unsigned int row = 0; row < m_RowCount; row++) {
+		for (unsigned int col = 0; col < m_ColCount; col++) {
+			int tileID = m_TileMap[row][col];
 
 			if (tileID == 0) {
+				std::cout << "Failed to Render Tile Layer: tileID = 0" << std::endl;
 				continue;
 			}
 			else {
-				int index;
+				int index = 0;
 				if (m_TileSets.size() > 1) {
 					for (unsigned int k = 1; k < m_TileSets.size(); k++) {
-						if (tileID > m_TileSets[k].FirstId && tileID < m_TileSets[k].LastId) {
+						if (tileID >= m_TileSets[k].FirstId && tileID <= m_TileSets[k].LastId) {
 							tileID = tileID + m_TileSets[k].TileCount - m_TileSets[k].LastId;
 							index = k;
 							break;
@@ -39,8 +41,11 @@ void TileLayer::Render(){
 					tileRow--;
 					tileCol = ts.ColCount - 1;
 				}
+				//int size = 20;
+				int x = col * ts.TileSize;
+				int y = row * ts.TileSize;
 
-				TextureManager::GetInstance()->DrawTile(ts.Name, ts.TileSize, j * ts.TileSize, i * ts.TileSize, tileRow, tileCol);
+				TextureManager::GetInstance()->DrawTile(ts.Name, ts.TileSize, x, y, tileRow, tileCol);
 			}
 		}
 	}

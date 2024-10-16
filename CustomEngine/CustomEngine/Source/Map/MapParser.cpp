@@ -20,7 +20,7 @@ bool MapParser::Parse(std::string id, std::string source){
 
 	root->Attribute("width", &colCount);
 	root->Attribute("height", &rowCount);
-	root->Attribute("tileWidth", &tileSize);
+	root->Attribute("tilewidth", &tileSize);
 
 	//Parse Tile Sets
 	TileSetList tilesets;
@@ -51,13 +51,20 @@ TileSet MapParser::ParseTileSet(TiXmlElement* xmlTileSet){
 	xmlTileSet->Attribute("tilecount", &tileset.TileCount);
 	tileset.LastId = (tileset.FirstId + tileset.TileCount) - 1;
 
-	xmlTileSet->Attribute("columns", &tileset.TileCount);
+	xmlTileSet->Attribute("columns", &tileset.ColCount);
 	tileset.RowCount = tileset.TileCount / tileset.ColCount;
 	xmlTileSet->Attribute("tileWidth", &tileset.TileSize);
 
-	TiXmlElement* image = xmlTileSet->FirstChildElement();
-	tileset.Source = image->Attribute("source");
+	/*TiXmlElement* image = xmlTileSet->FirstChildElement();
+	tileset.Source = image->Attribute("source");*/
+
+	if (xmlTileSet->FirstChildElement()->Value() == std::string("image"))
+		tileset.Source = xmlTileSet->FirstChildElement("image")->Attribute("source");
+	else
+		tileset.Source = xmlTileSet->Attribute("source");
+
 	return tileset;
+
 }
 
 TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TileSetList tileSets, int tileSize, int rowCount, int colCount){
