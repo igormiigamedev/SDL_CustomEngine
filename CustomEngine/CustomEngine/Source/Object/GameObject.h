@@ -6,6 +6,7 @@
 #include "IObject.h"
 #include "../Physics/Transform.h"
 #include <SDL.h>
+#include"../Physics/Point.h"
 
 struct Properties {
 
@@ -35,7 +36,13 @@ class GameObject : public IObject {
               m_Flip(props->Flip) {
 
             m_Transform = new Transform(props->X, props->Y);
+
+            float px = props->X + props->Width / 2;
+            float py = props->Y + props->Height / 2;
+            m_Origin = new Point(px, py);
         }
+
+        inline Point* GetOrigin() { return m_Origin; }
 
         virtual void Draw() = 0;
         virtual void Clean() = 0;
@@ -46,6 +53,7 @@ class GameObject : public IObject {
         }
 
     protected:
+        Point* m_Origin;
         Transform* m_Transform;
         int m_Width, m_Height;
         std::string m_TextureID;

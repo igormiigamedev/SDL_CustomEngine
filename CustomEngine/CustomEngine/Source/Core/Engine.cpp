@@ -6,6 +6,7 @@
 #include "../Timer/Timer.h"
 #include "../Map/MapParser.h"
 #include <ios>
+#include "../Camera/Camera.h"
 
 
 Engine* Engine::s_Instance = nullptr;
@@ -38,15 +39,21 @@ bool Engine::Init() {
     m_LevelMap = MapParser::GetInstance()->GetMap("MAP");
 
     // load texture
+    
+    //load bg texture
+    TextureManager::GetInstance()->Load("bg", "Assets/Images/BackGround.png");
+
+    //load player textures
+  
     // TODO - Jump Handler
     /*TextureManager::GetInstance()->Load("Player_Jump", "Assets/PlayerJump.png");*/
-
     TextureManager::GetInstance()->Load("Player_Walk", "Assets/PlayerWalk.png");
     int player_texture_width = 240;
     int player_texture_height = 207;
 
-    player = new Player(new Properties("Player_Walk", 50, (SCREEN_HEIGHT - (player_texture_height + 50)), player_texture_width, player_texture_height));
+    player = new Player(new Properties("Player_Walk", 50, (SCREEN_HEIGHT - 70), player_texture_width, player_texture_height));
 
+    Camera::GetInstance()->SetTarget(player->GetOrigin());
     return m_IsRunning = true;
 }
 
@@ -54,13 +61,16 @@ void Engine::Update() {
     float dt = Timer::GetInstance()->GetDeltaTime();
     m_LevelMap->Update();
     player->Update(dt);
+    Camera::GetInstance()->Update(dt);
 }
 
 void Engine::Render() {
     SDL_SetRenderDrawColor(m_Renderer, 124, 218, 254, 255);
     SDL_RenderClear(m_Renderer);
 
+    TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960); //BackGround with Parallax
     m_LevelMap->Render();
+
     player->Draw();
     SDL_RenderPresent(m_Renderer);
 }
