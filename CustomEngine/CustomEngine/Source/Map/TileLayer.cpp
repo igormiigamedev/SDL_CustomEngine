@@ -51,6 +51,6 @@ void TileLayer::Render(){
 	}
 }
 
-void TileLayer::Update()
-{
+void TileLayer::Update(){
+
 }

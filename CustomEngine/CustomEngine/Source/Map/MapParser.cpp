@@ -53,7 +53,7 @@ TileSet MapParser::ParseTileSet(TiXmlElement* xmlTileSet){
 
 	xmlTileSet->Attribute("columns", &tileset.ColCount);
 	tileset.RowCount = tileset.TileCount / tileset.ColCount;
-	xmlTileSet->Attribute("tileWidth", &tileset.TileSize);
+	xmlTileSet->Attribute("tilewidth", &tileset.TileSize);
 
 	/*TiXmlElement* image = xmlTileSet->FirstChildElement();
 	tileset.Source = image->Attribute("source");*/
