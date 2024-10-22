@@ -50,8 +50,9 @@ bool Engine::Init() {
     TextureManager::GetInstance()->Load("Player_Walk", "Assets/PlayerWalk.png");
     int player_texture_width = 240;
     int player_texture_height = 207;
+    float imageScalling = 0.7f;
 
-    player = new Player(new Properties("Player_Walk", 50, (SCREEN_HEIGHT - 70), player_texture_width, player_texture_height));
+    player = new Player(new Properties("Player_Walk", 50, SCREEN_HEIGHT , player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling));
 
     Camera::GetInstance()->SetTarget(player->GetOrigin());
     return m_IsRunning = true;

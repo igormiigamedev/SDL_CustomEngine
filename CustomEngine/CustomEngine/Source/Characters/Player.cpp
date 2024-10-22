@@ -19,10 +19,13 @@ Player::Player(Properties* props) : Character(props){
 
 	m_Animation = new Animation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
+
+	playerConfig.m_PlayerWidth = m_ImageScalling * (m_SpriteSheetWidth / playerConfig.m_PlayerWalkFrameCount);
+	playerConfig.m_PlayerHeight = m_ImageScalling * (m_SpriteSheetHeight / playerConfig.m_PlayerWalkSpriteRow);
 }
 
 void Player::Draw(){
-	m_Animation->Draw(m_Transform->X, m_Transform->Y, m_Width, m_Height);
+	m_Animation->Draw(m_Transform->X, m_Transform->Y, m_SpriteSheetWidth, m_SpriteSheetHeight, m_ImageScalling);
 
 	m_Collider->DrawDebugCollider();
 }
@@ -38,8 +41,8 @@ void Player::Update(float dt){
 	WalkMovement(dt);
 	JumpMovement(dt);
 
-	m_Origin->X = m_Transform->X + m_Width / 2;
-	m_Origin->Y = m_Transform->Y + m_Height / 2;
+	m_Origin->X = m_Transform->X;// + playerConfig.m_PlayerWidth  / 2;
+	m_Origin->Y = m_Transform->Y;// + playerConfig.m_PlayerHeight / 2;
 
 	m_Animation->Update();
 }
@@ -59,7 +62,7 @@ void Player::WalkMovement(float dt) {
 	m_RigidBody->Update(dt);
 	m_LastSafePosition.X = m_Transform->X;
 	m_Transform->X += m_RigidBody->GetDeltaPosition().X;
-	m_Collider->Set(m_Transform->X, m_Transform->Y, 160, 210);
+	m_Collider->Set(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, playerConfig.m_PlayerHeight);
 
 	/*if (CollisionHandler::GetInstance()->MapCollision(m_Collider->Get())) {
 		m_Transform->X = m_LastSafePosition.X;
@@ -67,7 +70,7 @@ void Player::WalkMovement(float dt) {
 }
 
 void Player::JumpMovement(float dt) {
-	std::cout << "m_IsGrounded: " << m_IsGrounded << std::endl;
+	/*std::cout << "m_IsGrounded: " << m_IsGrounded << std::endl;*/
 
 	// TODO - Double Jump
 	/*if (InputHandler::GetInstance()->GetKeyDown(SDL_SCANCODE_SPACE) && !m_IsGrounded && !m_UsedDoubleJump) {
@@ -95,7 +98,7 @@ void Player::JumpMovement(float dt) {
 	m_RigidBody->Update(dt);
 	m_LastSafePosition.Y = m_Transform->Y;
 	m_Transform->Y += m_RigidBody->GetDeltaPosition().Y;
-	m_Collider->Set(m_Transform->X, m_Transform->Y, 160, 210);
+	m_Collider->Set(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, playerConfig.m_PlayerHeight);
 
 	if (CollisionHandler::GetInstance()->MapCollision(m_Collider->Get())) {
 		m_IsGrounded = true;

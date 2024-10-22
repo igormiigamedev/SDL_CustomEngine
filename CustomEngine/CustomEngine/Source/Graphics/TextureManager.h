@@ -17,7 +17,7 @@ public:
 
     void Draw(std::string id, int x, int y, int width, int heigt, SDL_RendererFlip flip = SDL_FLIP_NONE);
     void DrawTile(std::string tileSetID, int tileSize, int x, int y, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
-    void DrawFrame(std::string id, int x, int y, int width, int heigt, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
+    void DrawFrame(std::string id, int x, int y, int width, int heigt, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE, float imageScalling = 1.0f);
 
 private:
     TextureManager() {}

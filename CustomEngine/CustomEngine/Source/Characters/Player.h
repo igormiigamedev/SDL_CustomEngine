@@ -7,13 +7,16 @@
 #include "../Physics/Vector2D.h"
 
 #define JUMP_TIME 2.8f
-#define JUMP_FORCE 150.0f
+#define JUMP_FORCE 180.0f
 
 struct PlayerConfig {
 	/*std::string m_PlayerTextureID;*/  
 	int m_PlayerWalkSpriteRow = 1;      
 	int m_PlayerWalkFrameCount = 2;     
-	int m_PlayerWalkAnimSpeed = 100;    
+	int m_PlayerWalkAnimSpeed = 100;   
+	float m_PlayerWidth;
+	float m_PlayerHeight;
+	/*float m_PlayerTextureScalling = 0.7;*/
 };
 
 

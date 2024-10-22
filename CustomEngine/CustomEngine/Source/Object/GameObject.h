@@ -11,19 +11,21 @@
 struct Properties {
 
     public:
-        Properties(std::string textureID, int x, int y, int width, int height, SDL_RendererFlip flip = SDL_FLIP_NONE) {
+        Properties(std::string textureID, int x, int y, int width, int height, SDL_RendererFlip flip = SDL_FLIP_NONE, float imageScalling = 1.0f ) {
             X = x;
             Y = y;
             Flip = flip;
             Width = width;
             Height = height;
             TextureID = textureID;
+            ImageScalling = imageScalling;
         }
 
     public:
         std::string TextureID;
         int Width, Height;
         float X, Y;
+        float ImageScalling;
         SDL_RendererFlip Flip;
 };
 
@@ -31,9 +33,10 @@ class GameObject : public IObject {
     public:
         GameObject(Properties* props) 
             : m_TextureID(props->TextureID),
-              m_Width(props->Width), 
-              m_Height(props->Height),
-              m_Flip(props->Flip) {
+              m_SpriteSheetWidth(props->Width), 
+              m_SpriteSheetHeight(props->Height),
+              m_Flip(props->Flip),
+              m_ImageScalling(props->ImageScalling) {
 
             m_Transform = new Transform(props->X, props->Y);
 
@@ -55,7 +58,8 @@ class GameObject : public IObject {
     protected:
         Point* m_Origin;
         Transform* m_Transform;
-        int m_Width, m_Height;
+        int m_SpriteSheetWidth, m_SpriteSheetHeight;
+        float m_ImageScalling;
         std::string m_TextureID;
         SDL_RendererFlip m_Flip;
 };

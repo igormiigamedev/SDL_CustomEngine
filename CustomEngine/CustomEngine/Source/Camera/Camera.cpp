@@ -6,7 +6,16 @@ void Camera::Update(float dt){
 
 	if (m_Target != nullptr) {
 		m_ViewBox.x = m_Target->X - SCREEN_WIDTH / 2;
-		m_ViewBox.y = m_Target->Y - SCREEN_HEIGHT / 1.3; 
+
+		//If the character goes beyond the middle of the screen, re-center the camera
+		if (m_Target->Y <= SCREEN_HEIGHT / 2) {
+			m_ViewBox.y = m_Target->Y - SCREEN_HEIGHT / 2;
+		}
+		
+		//In an extreme case: If the player moves down the screen and goes to a point on the y-axis below the camera
+		if (m_Target->Y > m_ViewBox.y + SCREEN_HEIGHT) {
+			m_ViewBox.y = m_Target->Y - SCREEN_HEIGHT / 2;
+		}
 
 		if (m_ViewBox.x < 0) {
 			m_ViewBox.x = 0;
