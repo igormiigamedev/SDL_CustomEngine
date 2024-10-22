@@ -17,7 +17,7 @@ void TileLayer::Render(){
 			int tileID = m_TileMap[row][col];
 
 			if (tileID == 0) {
-				std::cout << "Failed to Render Tile Layer: tileID = 0" << std::endl;
+				/*std::cout << "Failed to Render Tile Layer: tileID = 0" << std::endl;*/
 				continue;
 			}
 			else {

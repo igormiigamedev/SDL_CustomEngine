@@ -46,7 +46,7 @@ bool Engine::Init() {
     //load player textures
   
     // TODO - Jump Handler
-    /*TextureManager::GetInstance()->Load("Player_Jump", "Assets/PlayerJump.png");*/
+    TextureManager::GetInstance()->Load("Player_Jump", "Assets/PlayerJump.png");
     TextureManager::GetInstance()->Load("Player_Walk", "Assets/PlayerWalk.png");
     int player_texture_width = 240;
     int player_texture_height = 207;
