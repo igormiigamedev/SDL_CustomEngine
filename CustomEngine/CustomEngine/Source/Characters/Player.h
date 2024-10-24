@@ -6,8 +6,10 @@
 #include "../Physics/Collider.h"
 #include "../Physics/Vector2D.h"
 
-#define JUMP_TIME 2.8f
-#define JUMP_FORCE 180.0f
+#define JUMP_TIME 3.0f
+#define JUMP_FORCE 120.0f
+
+#define WALK_FORCE 12.0f
 
 struct PlayerConfig {
 	/*std::string m_PlayerTextureID;*/  
@@ -29,15 +31,39 @@ class Player : public Character{
 		virtual void Clean();
 		virtual void Update(float dt);
 
+		//Walk
 		void WalkMovement(float dt);
 
+		// Jump
 		void JumpMovement(float dt);
+		
+
+	private:
+		//Walk
+		void UpdatePlayerDirection();
+		void ApplyWalkingForce(float dt);
+		void UpdatePlayerPositionX(float dt);
+
+		// Jump
+		void CheckDoubleJump();
+		void AnimationState();
+		void HandleJumpInput();
+		void StartDoubleJump();
+		void StartJump();
+		void ApplyJumpForce(float dt = 0);
+		void StopJump();
+		void HandleFallingState();
+		void UpdatePlayerPositionY(float dt);
+		void CheckCollisionAndReset();
+		bool IsSpacePressed() const;
 
 	private:
 		PlayerConfig playerConfig;
 
 		bool m_IsJumping;
 		bool m_IsGrounded;
+		bool m_IsFalling;
+		bool m_UsedDoubleJump = false;
 
 		float m_JumpTime;
 		float m_JumpForce;
@@ -49,6 +75,6 @@ class Player : public Character{
 		Vector2D m_LastSafePosition;
 
 		int playerDirection = 1;
-		/*bool m_UsedDoubleJump = false;*/
+		
 
 };
