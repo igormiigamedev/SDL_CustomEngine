@@ -34,11 +34,11 @@ bool CollisionHandler::MapCollision(SDL_Rect a){
 	}
 
 	for (int i = left_tile; i <= right_tile; ++i) {
-		for (int j = top_tile; j <= botton_tile; ++j) {
-			if (m_CollisionTileMap[j][i] > 0) {
+		/*for (int j = top_tile; j <= botton_tile; ++j) {*/
+			if (m_CollisionTileMap[botton_tile][i] > 0) {
 				return true;
 			}
-		}
+		/*}*/
 	}
 	return false;
 }

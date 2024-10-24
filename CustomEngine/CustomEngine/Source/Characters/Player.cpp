@@ -100,7 +100,7 @@ void Player::JumpMovement(float dt) {
 	m_Transform->Y += m_RigidBody->GetDeltaPosition().Y;
 	m_Collider->Set(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, playerConfig.m_PlayerHeight);
 
-	if (CollisionHandler::GetInstance()->MapCollision(m_Collider->Get())) {
+	if (m_IsJumping == false && CollisionHandler::GetInstance()->MapCollision(m_Collider->Get())) {
 		m_IsGrounded = true;
 		m_Transform->Y = m_LastSafePosition.Y;
 		/*m_UsedDoubleJump = false;*/
