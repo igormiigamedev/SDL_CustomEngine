@@ -23,14 +23,14 @@ bool CollisionHandler::MapCollision(SDL_Rect a){
 	if (left_tile < 0) {
 		left_tile = 0;
 	}
-	if (right_tile > colCount) {
-		right_tile = colCount; //colCount - 1;
+	if (right_tile >= colCount) {
+		right_tile = colCount - 1;
 	}
 	if (top_tile < 0) {
 		top_tile = 0;
 	}
-	if (botton_tile > rowCount) {
-		botton_tile = rowCount; //rowCount - 1;
+	if (botton_tile >= rowCount) {
+		botton_tile = rowCount - 1;
 	}
 
 	for (int i = left_tile; i <= right_tile; ++i) {

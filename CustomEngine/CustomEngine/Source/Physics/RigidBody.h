@@ -27,6 +27,9 @@ class RigidBody
 		inline void ApplyForce(Vector2D force) { m_Force = force; }
 		inline void ApplyForceX(float forceX) { m_Force.X = forceX; }
 		inline void ApplyForceY(float forceY) { m_Force.Y = forceY; }
+		inline void SetVelocityX(float velocityX) { m_Velocity.X = velocityX; }
+		inline void SetVelocityY(float velocityY) { m_Velocity.Y = velocityY; }
+		inline void SetAccelerationY(float accelerationY) { m_Acceleration.Y = accelerationY; }
 		inline void UnSetForceY() { m_Force.Y = 0; }
 		inline void UnSetForce() { m_Force = Vector2D(0, 0); }
 
@@ -36,7 +39,7 @@ class RigidBody
 
 		//Getters
 		inline float GetMass() { return m_Mass; }
-		inline Vector2D GetDeltaPosition() { return m_Position; }
+		inline Vector2D GetDeltaPosition() { return m_DeltaPosition; }
 		inline Vector2D GetVelocity() { return m_Velocity; }
 		inline Vector2D GetAcceleration() { return m_Acceleration; }
 			
@@ -44,8 +47,11 @@ class RigidBody
 		void Update(float dt) {
 			m_Acceleration.X = (m_Force.X + m_Friction.X) / m_Mass;
 			m_Acceleration.Y = m_Gravity + (m_Force.Y / m_Mass);
-			m_Velocity = m_Acceleration * dt;
-			m_Position = m_Velocity * dt;
+
+			m_Velocity.X += m_Acceleration.X * dt;
+			m_Velocity.Y += m_Acceleration.Y * dt;
+
+			m_DeltaPosition = m_Velocity * dt;
 		}
 
 
@@ -56,7 +62,7 @@ class RigidBody
 		Vector2D m_Force;
 		Vector2D m_Friction;
 
-		Vector2D m_Position;
+		Vector2D m_DeltaPosition;
 		Vector2D m_Velocity;
 		Vector2D m_Acceleration;
 

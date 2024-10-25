@@ -8,8 +8,10 @@
 
 #define JUMP_TIME 3.0f
 #define JUMP_FORCE 120.0f
+#define JUMP_VELOCITY 400.0f
 
 #define WALK_FORCE 12.0f
+#define WALK_VELOCITY 400.0f
 
 struct PlayerConfig {
 	/*std::string m_PlayerTextureID;*/  

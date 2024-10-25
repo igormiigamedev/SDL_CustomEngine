@@ -15,7 +15,7 @@ Player::Player(Properties* props) : Character(props){
 	m_Collider->SetBuffer(0, 0, 0, 0);
 
 	m_RigidBody = new RigidBody();
-	m_RigidBody->SetGravity(9.0f);
+	m_RigidBody->SetGravity(360.0f);
 
 	m_Animation = new Animation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
@@ -71,7 +71,8 @@ void Player::UpdatePlayerDirection() {
 }
 
 void Player::ApplyWalkingForce(float dt) {
-	m_RigidBody->ApplyForceX(WALK_FORCE * playerDirection);
+	/*m_RigidBody->ApplyForceX(WALK_FORCE * playerDirection);*/
+	m_RigidBody->SetVelocityX(WALK_VELOCITY * playerDirection);
 	m_RigidBody->Update(dt);
 }
 
@@ -82,7 +83,7 @@ void Player::UpdatePlayerPositionX(float dt) {
 
 void Player::JumpMovement(float dt) {
 	HandleJumpInput();
-	ApplyJumpForce(dt);
+	/*ApplyJumpForce(dt);*/
 	HandleFallingState();
 	UpdatePlayerPositionY(dt);
 	CheckCollisionAndReset();
@@ -112,13 +113,21 @@ void Player::StartJump() {
 }
 
 void Player::ApplyJumpForce(float dt) {
-	if (m_IsJumping && m_JumpTime > 0) {
-		m_JumpTime -= dt;
-		m_RigidBody->ApplyForceY(UPWARD * m_JumpForce);
+	//if (m_IsJumping && m_JumpTime > 0) {
+	//	m_JumpTime -= dt;
+	//	//m_RigidBody->ApplyForceY(UPWARD * m_JumpForce);
+	//	m_RigidBody->SetVelocityY(UPWARD * JUMP_VELOCITY);
+	//}
+	//else {
+	//	StopJump();
+	//}
+
+	if (m_IsJumping) {
+		m_RigidBody->SetVelocityY(UPWARD * JUMP_VELOCITY);
 	}
-	else {
+	/*if( m_RigidBody->GetVelocity().Y >= 0 ) {
 		StopJump();
-	}
+	}*/
 }
 
 void Player::StopJump() {
@@ -130,6 +139,7 @@ void Player::StopJump() {
 void Player::HandleFallingState() {
 	if (m_RigidBody->GetVelocity().Y > 0 && !m_IsGrounded) {
 		m_IsFalling = true;
+		m_IsJumping = false;
 	}
 	else {
 		m_IsFalling = false;
@@ -148,6 +158,8 @@ void Player::CheckCollisionAndReset() {
 		m_IsGrounded = true;
 		m_Transform->Y = m_LastSafePosition.Y;
 		m_UsedDoubleJump = false;
+		m_RigidBody->SetVelocityY(0);
+		m_RigidBody->SetAccelerationY(0);
 	}
 	else {
 		m_IsGrounded = false;
