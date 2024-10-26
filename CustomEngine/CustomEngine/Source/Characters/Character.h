@@ -5,6 +5,7 @@
 
 #include "../Object/GameObject.h"
 #include <string>
+#include "../Collision/CollisionTypes.h"
 
 class Character : public GameObject
 {

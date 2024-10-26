@@ -1,6 +1,9 @@
 #pragma once
 
 #include"Vector2D.h"
+#include "../Collision/CollisionTypes.h"
+#include "Collider.h"
+#include "../Collision/CollisionHandler.h"
 
 #define UNI_MASS 1.0f
 #define GRAVITY 9.8f
@@ -17,6 +20,7 @@ class RigidBody
 		RigidBody() {
 			m_Mass = UNI_MASS;
 			m_Gravity = GRAVITY;
+			m_ColliderRB = new Collider();
 		}
 
 		//Setter Gravity & Mass
@@ -42,14 +46,39 @@ class RigidBody
 		inline Vector2D GetDeltaPosition() { return m_DeltaPosition; }
 		inline Vector2D GetVelocity() { return m_Velocity; }
 		inline Vector2D GetAcceleration() { return m_Acceleration; }
-			
+		inline Collider* GetCollider() { return m_ColliderRB; }
+
 		//Update Metods
 		void Update(float dt) {
+			//Velocity, Acceleration and Position
 			m_Acceleration.X = (m_Force.X + m_Friction.X) / m_Mass;
 			m_Acceleration.Y = m_Gravity + (m_Force.Y / m_Mass);
 
 			m_Velocity.X += m_Acceleration.X * dt;
 			m_Velocity.Y += m_Acceleration.Y * dt;
+
+
+			//Collision
+			if (m_ColliderRB != nullptr) {
+				switch (m_ColliderRB->GetCollisionResponse(WorldFloor)){
+					case IGNORE:
+						break;
+					case BLOCK:
+						if (CollisionHandler::GetInstance()->MapCollision(m_ColliderRB->Get())) {
+							// If the collider is on the ground and has no upward velocity
+							if (m_Velocity.Y >= 0) {
+								SetVelocityY(0);
+								SetAccelerationY(0);
+							}
+						
+						}
+						break;
+					case OVERLAP:
+						break;
+					default:
+						break;
+				}
+			}
 
 			m_DeltaPosition = m_Velocity * dt;
 		}
@@ -66,5 +95,6 @@ class RigidBody
 		Vector2D m_Velocity;
 		Vector2D m_Acceleration;
 
+		Collider* m_ColliderRB;
 };
 

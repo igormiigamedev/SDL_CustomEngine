@@ -11,11 +11,12 @@ Player::Player(Properties* props) : Character(props){
 	m_JumpTime = JUMP_TIME;
 	m_JumpForce = JUMP_FORCE;
 
-	m_Collider = new Collider();
-	m_Collider->SetBuffer(0, 0, 0, 0);
+	/*m_Collider = new Collider();
+	m_Collider->SetBuffer(0, 0, 0, 0);*/
 
 	m_RigidBody = new RigidBody();
 	m_RigidBody->SetGravity(360.0f);
+	m_RigidBody->GetCollider()->SetBuffer(0, 0, 0, 0);
 
 	m_Animation = new Animation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
@@ -100,7 +101,6 @@ void Player::HandleJumpInput() {
 
 void Player::StartDoubleJump() {
 	m_UsedDoubleJump = true;
-	m_JumpTime = JUMP_TIME;
 	m_IsJumping = true;
 	m_IsGrounded = false;
 	ApplyJumpForce();
@@ -124,46 +124,52 @@ void Player::ApplyJumpForce(float dt) {
 
 	if (m_IsJumping) {
 		m_RigidBody->SetVelocityY(UPWARD * JUMP_VELOCITY);
+		/*m_RigidBody->ApplyForceY(UPWARD * m_JumpForce);*/
 	}
 	/*if( m_RigidBody->GetVelocity().Y >= 0 ) {
 		StopJump();
 	}*/
 }
 
-void Player::StopJump() {
-	m_IsJumping = false;
-	m_JumpTime = JUMP_TIME;
-	m_RigidBody->UnSetForceY();
-}
-
 void Player::HandleFallingState() {
 	if (m_RigidBody->GetVelocity().Y > 0 && !m_IsGrounded) {
+		/*m_RigidBody->GetCollider()->SetCollisionResponse(WorldFloor, BLOCK);*/
 		m_IsFalling = true;
 		m_IsJumping = false;
 	}
-	else {
+	else{
+		if (m_RigidBody->GetVelocity().Y == 0) {
+			m_IsGrounded = true;
+			m_IsJumping = false;
+			m_UsedDoubleJump = false;
+		}
 		m_IsFalling = false;
 	}
+
 }
 
 void Player::UpdatePlayerPositionY(float dt) {
 	m_RigidBody->Update(dt);
 	m_LastSafePosition.Y = m_Transform->Y;
 	m_Transform->Y += m_RigidBody->GetDeltaPosition().Y;
-	m_Collider->Set(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
+	m_RigidBody->GetCollider()->Set(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
 }
 
 void Player::CheckCollisionAndReset() {
-	if (!m_IsJumping && CollisionHandler::GetInstance()->MapCollision(m_Collider->Get())) {
-		m_IsGrounded = true;
-		m_Transform->Y = m_LastSafePosition.Y;
-		m_UsedDoubleJump = false;
-		m_RigidBody->SetVelocityY(0);
-		m_RigidBody->SetAccelerationY(0);
-	}
-	else {
-		m_IsGrounded = false;
-	}
+	//if (!m_IsJumping) {
+	//	m_RigidBody->GetCollider()->SetCollisionResponse(WorldFloor, BLOCK);
+
+	//	m_IsGrounded = true;
+	//	m_UsedDoubleJump = false;
+
+	//	/*m_Transform->Y = m_LastSafePosition.Y;*/
+	//	/*m_RigidBody->SetVelocityY(0);
+	//	m_RigidBody->SetAccelerationY(0);*/
+	//}
+	//else {
+	//	m_IsGrounded = false;
+	//	m_RigidBody->GetCollider()->SetCollisionResponse(WorldFloor, IGNORE);
+	//}
 }
 
 bool Player::IsSpacePressed() const {

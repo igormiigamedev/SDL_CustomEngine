@@ -2,10 +2,13 @@
 
 #include "SDL.h"
 #include "../Camera/Camera.h"
+#include <unordered_map>
+#include "../Collision/CollisionManager.h"    
 
-class Collider{
+class Collider : public CollisionManager{
 
 	public:
+
 		inline SDL_Rect Get() { return m_Box; }
 		inline void SetBuffer(int x, int y, int w, int h) { m_Buffer = { x, y, w, h }; }
 
