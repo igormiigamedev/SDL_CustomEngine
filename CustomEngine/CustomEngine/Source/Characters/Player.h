@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Character.h"
-#include "../Animation/Animation.h"
+#include "../Animation/SpriteAnimation.h"
 #include "../Physics/RigidBody.h"
 #include "../Physics/Collider.h"
 #include "../Physics/Vector2D.h"
@@ -65,7 +65,7 @@ class Player : public Character{
 		bool m_IsFalling;
 		bool m_UsedDoubleJump = false;
 
-		Animation* m_Animation;
+		SpriteAnimation* m_Animation;
 		RigidBody* m_RigidBody;
 
 		int playerDirection = 1;

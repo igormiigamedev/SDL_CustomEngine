@@ -12,7 +12,7 @@ Player::Player(Properties* props) : Character(props){
 	m_RigidBody->SetGravity(360.0f);
 	m_RigidBody->GetCollider()->SetBuffer(0, 0, 0, 0);
 
-	m_Animation = new Animation();
+	m_Animation = new SpriteAnimation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
 
 	playerConfig.m_PlayerWidth = m_ImageScalling * (m_SpriteSheetWidth / playerConfig.m_PlayerWalkFrameCount);
@@ -41,7 +41,7 @@ void Player::Update(float dt){
 	m_Origin->X = m_Transform->X;// + playerConfig.m_PlayerWidth  / 2;
 	m_Origin->Y = m_Transform->Y;// + playerConfig.m_PlayerHeight / 2;
 
-	m_Animation->Update();
+	m_Animation->Update(dt);
 }
 
 void Player::WalkMovement(float dt) {

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<animations>
+    <!-- Enemy -->
+    <sequence id="spikeMan_Walk" frameCount="2" speed="100" width="120" height="159">
+        <frame textureID="spikeMan_Walk1"/>
+        <frame textureID="spikeMan_Walk2"/>
+    </sequence>
+
+</animations>
