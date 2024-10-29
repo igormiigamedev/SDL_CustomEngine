@@ -23,7 +23,7 @@ void Player::Draw(){
 	m_Animation->Draw(m_Transform->X, m_Transform->Y, m_SpriteSheetWidth, m_SpriteSheetHeight, m_ImageScalling, m_Flip);
 	m_RigidBody->GetCollider()->SetProperties(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
 
-	m_RigidBody->GetCollider()->DrawDebugCollider();
+	/*m_RigidBody->GetCollider()->DrawDebugCollider();*/
 }
 
 void Player::Clean(){
@@ -57,7 +57,7 @@ void Player::WalkMovement(float dt) {
 }
 
 void Player::UpdatePlayerDirection() {
-	if (m_Transform->X >= (SCREEN_WIDTH - 120)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
+	if (m_Transform->X >= (SCREEN_WIDTH - playerConfig.m_PlayerWidth)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
 		playerDirection = BACKWARD;
 		m_Flip = SDL_FLIP_HORIZONTAL;
 	}

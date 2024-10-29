@@ -2,37 +2,33 @@
 
 Camera* Camera::s_Instance = nullptr;
 
-void Camera::Update(float dt){
+void Camera::Update(float dt) {
+    if (m_Target == nullptr) return;
+    
+    // Calculates the desired camera position to center the target
+    float targetX = m_Target->X - SCREEN_WIDTH / 2;
+    float targetY = m_ViewBox.y;
 
-	if (m_Target != nullptr) {
-		m_ViewBox.x = m_Target->X - SCREEN_WIDTH / 2;
+    // Centers the camera if the character is beyond the middle of the screen
+    if (m_Target->Y <= SCREEN_HEIGHT / 2) {
+        targetY = m_Target->Y - SCREEN_HEIGHT / 2;
+    }
+    //In an extreme case: If the character is below the camera on the y-axis, reset targetY
+    if (m_Target->Y > m_ViewBox.y + SCREEN_HEIGHT) {
+        targetY = m_Target->Y - SCREEN_HEIGHT / 2;
+    }
 
-		//If the character goes beyond the middle of the screen, re-center the camera
-		if (m_Target->Y <= SCREEN_HEIGHT / 2) {
-			m_ViewBox.y = m_Target->Y - SCREEN_HEIGHT / 2;
-		}
-		
-		//In an extreme case: If the player moves down the screen and goes to a point on the y-axis below the camera
-		if (m_Target->Y > m_ViewBox.y + SCREEN_HEIGHT) {
-			m_ViewBox.y = m_Target->Y - SCREEN_HEIGHT / 2;
-		}
+    // Limits the desired position within the screen limits
+    if (targetX < 0) targetX = 0;
+    if (targetY < 0) targetY = 0;
+    if (targetX > (2 * SCREEN_WIDTH - m_ViewBox.w)) targetX = (2 * SCREEN_WIDTH - m_ViewBox.w);
+    if (targetY > (2 * SCREEN_HEIGHT - m_ViewBox.h)) targetY = (2 * SCREEN_HEIGHT - m_ViewBox.h);
 
-		if (m_ViewBox.x < 0) {
-			m_ViewBox.x = 0;
-		}
+    // Linear interpolation to smooth camera transition
+    constexpr float lerpFactor = 0.02f; // Adjust this value to control the speed of smoothing
+    m_ViewBox.x += (targetX - m_ViewBox.x) * lerpFactor;
+    m_ViewBox.y += (targetY - m_ViewBox.y) * lerpFactor;
 
-		if (m_ViewBox.y < 0) {
-			m_ViewBox.y = 0;
-		}
-
-		if (m_ViewBox.x >  (2 * SCREEN_WIDTH - m_ViewBox.w)) {
-			m_ViewBox.x = (2 * SCREEN_WIDTH - m_ViewBox.w);
-		}
-
-		if (m_ViewBox.y > (2 * SCREEN_HEIGHT - m_ViewBox.h)) {
-			m_ViewBox.y = (2 * SCREEN_HEIGHT - m_ViewBox.h);
-		}
-
-		m_Position = Vector2D(m_ViewBox.x, m_ViewBox.y);
-	}
+    // Update camera position
+    m_Position = Vector2D(m_ViewBox.x, m_ViewBox.y);
 }
