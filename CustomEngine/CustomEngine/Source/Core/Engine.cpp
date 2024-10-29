@@ -39,15 +39,8 @@ bool Engine::Init() {
     m_LevelMap = MapParser::GetInstance()->GetMap("MAP");
 
     // load texture
-    
-    //load bg texture
-    TextureManager::GetInstance()->Load("bg", "Assets/Images/BackGround.png");
+    TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");
 
-    //load player textures
-  
-    // TODO - Jump Handler
-    TextureManager::GetInstance()->Load("Player_Jump", "Assets/PlayerJump.png");
-    TextureManager::GetInstance()->Load("Player_Walk", "Assets/PlayerWalk.png");
     int player_texture_width = 240;
     int player_texture_height = 207;
     float imageScalling = 0.7f;
@@ -69,7 +62,7 @@ void Engine::Render() {
     SDL_SetRenderDrawColor(m_Renderer, 124, 218, 254, 255);
     SDL_RenderClear(m_Renderer);
 
-    TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960); //BackGround with Parallax
+    TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
     m_LevelMap->Render();
 
     player->Draw();

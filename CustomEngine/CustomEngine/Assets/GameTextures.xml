@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<textures>
+    <texture id="Player_Walk" source="Assets/PlayerWalk.png"/>
+    <texture id="Player_Jump" source="Assets/PlayerJump.png"/>
+
+    <texture id="bg" source="Assets/Images/BackGround.png"/>
+
+</textures>

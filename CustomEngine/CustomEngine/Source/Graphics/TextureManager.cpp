@@ -1,6 +1,7 @@
 #include "TextureManager.h"
 #include "../Core/Engine.h"
 #include "../Camera/Camera.h"
+#include "../Vendor/tinyXML/tinyxml.h"
 
 TextureManager* TextureManager::s_Instance = nullptr;
 
@@ -22,11 +23,32 @@ bool TextureManager::Load(std::string id, std::string filename) {
     return true;
 }
 
-void TextureManager::Draw(std::string id, int x, int y, int width, int height, SDL_RendererFlip flip) {
+bool TextureManager::ParseTextures(std::string source){
+
+    TiXmlDocument xml;
+    xml.LoadFile(source);
+    if (xml.Error()) {
+        std::cout << "Failed to Load: " << source << std::endl;
+        return false;
+    }
+
+    TiXmlElement* root = xml.RootElement();
+    for (TiXmlElement* e=root->FirstChildElement() ; e!= nullptr ; e=e->NextSiblingElement()){
+        if (e->Value() == std::string("texture")) {
+            std::string id = e->Attribute("id");
+            std::string src = e->Attribute("source");
+            Load(id, src);
+        }
+
+    }
+    return true;
+}
+
+void TextureManager::Draw(std::string id, int x, int y, int width, int height, float scaleX, float scaleY, float scrollRatio, SDL_RendererFlip flip ) {
     SDL_Rect srcRect = { 0, 0, width, height };
 
-    Vector2D cam = Camera::GetInstance()->GetPosition()*0.5;
-    SDL_Rect dstRect = { x /*- cam.X*/, y - cam.Y, width, height };
+    Vector2D cam = Camera::GetInstance()->GetPosition() * scrollRatio;
+    SDL_Rect dstRect = { x /*- cam.X*/, y - cam.Y, width * scaleX, height * scaleY };
     SDL_RenderCopyEx(Engine::GetInstance()->GetRenderer(), m_TextureMap[id], &srcRect, &dstRect, 0, nullptr, flip);
 }
 
