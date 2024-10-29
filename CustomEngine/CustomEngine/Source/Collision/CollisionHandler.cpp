@@ -1,5 +1,6 @@
 #include "CollisionHandler.h"
 #include "../Core/Engine.h"
+#include <iostream>
 
 CollisionHandler* CollisionHandler::s_Instance = nullptr;
 
@@ -8,7 +9,7 @@ CollisionHandler::CollisionHandler() {
 	m_CollisionTileMap = m_CollisionLayer->GetTileMap();
 }
 
-bool CollisionHandler::MapCollision(SDL_Rect a){
+CollisionLocation CollisionHandler::MapCollision(SDL_Rect a){ 
 	int tileSize = 32;
 	int colCount = 40;
 	int rowCount = 30;
@@ -34,13 +35,21 @@ bool CollisionHandler::MapCollision(SDL_Rect a){
 	}
 
 	for (int i = left_tile; i <= right_tile; ++i) {
-		/*for (int j = top_tile; j <= botton_tile; ++j) {*/
-			if (m_CollisionTileMap[botton_tile][i] > 0) {
-				return true;
+		for (int j = top_tile; j <= botton_tile; ++j) {
+			if (m_CollisionTileMap[j][i] > 0) {
+				/*std::cout << "Valor de j: " << j << std::endl;
+				std::cout << "Valor de botton_tile: " << botton_tile << std::endl;
+				std::cout << "Valor de top_tile: " << top_tile << std::endl;*/
+				if (j == botton_tile ) {
+					return Below;
+				}
+				else {
+					return Top;
+				}
 			}
-		/*}*/
+		}
 	}
-	return false;
+	return None;
 }
 
 bool CollisionHandler::CheckCollision(SDL_Rect a, SDL_Rect b){

@@ -14,8 +14,7 @@
 #define UPWARD -1
 #define DOWNWARD +1
 
-class RigidBody
-{
+class RigidBody{
 	public:
 		RigidBody() {
 			m_Mass = UNI_MASS;
@@ -47,39 +46,76 @@ class RigidBody
 		inline Vector2D GetVelocity() { return m_Velocity; }
 		inline Vector2D GetAcceleration() { return m_Acceleration; }
 		inline Collider* GetCollider() { return m_ColliderRB; }
-
-		//Update Metods
+		
+		// Update Methods
 		void Update(float dt) {
-			//Velocity, Acceleration and Position
+			UpdateAcceleration();
+			HandleCollision(dt);
+			UpdateVelocity(dt);
+			UpdatePosition(dt);
+		}
+
+		// Calculate acceleration based on forces and mass
+		void UpdateAcceleration() {
 			m_Acceleration.X = (m_Force.X + m_Friction.X) / m_Mass;
 			m_Acceleration.Y = m_Gravity + (m_Force.Y / m_Mass);
+		}
 
+		// Handle collision response
+		void HandleCollision(float dt) {
+			if (m_ColliderRB == nullptr) return;
+
+			switch (m_ColliderRB->GetCollisionResponse(WorldFloor)) {
+			case IGNORE:
+				break;
+			case BLOCK:
+				ProcessBlockCollision(dt);
+				break;
+			case OVERLAP:
+				// Handle overlap case if needed
+				break;
+			default:
+				break;
+			}
+		}
+
+		// Process collision response when BLOCK is detected
+		void ProcessBlockCollision(float dt) {
+			switch (CollisionHandler::GetInstance()->MapCollision(m_ColliderRB->Get())) {
+			case CollisionLocation::Below:
+				ResolveGroundCollision(dt);
+				break;
+			case CollisionLocation::Top:
+				ResolveCeilingCollision();
+				break;
+			default:
+				break;
+			}
+		}
+
+		// Stop downward velocity when on the ground
+		void ResolveGroundCollision(float dt) {
+			if (m_Velocity.Y >= 0) {
+				SetVelocityY(0);
+				SetAccelerationY(0);
+			}
+		}
+
+		// Stop upward velocity when hitting a ceiling
+		void ResolveCeilingCollision() {
+			if (m_Velocity.Y < 0) {
+				SetVelocityY(0);
+			}
+		}
+
+		// Update velocity based on acceleration
+		void UpdateVelocity(float dt) {
 			m_Velocity.X += m_Acceleration.X * dt;
 			m_Velocity.Y += m_Acceleration.Y * dt;
+		}
 
-
-			//Collision
-			if (m_ColliderRB != nullptr) {
-				switch (m_ColliderRB->GetCollisionResponse(WorldFloor)){
-					case IGNORE:
-						break;
-					case BLOCK:
-						if (CollisionHandler::GetInstance()->MapCollision(m_ColliderRB->Get())) {
-							// If the collider is on the ground and has no upward velocity
-							if (m_Velocity.Y >= 0) {
-								SetVelocityY(0);
-								SetAccelerationY(0);
-							}
-						
-						}
-						break;
-					case OVERLAP:
-						break;
-					default:
-						break;
-				}
-			}
-
+		// Update position based on velocity
+		void UpdatePosition(float dt) {
 			m_DeltaPosition = m_Velocity * dt;
 		}
 
@@ -97,4 +133,3 @@ class RigidBody
 
 		Collider* m_ColliderRB;
 };
-

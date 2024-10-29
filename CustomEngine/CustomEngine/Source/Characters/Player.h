@@ -55,7 +55,6 @@ class Player : public Character{
 		void ApplyJumpForce(float dt = 0);
 		void HandleFallingState();
 		void UpdatePlayerPositionY(float dt);
-		void CheckCollisionAndReset();
 		bool IsSpacePressed() const;
 
 	private:
@@ -66,14 +65,8 @@ class Player : public Character{
 		bool m_IsFalling;
 		bool m_UsedDoubleJump = false;
 
-		float m_JumpTime;
-		float m_JumpForce;
-
-		Collider* m_Collider;
-
 		Animation* m_Animation;
 		RigidBody* m_RigidBody;
-		Vector2D m_LastSafePosition;
 
 		int playerDirection = 1;
 		

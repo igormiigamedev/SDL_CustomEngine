@@ -12,7 +12,7 @@ class Collider : public CollisionManager{
 		inline SDL_Rect Get() { return m_Box; }
 		inline void SetBuffer(int x, int y, int w, int h) { m_Buffer = { x, y, w, h }; }
 
-		void Set( int x, int y, int w, int h) {
+		void SetProperties( int x, int y, int w, int h) {
 			m_Box = {
 				x - m_Buffer.x,
 				y - m_Buffer.y,
@@ -21,11 +21,16 @@ class Collider : public CollisionManager{
 			};
 		}
 
+		void SetPositionX(int x) { m_Box.x = x; }
+
+		void SetPositionY(int y) { m_Box.y = y; }
+
 		void DrawDebugCollider() {
 			Vector2D cam = Camera::GetInstance()->GetPosition();
+			SDL_Rect DebugBox = m_Box;
 			/*m_Box.x -= cam.X;*/
-			m_Box.y -= cam.Y;
-			SDL_RenderDrawRect(Engine::GetInstance()->GetRenderer(), &m_Box);
+			DebugBox.y -= cam.Y;
+			SDL_RenderDrawRect(Engine::GetInstance()->GetRenderer(), &DebugBox);
 		}
 
 	private:

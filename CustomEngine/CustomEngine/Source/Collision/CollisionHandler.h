@@ -5,10 +5,12 @@
 #include "../Map/TileLayer.h"
 #include "../Map/GameMap.h"
 
+enum CollisionLocation { None, Top, Below };
+
 class CollisionHandler{
 
 	public:
-		bool MapCollision(SDL_Rect a);
+		CollisionLocation MapCollision(SDL_Rect a);
 		bool CheckCollision(SDL_Rect a, SDL_Rect b);
 
 		inline static CollisionHandler* GetInstance() { return s_Instance = (s_Instance != nullptr) ? s_Instance : new CollisionHandler(); }
