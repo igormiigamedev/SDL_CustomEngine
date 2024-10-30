@@ -7,10 +7,10 @@
 #include "../Map/MapParser.h"
 #include <ios>
 #include "../Camera/Camera.h"
+#include "../Characters/Enemy.h"
 
 
 Engine* Engine::s_Instance = nullptr;
-Player* player = nullptr;
 
 bool Engine::Init() {
 
@@ -45,7 +45,10 @@ bool Engine::Init() {
     int player_texture_height = 207;
     float imageScalling = 0.7f;
 
-    player = new Player(new Properties("Player_Walk", 50, SCREEN_HEIGHT , player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling));
+    Player* player = new Player(new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling));
+    Enemy* enemy = new Enemy(new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling));
+    m_GameObjects.push_back(player);
+    m_GameObjects.push_back(enemy);
 
     Camera::GetInstance()->SetTarget(player->GetOrigin());
     return m_IsRunning = true;
@@ -54,7 +57,12 @@ bool Engine::Init() {
 void Engine::Update() {
     float dt = Timer::GetInstance()->GetDeltaTime();
     m_LevelMap->Update();
-    player->Update(dt);
+
+    for (unsigned int i = 0; i != m_GameObjects.size(); i++) {
+        m_GameObjects[i]->Update(dt);
+    }
+
+
     Camera::GetInstance()->Update(dt);
 }
 
@@ -65,7 +73,11 @@ void Engine::Render() {
     TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
     m_LevelMap->Render();
 
-    player->Draw();
+    for (unsigned int i = 0; i != m_GameObjects.size(); i++) {
+        m_GameObjects[i]->Draw();
+    }
+
+
     SDL_RenderPresent(m_Renderer);
 }
 
@@ -74,6 +86,10 @@ void Engine::Events() {
 }
 
 bool Engine::Clean() {
+    for (unsigned int i = 0; i != m_GameObjects.size(); i++) {
+        m_GameObjects[i]->Clean();
+    }
+
     TextureManager::GetInstance()->Clean();
     SDL_DestroyRenderer(m_Renderer);
     SDL_DestroyWindow(m_Window);

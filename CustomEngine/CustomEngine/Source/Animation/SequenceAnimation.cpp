@@ -54,6 +54,6 @@ void SequenceAnimation::SetCurrentSequence(std::string seqID){
 }
 
 void SequenceAnimation::DrawFrame(float x, float y, float xScale, float yScale, SDL_RendererFlip flip){
-	TextureManager::GetInstance()->Draw(m_CurrentSeq.TextureIDs[m_CurrentFrame], x, y, m_CurrentSeq.Width, m_CurrentSeq.Height, xScale, yScale, flip); //scrollRatio = 1?
+	TextureManager::GetInstance()->Draw(m_CurrentSeq.TextureIDs[m_CurrentFrame], x, y, m_CurrentSeq.Width, m_CurrentSeq.Height, xScale, yScale, 1,flip); 
 }
 
