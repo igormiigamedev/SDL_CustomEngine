@@ -45,10 +45,11 @@ bool Engine::Init() {
     int player_texture_height = 207;
     float imageScalling = 0.7f;
 
-    Player* player = new Player(new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling));
-    Enemy* enemy = new Enemy(new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling));
-    m_GameObjects.push_back(player);
-    m_GameObjects.push_back(enemy);
+    Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
+    Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);
+
+    auto player = SpawnGameObject < GameObject >("PLAYER", playerProps);
+    SpawnGameObject < GameObject >("ENEMY", enemyProps);
 
     Camera::GetInstance()->SetTarget(player->GetOrigin());
     return m_IsRunning = true;

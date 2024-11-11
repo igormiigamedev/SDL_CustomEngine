@@ -9,7 +9,7 @@ public:
     float X, Y;
 
 public:
-    Vector2D(float x = 0, float y = 0) : X(x), Y(y) {}
+    Vector2D(float x = 0.0f, float y = 0.0f) : X(x), Y(y) {}
 
 public:
     // addition +

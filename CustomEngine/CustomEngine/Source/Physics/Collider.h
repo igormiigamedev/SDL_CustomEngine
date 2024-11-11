@@ -27,10 +27,10 @@ class Collider : public CollisionManager{
 
 		void DrawDebugCollider() {
 			Vector2D cam = Camera::GetInstance()->GetPosition();
-			SDL_Rect DebugBox = m_Box;
+			SDL_Rect debugBox = m_Box;
 			/*m_Box.x -= cam.X;*/
-			DebugBox.y -= cam.Y;
-			SDL_RenderDrawRect(Engine::GetInstance()->GetRenderer(), &DebugBox);
+			debugBox.y -= cam.Y;
+			SDL_RenderDrawRect(Engine::GetInstance()->GetRenderer(), &debugBox); 
 		}
 
 	private:

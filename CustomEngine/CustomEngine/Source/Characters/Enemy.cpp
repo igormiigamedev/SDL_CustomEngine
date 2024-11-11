@@ -1,4 +1,7 @@
 #include "Enemy.h"
+#include "../Factory/ObjectFactory.h"
+
+static RegisterObject<Enemy> registerObject("ENEMY");
 
 Enemy::Enemy(Properties* props) : Character(props){
 	m_RigidBody = new RigidBody();
@@ -16,7 +19,7 @@ Enemy::Enemy(Properties* props) : Character(props){
 void Enemy::Draw(){
 	m_Animation->DrawFrame(m_Transform->X, m_Transform->Y, m_ImageScalling, m_ImageScalling, m_Flip);
 	m_RigidBody->GetCollider()->SetProperties(m_Transform->X, m_Transform->Y, enemyConfig.m_EnemyWidth, (enemyConfig.m_EnemyHeight - 30));
-	m_RigidBody->GetCollider()->DrawDebugCollider();
+	/*m_RigidBody->GetCollider()->DrawDebugCollider();*/
 }
 
 void Enemy::Clean(){

@@ -5,6 +5,9 @@
 #include "../Core/Engine.h" // TODO - Remove when update Player Flip logic
 #include "../Camera/Camera.h"
 #include "../Collision/CollisionHandler.h"
+#include "../Factory/ObjectFactory.h"
+
+static RegisterObject<Player> registerObject("PLAYER");
 
 Player::Player(Properties* props) : Character(props){
 
