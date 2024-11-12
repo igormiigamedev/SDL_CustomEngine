@@ -7,6 +7,7 @@
 #include "../Map/GameMap.h"
 #include "../Object/GameObject.h"
 #include "../Factory/ObjectFactory.h"
+#include "../States/GameState.h"
 
 #define SCREEN_WIDTH 960
 #define SCREEN_HEIGHT 750 //640
@@ -26,9 +27,14 @@ public:
     void Render();
     void Events();
 
+    void PopState();
+    void PushState(GameState* current);
+    void ChangeState(GameState* target);
+
     inline GameMap* GetMap() { return m_LevelMap; }
     inline bool IsRunning() { return m_IsRunning; }
     inline SDL_Renderer* GetRenderer() { return m_Renderer; }
+    inline SDL_Window* GetMainWindow() { return m_Window; }
 
     template< typename T, typename = std::enable_if_t< std::is_base_of_v< GameObject, T > > >
     T* SpawnGameObject(std::string type, Properties* props) {
@@ -48,6 +54,7 @@ private:
     static Engine* s_Instance;
 
     std::vector<GameObject*> m_GameObjects;
+    std::vector<GameState*> m_States;
 };
 
 #endif // ENGINE_H

@@ -20,6 +20,9 @@ class TileLayer : public Layer{
 		virtual void Render();
 		virtual void Update();
 		inline TileMap GetTileMap() { return m_TileMap; }
+		inline int GetTileSize() { return m_TileSize; }
+		inline int GetTileWidth() { return m_ColCount; }
+		inline int GetTileHeight() { return m_RowCount; }
 
 	private:
 		int m_TileSize;

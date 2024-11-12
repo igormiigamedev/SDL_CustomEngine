@@ -86,6 +86,15 @@ void Engine::Events() {
     InputHandler::GetInstance()->Listen();
 }
 
+void Engine::PopState(){
+}
+
+void Engine::PushState(GameState* current){
+}
+
+void Engine::ChangeState(GameState* target){
+}
+
 bool Engine::Clean() {
     for (unsigned int i = 0; i != m_GameObjects.size(); i++) {
         m_GameObjects[i]->Clean();
