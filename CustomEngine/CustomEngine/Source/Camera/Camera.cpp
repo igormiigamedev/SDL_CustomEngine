@@ -21,8 +21,11 @@ void Camera::Update(float dt) {
     // Limits the desired position within the screen limits
     if (targetX < 0) targetX = 0;
     if (targetY < 0) targetY = 0;
-    if (targetX > (2 * SCREEN_WIDTH - m_ViewBox.w)) targetX = (2 * SCREEN_WIDTH - m_ViewBox.w);
-    if (targetY > (2 * SCREEN_HEIGHT - m_ViewBox.h)) targetY = (2 * SCREEN_HEIGHT - m_ViewBox.h);
+    /*if (targetX > (2 * SCREEN_WIDTH - m_ViewBox.w)) targetX = (2 * SCREEN_WIDTH - m_ViewBox.w);
+    if (targetY > (2 * SCREEN_HEIGHT - m_ViewBox.h)) targetY = (2 * SCREEN_HEIGHT - m_ViewBox.h);*/
+
+    if (targetX > (m_SceneWidth - m_ViewBox.w)) targetX = (m_SceneWidth - m_ViewBox.w);
+    if (targetY > (m_SceneHeight - m_ViewBox.h)) targetY = (m_SceneHeight - m_ViewBox.h);
 
     // Linear interpolation to smooth camera transition
     constexpr float lerpFactor = 0.02f; // Adjust this value to control the speed of smoothing

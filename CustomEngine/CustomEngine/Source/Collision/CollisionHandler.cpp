@@ -9,29 +9,36 @@ CollisionHandler::CollisionHandler() {
 	m_CollisionTileMap = m_CollisionLayer->GetTileMap();
 }
 
+void CollisionHandler::SetCollisionMap(TileMap tilemap, int tilesize) {
+	m_CollisionTileMap = tilemap;
+	m_MapTileSize = tilesize;
+	m_MapHeight = tilemap.size();
+	m_MapWidth = tilemap[0].size();
+}
+
 CollisionLocation CollisionHandler::MapCollision(SDL_Rect a){ 
-	int tileSize = 32;
+	/*int tileSize = 32;
 	int colCount = 40;
-	int rowCount = 30;
+	int rowCount = 30;*/
 
-	int left_tile = a.x / tileSize;
-	int right_tile = (a.x + a.w) / tileSize;
+	int left_tile = a.x / m_MapTileSize;
+	int right_tile = (a.x + a.w) / m_MapTileSize;
 
-	int top_tile = a.y / tileSize;
-	int botton_tile = (a.y + a.h) / tileSize;
+	int top_tile = a.y / m_MapTileSize;
+	int botton_tile = (a.y + a.h) / m_MapTileSize;
 
 	//limit range
 	if (left_tile < 0) {
 		left_tile = 0;
 	}
-	if (right_tile >= colCount) {
-		right_tile = colCount - 1;
+	if (right_tile >= m_MapWidth) {
+		right_tile = m_MapWidth - 1;
 	}
 	if (top_tile < 0) {
 		top_tile = 0;
 	}
-	if (botton_tile >= rowCount) {
-		botton_tile = rowCount - 1;
+	if (botton_tile >= m_MapHeight) {
+		botton_tile = m_MapHeight - 1;
 	}
 
 	for (int i = left_tile; i <= right_tile; ++i) {

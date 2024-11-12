@@ -35,8 +35,8 @@ bool Play::Init(){
 	int width = collisionLayer->GetTileWidth() * tileSize;
 	int height = collisionLayer->GetTileHeight() * tileSize;
 
-	/*Camera::GetInstance()->SetSceneLimit(width, height);
-	CollisionHandler::GetInstance()->SetCollisionMap(collisionLayer->GetTileMap(), tileSize);*/
+	Camera::GetInstance()->SetSceneLimit(width, height);
+	CollisionHandler::GetInstance()->SetCollisionMap(collisionLayer->GetTileMap(), tileSize);
 
 	int player_texture_width = 240;
 	int player_texture_height = 207;
