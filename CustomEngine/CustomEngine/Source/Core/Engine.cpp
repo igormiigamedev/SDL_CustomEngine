@@ -37,6 +37,14 @@ bool Engine::Init() {
         std::cout << "Failed to load map" << std::endl;
     }
     m_LevelMap = MapParser::GetInstance()->GetMap("MAP");
+   /* TileLayer* collisionLayer = (TileLayer*)m_LevelMap->GetMapLayers().back();
+
+    int tileSize = collisionLayer->GetTileSize();
+    int width = collisionLayer->GetTileWidth() * tileSize;
+    int height = collisionLayer->GetTileHeight() * tileSize;
+
+    Camera::GetInstance()->SetSceneLimit(width, height);
+    CollisionHandler::GetInstance()->SetCollisionMap(collisionLayer->GetTileMap(), tileSize);*/
 
     // load texture
     TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");

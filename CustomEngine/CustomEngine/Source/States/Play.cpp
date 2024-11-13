@@ -57,7 +57,7 @@ bool Play::Init(){
 
 bool Play::Exit(){
 
-	/*m_LevelMap->Clean();*/
+	m_LevelMap->Clean();
 	delete m_LevelMap;
 
 	for (auto gameobj : m_GameObjects) {

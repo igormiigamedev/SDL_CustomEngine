@@ -31,7 +31,7 @@ bool MapParser::Parse(std::string id, std::string source){
 	}
 
 	//Parse Layers
-	GameMap* gameMap = new GameMap();
+	TileMap* gameMap = new TileMap();
 	for (TiXmlElement* e = root->FirstChildElement(); e != nullptr; e = e->NextSiblingElement()) {
 		if (e->Value() == std::string("layer")) {
 			TileLayer* tilelayer = ParseTileLayer(e, tilesets, tileSize, rowCount, colCount);
@@ -90,7 +90,7 @@ TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TileSetList tileSet
 	std::istringstream iss(matrix);
 	std::string id;
 
-	TileMap tilemap(rowCount, std::vector<int>(colCount, 0));
+	TileMatrix tilemap(rowCount, std::vector<int>(colCount, 0));
 
 	for (int row = 0; row < rowCount; row++) {
 		for (int col = 0; col < colCount; col++) {
@@ -110,7 +110,7 @@ TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TileSetList tileSet
 }
 
 void MapParser::Clean(){
-	std::map<std::string, GameMap*>::iterator it;
+	std::map<std::string, TileMap*>::iterator it;
 	for (it = m_MapDict.begin(); it != m_MapDict.end(); it++) {
 		it->second = nullptr;
 	}

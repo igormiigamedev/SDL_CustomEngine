@@ -4,7 +4,7 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
-#include "../Map/GameMap.h"
+#include "../Map/TileMap.h"
 #include "../Object/GameObject.h"
 #include "../Factory/ObjectFactory.h"
 #include "../States/GameState.h"
@@ -31,7 +31,7 @@ public:
     void PushState(GameState* current);
     void ChangeState(GameState* target);
 
-    inline GameMap* GetMap() { return m_LevelMap; }
+    inline TileMap* GetMap() { return m_LevelMap; }
     inline bool IsRunning() { return m_IsRunning; }
     inline SDL_Renderer* GetRenderer() { return m_Renderer; }
     inline SDL_Window* GetMainWindow() { return m_Window; }
@@ -48,7 +48,7 @@ private:
     Engine() {}
     bool m_IsRunning;
 
-    GameMap* m_LevelMap;
+    TileMap* m_LevelMap;
     SDL_Window* m_Window;
     SDL_Renderer* m_Renderer;
     static Engine* s_Instance;

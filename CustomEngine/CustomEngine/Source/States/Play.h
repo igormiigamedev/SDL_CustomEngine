@@ -8,7 +8,7 @@
 #include "Menu.h"
 #include "../Inputs/InputHandler.h"
 #include "../Camera/Camera.h"
-#include "../Map/GameMap.h"
+#include "../Map/TileMap.h"
 #include "../Map/MapParser.h"
 #include "../Map/TileLayer.h"
 #include "../Factory/ObjectFactory.h"
@@ -39,7 +39,7 @@ class Play : public GameState{
 
 	private:
 		bool m_EditMode;
-		GameMap* m_LevelMap;
+		TileMap* m_LevelMap;
 		std::vector<GameObject*> m_GameObjects;
 };
 

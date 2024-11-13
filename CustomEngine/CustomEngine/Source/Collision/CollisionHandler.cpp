@@ -9,7 +9,7 @@ CollisionHandler::CollisionHandler() {
 	m_CollisionTileMap = m_CollisionLayer->GetTileMap();
 }
 
-void CollisionHandler::SetCollisionMap(TileMap tilemap, int tilesize) {
+void CollisionHandler::SetCollisionMap(TileMatrix tilemap, int tilesize) {
 	m_CollisionTileMap = tilemap;
 	m_MapTileSize = tilesize;
 	m_MapHeight = tilemap.size();

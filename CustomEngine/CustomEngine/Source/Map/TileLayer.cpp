@@ -3,7 +3,7 @@
 #include <iostream>
 
 
-TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMap tileMap, TileSetList tileSets):
+TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMatrix tileMap, TileSetList tileSets):
 	m_TileSize (tileSize), m_ColCount (colCount), m_RowCount (rowCount), m_TileMap (tileMap), m_TileSets (tileSets){ 
 
 	for (unsigned int i = 0; i < m_TileSets.size(); i++) {
