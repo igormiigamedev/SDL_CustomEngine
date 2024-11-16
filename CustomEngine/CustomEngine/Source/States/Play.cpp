@@ -31,6 +31,8 @@ bool Play::Init(){
 	m_LevelMap = MapParser::GetInstance()->GetMap("MAP");
 	TileLayer* collisionLayer = (TileLayer*)m_LevelMap->GetMapLayers().back();
 
+	m_ParalaxBg.push_back(new ImgLayer("bg", 0, -90, 0.5f, 1.0, 1.0 )); //("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f);
+
 	int tileSize = collisionLayer->GetTileSize();
 	int width = collisionLayer->GetTileWidth() * tileSize;
 	int height = collisionLayer->GetTileHeight() * tileSize;
@@ -92,6 +94,10 @@ void Play::Render(){
 	SDL_RenderClear(m_Ctxt);
 
 	//TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
+
+	for (auto imgLayer : m_ParalaxBg)
+		imgLayer->Render();
+
 	m_LevelMap->Render();
 
 	for (auto gameobj : m_GameObjects) {

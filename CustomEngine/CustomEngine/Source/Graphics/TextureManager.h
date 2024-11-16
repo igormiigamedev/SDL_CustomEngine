@@ -20,6 +20,7 @@ public:
     void DrawTile(std::string tileSetID, int tileSize, int x, int y, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE);
     void DrawFrame(std::string id, int x, int y, int width, int heigt, int row, int frame, SDL_RendererFlip flip = SDL_FLIP_NONE, float imageScalling = 1.0f);
 
+    SDL_Texture* GetTexture(std::string id) { return m_TextureMap[id]; }
 private:
     TextureManager() {}
     std::map<std::string, SDL_Texture*> m_TextureMap;

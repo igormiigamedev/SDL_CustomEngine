@@ -26,7 +26,7 @@ void Player::Draw(){
 	m_Animation->Draw(m_Transform->X, m_Transform->Y, m_SpriteSheetWidth, m_SpriteSheetHeight, m_ImageScalling, m_Flip);
 	m_RigidBody->GetCollider()->SetProperties(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
 
-	/*m_RigidBody->GetCollider()->DrawDebugCollider();*/
+	m_RigidBody->GetCollider()->DrawDebugCollider();
 }
 
 void Player::Clean(){
@@ -144,12 +144,21 @@ bool Player::IsSpacePressed() const {
 void Player::AnimationState(){
 
 	m_Animation->SetProps("Player_Walk", playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
+	/*m_SpriteSheetWidth = 240;
+	m_SpriteSheetHeight = 207;*/
 
 	if (m_IsJumping) {
+		//m_ImageScalling = 2;
+		/*m_SpriteSheetWidth = 1500;
+		m_SpriteSheetHeight = 500;
+		m_Animation->SetProps("Pombo_Jump", 1, 3, 180);*/
 		m_Animation->SetProps("Player_Jump", 1, 2, 180);
 	}
 
 	if (m_IsFalling) {
+		/*m_SpriteSheetWidth = 1500;
+		m_SpriteSheetHeight = 500;
+		m_Animation->SetProps("Pombo_Jump", 1, 3, 180);*/
 		m_Animation->SetProps("Player_Jump", 1, 2, 180);
 	}
 

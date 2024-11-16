@@ -14,6 +14,7 @@
 #include "../Factory/ObjectFactory.h"
 #include "../Graphics/TextureManager.h"
 #include "../Collision/CollisionHandler.h"
+#include "../Map/ImgLayer.h"
 
 class Play : public GameState{
 
@@ -41,5 +42,6 @@ class Play : public GameState{
 		bool m_EditMode;
 		TileMap* m_LevelMap;
 		std::vector<GameObject*> m_GameObjects;
+		std::vector<ImgLayer*> m_ParalaxBg;
 };
 
