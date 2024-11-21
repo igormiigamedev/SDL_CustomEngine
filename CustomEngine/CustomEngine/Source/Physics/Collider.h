@@ -4,6 +4,7 @@
 #include "../Camera/Camera.h"
 #include <unordered_map>
 #include "../Collision/CollisionManager.h"    
+#include "../Core/Engine.h"
 
 class Collider : public CollisionManager{
 

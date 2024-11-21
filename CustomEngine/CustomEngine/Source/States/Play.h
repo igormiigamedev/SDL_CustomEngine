@@ -15,6 +15,7 @@
 #include "../Graphics/TextureManager.h"
 #include "../Collision/CollisionHandler.h"
 #include "../Map/ImgLayer.h"
+#include "../Parser/Parser.h"
 
 class Play : public GameState{
 
@@ -26,12 +27,16 @@ class Play : public GameState{
 		virtual void Update();
 		virtual void Render();
 
-		template< typename T, typename = std::enable_if_t< std::is_base_of_v< GameObject, T > > >
+		template <typename T, typename = std::enable_if_t<std::is_base_of_v<GameObject, T>>>
 		T* SpawnGameObject(std::string type, Properties* props) {
-			/*T* game_object = new T(props);*/
-			T* game_object = ObjectFactory::GetInstance()->CreateObject(type, props);
-			m_GameObjects.push_back(game_object);
-			return game_object;
+			/*Properties* props = Parser::GetInstance()->GetGameObjectPropertiesById(type);
+			if (props == nullptr) {
+				std::cout << "Failed to get properties for GameObject: " << type << std::endl;
+				return nullptr; 
+			}*/
+			auto game_object = ObjectFactory::GetInstance()->CreateGameObject(type, props);
+			m_GameObjects.push_back(std::move(game_object));
+			return static_cast<T*>(m_GameObjects.back().get());
 		}
 
 	private:
@@ -41,7 +46,9 @@ class Play : public GameState{
 	private:
 		bool m_EditMode;
 		TileMap* m_LevelMap;
-		std::vector<GameObject*> m_GameObjects;
 		std::vector<ImgLayer*> m_ParalaxBg;
+
+		std::vector<std::unique_ptr<GameObject>> m_GameObjects;
+		std::vector<std::unique_ptr<GameObject>> m_SceneObjects;
 };
 

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects>
+    <!-- Enemy -->
+    <object id="SOBJECT" category="0" texture="sky" x="0" y="0" w="0" h="0" flip="0" sX="0" sY="0" sratio="0.0" rot="0" imgScalling="1.0"/>
+
+</objects>

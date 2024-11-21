@@ -1,6 +1,4 @@
 #pragma once
-#ifndef TEXTUREMANAGER_H
-#define TEXTUREMANAGER_H
 
 #include <string>
 #include "SDL.h"
@@ -26,5 +24,3 @@ private:
     std::map<std::string, SDL_Texture*> m_TextureMap;
     static TextureManager* s_Instance;
 };
-
-#endif // TEXTUREMANAGER_H

@@ -8,6 +8,7 @@
 #include <ios>
 #include "../Camera/Camera.h"
 #include "../Characters/Enemy.h"
+#include "../States/Play.h"
 
 
 Engine* Engine::s_Instance = nullptr;
@@ -33,74 +34,60 @@ bool Engine::Init() {
         return false;
     }
 
-    if (!MapParser::GetInstance()->Load()) {
-        std::cout << "Failed to load map" << std::endl;
+    // Initialize the game state (Play)
+    Play* playState = new Play();
+    if (!playState->Init()) {
+        std::cout << "Failed to initialize Play state!" << std::endl;
+        return false;
     }
-    m_LevelMap = MapParser::GetInstance()->GetMap("MAP");
-   /* TileLayer* collisionLayer = (TileLayer*)m_LevelMap->GetMapLayers().back();
 
-    int tileSize = collisionLayer->GetTileSize();
-    int width = collisionLayer->GetTileWidth() * tileSize;
-    int height = collisionLayer->GetTileHeight() * tileSize;
+    ChangeState(playState);
 
-    Camera::GetInstance()->SetSceneLimit(width, height);
-    CollisionHandler::GetInstance()->SetCollisionMap(collisionLayer->GetTileMap(), tileSize);*/
-
-    // load texture
-    TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");
-
-    int player_texture_width = 240;
-    int player_texture_height = 207;
-    float imageScalling = 0.7f;
-
-    Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
-    Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);
-
-    auto player = SpawnGameObject < GameObject >("PLAYER", playerProps);
-    SpawnGameObject < GameObject >("ENEMY", enemyProps);
-
-    Camera::GetInstance()->SetTarget(player->GetOrigin());
     return m_IsRunning = true;
 }
 
 void Engine::Update() {
-    float dt = Timer::GetInstance()->GetDeltaTime();
-    m_LevelMap->Update();
-
-    for (unsigned int i = 0; i != m_GameObjects.size(); i++) {
-        m_GameObjects[i]->Update(dt);
+    if (!m_States.empty()) {
+        m_States.back()->Update();
     }
-
-
-    Camera::GetInstance()->Update(dt);
 }
 
 void Engine::Render() {
-    SDL_SetRenderDrawColor(m_Renderer, 124, 218, 254, 255);
-    SDL_RenderClear(m_Renderer);
-
-    TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
-    m_LevelMap->Render();
-
-    for (unsigned int i = 0; i != m_GameObjects.size(); i++) {
-        m_GameObjects[i]->Draw();
+    if (!m_States.empty()) {
+        m_States.back()->Render();
     }
-
-
     SDL_RenderPresent(m_Renderer);
 }
 
 void Engine::Events() {
+    /*if (!m_States.empty()) {
+        m_States.back()->Events();
+    }*/
     InputHandler::GetInstance()->Listen();
 }
 
-void Engine::PopState(){
+void Engine::PushState(GameState* current) {
+    m_States.push_back(current);
 }
 
-void Engine::PushState(GameState* current){
+void Engine::PopState() {
+    if (!m_States.empty()) {
+        m_States.back()->Exit();
+        delete m_States.back();
+        m_States.pop_back();
+    }
 }
 
-void Engine::ChangeState(GameState* target){
+void Engine::ChangeState(GameState* target) {
+    // Remove current state
+    if (!m_States.empty()) {
+        m_States.back()->Exit();
+        delete m_States.back();
+        m_States.pop_back();
+    }
+
+    // Add the new state
+    m_States.push_back(target);
 }
 
 bool Engine::Clean() {

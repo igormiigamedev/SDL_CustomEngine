@@ -36,14 +36,6 @@ public:
     inline SDL_Renderer* GetRenderer() { return m_Renderer; }
     inline SDL_Window* GetMainWindow() { return m_Window; }
 
-    template< typename T, typename = std::enable_if_t< std::is_base_of_v< GameObject, T > > >
-    T* SpawnGameObject(std::string type, Properties* props) {
-        /*T* game_object = new T(props);*/
-        T* game_object = ObjectFactory::GetInstance()->CreateObject(type, props);
-        m_GameObjects.push_back(game_object);
-        return game_object;
-    }
-
 private:
     Engine() {}
     bool m_IsRunning;
@@ -55,6 +47,7 @@ private:
 
     std::vector<GameObject*> m_GameObjects;
     std::vector<GameState*> m_States;
+
 };
 
 #endif // ENGINE_H
