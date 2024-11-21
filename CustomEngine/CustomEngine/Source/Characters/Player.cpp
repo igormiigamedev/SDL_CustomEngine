@@ -7,9 +7,9 @@
 #include "../Collision/CollisionHandler.h"
 #include "../Factory/ObjectFactory.h"
 
-static RegisterObject<Player> registerObject("PLAYER");
+static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 
-Player::Player(Properties* props) : Character(props){
+Player::Player(const Properties& props, Transform transform) : Character(props, transform){
 
 	m_RigidBody = new RigidBody();
 	m_RigidBody->SetGravity(360.0f);
@@ -18,13 +18,13 @@ Player::Player(Properties* props) : Character(props){
 	m_Animation = new SpriteAnimation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
 
-	playerConfig.m_PlayerWidth = m_ImageScalling * (m_SpriteSheetWidth / playerConfig.m_PlayerWalkFrameCount);
-	playerConfig.m_PlayerHeight = m_ImageScalling * (m_SpriteSheetHeight / playerConfig.m_PlayerWalkSpriteRow);
+	playerConfig.m_PlayerWidth = m_Properties.ScaleX * (m_Properties.Width / playerConfig.m_PlayerWalkFrameCount);
+	playerConfig.m_PlayerHeight = m_Properties.ScaleY * (m_Properties.Height / playerConfig.m_PlayerWalkSpriteRow);
 }
 
 void Player::Draw(){
-	m_Animation->Draw(m_Transform->X, m_Transform->Y, m_SpriteSheetWidth, m_SpriteSheetHeight, m_ImageScalling, m_Flip);
-	m_RigidBody->GetCollider()->SetProperties(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
+	m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.Width, m_Properties.Height, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
+	m_RigidBody->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
 
 	m_RigidBody->GetCollider()->DrawDebugCollider();
 }
@@ -41,8 +41,8 @@ void Player::Update(float dt){
 	/*m_RigidBody->GetCollider()->SetProperties(m_Transform->X, m_Transform->Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));*/
 	AnimationState();
 
-	m_Origin->X = m_Transform->X;// + playerConfig.m_PlayerWidth  / 2;
-	m_Origin->Y = m_Transform->Y;// + playerConfig.m_PlayerHeight / 2;
+	m_Origin->X = m_Transform.X;// + playerConfig.m_PlayerWidth  / 2;
+	m_Origin->Y = m_Transform.Y;// + playerConfig.m_PlayerHeight / 2;
 
 	m_Animation->Update(dt);
 }
@@ -60,11 +60,11 @@ void Player::WalkMovement(float dt) {
 }
 
 void Player::UpdatePlayerDirection() {
-	if (m_Transform->X >= (SCREEN_WIDTH - playerConfig.m_PlayerWidth)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
+	if (m_Transform.X >= (SCREEN_WIDTH - playerConfig.m_PlayerWidth)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
 		playerDirection = BACKWARD;
 		m_Flip = SDL_FLIP_HORIZONTAL;
 	}
-	else if (m_Transform->X <= 0) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
+	else if (m_Transform.X <= 0) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
 		playerDirection = FORWARD;
 		m_Flip = SDL_FLIP_NONE;
 	}
@@ -76,8 +76,8 @@ void Player::ApplyWalkingForce(float dt) {
 }
 
 void Player::UpdatePlayerPositionX(float dt) {
-	m_Transform->X += m_RigidBody->GetDeltaPosition().X;
-	m_RigidBody->GetCollider()->SetPositionX(m_Transform->X);
+	m_Transform.X += m_RigidBody->GetDeltaPosition().X;
+	m_RigidBody->GetCollider()->SetPositionX(m_Transform.X);
 }
 
 void Player::JumpMovement(float dt) {
@@ -133,8 +133,8 @@ void Player::HandleFallingState() {
 
 void Player::UpdatePlayerPositionY(float dt) {
 	m_RigidBody->Update(dt);
-	m_Transform->Y += m_RigidBody->GetDeltaPosition().Y;
-	m_RigidBody->GetCollider()->SetPositionY(m_Transform->Y);
+	m_Transform.Y += m_RigidBody->GetDeltaPosition().Y;
+	m_RigidBody->GetCollider()->SetPositionY(m_Transform.Y);
 }
 
 bool Player::IsSpacePressed() const {

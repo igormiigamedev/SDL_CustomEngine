@@ -16,7 +16,7 @@ struct EnemyConfig {
 class Enemy : public Character{
 
 public:
-	Enemy(Properties* props);
+	Enemy(const Properties& props, Transform transform);
 	
 	virtual void Draw();
 	virtual void Clean();

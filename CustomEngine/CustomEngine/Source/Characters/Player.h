@@ -27,7 +27,7 @@ struct PlayerConfig {
 class Player : public Character{
 
 	public:
-		Player(Properties* props);
+		Player(const Properties& props, Transform transform);
 
 		virtual void Draw();
 		virtual void Clean();

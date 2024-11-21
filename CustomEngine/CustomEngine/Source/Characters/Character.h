@@ -10,7 +10,7 @@
 class Character : public GameObject
 {
 	public:
-		Character(Properties *props) : GameObject(props) {}
+		Character(const Properties& props, Transform transform) : GameObject(props, transform) {}
 
 		virtual void Draw() = 0;
 		virtual void Clean() = 0;

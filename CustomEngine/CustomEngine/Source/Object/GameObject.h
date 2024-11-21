@@ -7,41 +7,30 @@
 #include "../Physics/Transform.h"
 #include <SDL.h>
 #include"../Physics/Point.h"
+#include "EGameObjectTypes.h"
 
 struct Properties {
 
     public:
-        Properties(std::string textureID, int x, int y, int width, int height, SDL_RendererFlip flip = SDL_FLIP_NONE, float imageScalling = 1.0f ) {
-            X = x;
-            Y = y;
-            Flip = flip;
+        Properties(int width, int height, float scaleX = 1.0f, float scaleY = 1.0f) {
             Width = width;
             Height = height;
-            TextureID = textureID;
-            ImageScalling = imageScalling;
+            ScaleX = scaleX;
+            ScaleY = scaleY;
         }
 
     public:
-        std::string TextureID;
         int Width, Height;
-        float X, Y;
-        float ImageScalling;
-        SDL_RendererFlip Flip;
+        float ScaleX, ScaleY;
 };
 
 class GameObject : public IObject {
     public:
-        GameObject(Properties* props) 
-            : m_TextureID(props->TextureID),
-              m_SpriteSheetWidth(props->Width), 
-              m_SpriteSheetHeight(props->Height),
-              m_Flip(props->Flip),
-              m_ImageScalling(props->ImageScalling) {
+        GameObject(const Properties& props, Transform transform)
+            : m_Properties(props), m_Transform(transform) {
 
-            m_Transform = new Transform(props->X, props->Y);
-
-            float px = props->X + props->Width / 2;
-            float py = props->Y + props->Height / 2;
+            float px = m_Transform.X + props.Width / 2;
+            float py = m_Transform.Y + props.Height / 2;
             m_Origin = new Point(px, py);
         }
 
@@ -52,16 +41,16 @@ class GameObject : public IObject {
         virtual void Update(float dt) = 0;
 
         virtual ~GameObject() {
-            delete m_Transform; // Libera a memória alocada
+            /*delete m_Transform;*/ // Libera a memória alocada
         }
 
     protected:
         Point* m_Origin;
-        Transform* m_Transform;
-        int m_SpriteSheetWidth, m_SpriteSheetHeight;
-        float m_ImageScalling;
+        Transform m_Transform;
+        /*int m_SpriteSheetWidth, m_SpriteSheetHeight;*/
         std::string m_TextureID;
-        SDL_RendererFlip m_Flip;
+        SDL_RendererFlip m_Flip = SDL_FLIP_NONE;
+        Properties m_Properties;
 };
 
 #endif // GAMEOBJECT_H

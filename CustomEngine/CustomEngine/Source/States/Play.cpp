@@ -53,15 +53,22 @@ bool Play::Init(){
 	int player_texture_width = 240;
 	int player_texture_height = 207;
 	float imageScalling = 0.7f;
+	Transform playertf, enemytf;
+	playertf.X = 50;
+	playertf.Y = SCREEN_HEIGHT;
+	enemytf.X = 50;
+	enemytf.Y = SCREEN_HEIGHT - 150;
+	/*Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
+	Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);*/
 
-	Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
-	Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);
+	/*Properties* playerProps = new Properties(player_texture_width, player_texture_height, imageScalling, imageScalling);*/
+	/*Properties* enemyProps = new Properties( 120, 159, imageScalling, imageScalling);*/
 
-	/*Parser::GetInstance()->ParseGameObjects("Assets/Level1.xml", m_SceneObjects);*/
+	Parser::GetInstance()->ParseGameObjects("Assets/Level1.xml");
 
-	GameObject* player = SpawnGameObject<GameObject>("PLAYER", playerProps);
+	GameObject* player = SpawnGameObjectAtLocation<GameObject>(GameObjectType::PLAYER, playertf);
 	assert(player != nullptr && "Player object is null!"); // Debugging
-	GameObject* enemy = SpawnGameObject < GameObject >("ENEMY", enemyProps);
+	GameObject* enemy = SpawnGameObjectAtLocation < GameObject >(GameObjectType::ENEMY, enemytf);
 	assert(enemy != nullptr && "Enemy object is null!"); // Debugging
 
 	if (player == nullptr) {

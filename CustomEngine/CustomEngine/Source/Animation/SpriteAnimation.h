@@ -10,7 +10,7 @@ class SpriteAnimation : public Animation {
 		SpriteAnimation(bool repeat = true);
 
 		virtual void Update(float dt);
-		void Draw(float x, float y, int spriteWidth, int spriteHeight, float imageScalling, SDL_RendererFlip flip = SDL_FLIP_NONE);
+		void Draw(float x, float y, int spriteWidth, int spriteHeight, float scaleX = 1.0f, float scaleY = 1.0f, SDL_RendererFlip flip = SDL_FLIP_NONE);
 		void SetProps(std::string textureID, int spriteRow, int frameCount, int animSpeed);
 
 		/*int GetCurrFrame() { return  m_CurrentFrame; }

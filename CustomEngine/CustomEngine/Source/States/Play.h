@@ -28,13 +28,17 @@ class Play : public GameState{
 		virtual void Render();
 
 		template <typename T, typename = std::enable_if_t<std::is_base_of_v<GameObject, T>>>
-		T* SpawnGameObject(std::string type, Properties* props) {
-			/*Properties* props = Parser::GetInstance()->GetGameObjectPropertiesById(type);
-			if (props == nullptr) {
-				std::cout << "Failed to get properties for GameObject: " << type << std::endl;
-				return nullptr; 
-			}*/
-			auto game_object = ObjectFactory::GetInstance()->CreateGameObject(type, props);
+		T* SpawnGameObjectAtLocation(const GameObjectType type, const Transform& transform) {
+			const Properties* props = Parser::GetInstance()->GetGameObjectPropertiesByType(type);
+			if (!props) {
+				std::cout << "Failed to get properties for GameObject: " << GameObjectTypeToString(type) << std::endl;
+				return nullptr;
+			}
+			auto game_object = ObjectFactory::GetInstance()->CreateGameObject(type, *props, transform);
+			if (!game_object) {
+				std::cout << "Failed to create GameObject: " << GameObjectTypeToString(type) << std::endl;
+				return nullptr;
+			}
 			m_GameObjects.push_back(std::move(game_object));
 			return static_cast<T*>(m_GameObjects.back().get());
 		}

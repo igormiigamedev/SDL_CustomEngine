@@ -4,19 +4,19 @@
 
 ObjectFactory* ObjectFactory::s_Instance = nullptr;
 
-std::unique_ptr<GameObject> ObjectFactory::CreateGameObject(std::string type, Properties* props){
+std::unique_ptr<GameObject> ObjectFactory::CreateGameObject(GameObjectType type, const Properties& props, Transform transform){
 
 	std::unique_ptr<GameObject> object = nullptr;
 	auto it = m_TypeRegistry.find(type);
 
 	if (it != m_TypeRegistry.end()) {
-		object = it->second(props);
+		object = it->second(props, transform);
 	}
 
 	return object;
 }
 
-void ObjectFactory::RegisterType(std::string className, std::function<std::unique_ptr<GameObject> (Properties* props)> type) {
+void ObjectFactory::RegisterType(GameObjectType className, std::function<std::unique_ptr<GameObject> (const Properties& props, Transform transform)> type) {
 	m_TypeRegistry[className] = type;
 }
 

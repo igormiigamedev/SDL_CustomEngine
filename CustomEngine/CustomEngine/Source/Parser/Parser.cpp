@@ -5,7 +5,7 @@
 
 Parser* Parser::s_Instance = nullptr;
 
-void Parser::ParseGameObjects(std::string source, std::vector<std::unique_ptr<GameObject>>& targets) {
+void Parser::ParseGameObjects(std::string source/*, std::vector<std::unique_ptr<GameObject>>& targets*/) {
 
 	TiXmlDocument xml;
 	xml.LoadFile(source);
@@ -17,60 +17,54 @@ void Parser::ParseGameObjects(std::string source, std::vector<std::unique_ptr<Ga
 	TiXmlElement* root = xml.RootElement();
 	for (TiXmlElement* e = root->FirstChildElement(); e != nullptr; e = e->NextSiblingElement()) {
 		if (e->Value() == std::string("object")) {
-			int x, y, width, height, flip = 0;
-			double scX, scY = 0;
+			int width, height;
+			double scaleX, scaleY = 0;
 			const char* objType;
-			const char* texID;
-			double sratio = 0;
-			double rot = 0;
-			int category = -1;
-			double imgScalling = 1.0;
+			/*double sratio = 0;*/
+			/*double rot = 0;*/
+			/*int category = -1;*/
+
+			e->Attribute("width", &width);
+			e->Attribute("height", &height);
+			e->Attribute("scaleX", &scaleX);
+			e->Attribute("scaleY", &scaleY);
+			/*e->Attribute("sratio", &sratio);*/
+
+			Properties* props = new Properties(width, height, scaleX, scaleY);
 
 			objType = e->Attribute("type");
-			texID = e->Attribute("texture");
+			GameObjectType type = StringToGameObjectType(objType);
+			
+			try {
+				const char* objType = e->Attribute("type");
+				GameObjectType type = StringToGameObjectType(objType);
 
-			e->Attribute("x", &x);
-			e->Attribute("y", &y);
-			e->Attribute("rot", &rot);
-			e->Attribute("imgScalling", &imgScalling);
+				m_GameObjectProperties[type] = props;
+			}
+			catch (const std::invalid_argument& ex) {
+				std::cout << "Error: " << ex.what() << std::endl;
+				// Perform error handling, such as returning or stopping execution
+			}
 
-			e->Attribute("w", &width);
-			e->Attribute("h", &height);
-			e->Attribute("flip", &flip);
-			e->Attribute("category", &category);
-
-			SDL_RendererFlip rFlip;
-			if (flip == 0) { rFlip = SDL_FLIP_NONE; }
-			if (flip == 1) { rFlip = SDL_FLIP_HORIZONTAL; }
-			if (flip == 2) { rFlip = SDL_FLIP_VERTICAL; }
-
-			e->Attribute("scX", &scX);
-			e->Attribute("scY", &scY);
-			e->Attribute("sratio", &sratio);
-
-			Properties* props = new Properties(texID, x, y, width, height, rFlip, imgScalling);
-			// Armazena as propriedades no mapa com a chave sendo o tipo (id)
-			/*m_GameObjectProperties[objType] = props;*/
-
-			// Você pode adicionar a criação do objeto aqui, se necessário:
-			auto object = ObjectFactory::GetInstance()->CreateGameObject(objType, props);
+			// You can add object creation here if needed::
+			/*auto object = ObjectFactory::GetInstance()->CreateGameObject(objType, props);
 
 			if (object) {
 				targets.push_back(std::move(object));
-			}
+			}*/
 
 		}
-		std::cout << source << "Parsed!" << std::endl;
 	}
+	std::cout << source << "Parsed!" << std::endl;
 }
 
-Properties* Parser::GetGameObjectPropertiesById(const std::string& id) {
-	auto it = m_GameObjectProperties.find(id);
+Properties* Parser::GetGameObjectPropertiesByType(const GameObjectType type) {
+	auto it = m_GameObjectProperties.find(type);
 	if (it != m_GameObjectProperties.end()) {
-		return it->second; // Retorna as propriedades do GameObject com esse id
+		return it->second; 
 	}
-	std::cout << "GameObject with ID " << id << " not found!" << std::endl;
-	return nullptr; // Retorna nullptr se o ID não for encontrado
+	std::cout << "GameObject with ID " << GameObjectTypeToString(type) << " not found!" << std::endl;
+	return nullptr;
 }
 
 //bool Parser::ParseTextures(std::string source) {
