@@ -18,6 +18,10 @@ class ImgLayer : public Layer{
 		virtual void Render();
 		virtual void Update();
 
+		std::unique_ptr<Layer> Clone() const override {
+			return std::make_unique<ImgLayer>(*this);
+		}
+
 	private:
 		bool m_Repeated;
 		float m_ScrollRatio;

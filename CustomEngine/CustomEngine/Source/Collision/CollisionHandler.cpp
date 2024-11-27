@@ -10,37 +10,37 @@ CollisionHandler::CollisionHandler() {
 	m_CollisionTileMap = m_CollisionLayer->GetTileMap();*/
 }
 
-void CollisionHandler::SetCollisionMap(TileMatrix tilemap, int tilesize) {
-	m_CollisionTileMap = tilemap;
+void CollisionHandler::SetCollisionMap(TileMatrix tilematrix, int tilesize) {
+	m_CollisionTileMatrix = tilematrix;
 	m_MapTileSize = tilesize;
-	m_MapHeight = tilemap.size();
-	m_MapWidth = tilemap[0].size();
+	m_MapHeight = tilematrix.size();
+	m_MapWidth = tilematrix[0].size();
 }
 
 CollisionLocation CollisionHandler::DetectTileCollision(const SDL_Rect& entityBounds) {
-    // Calcula os índices das tiles envolvidas horizontalmente
+    // Calculates the indexes of horizontally wrapped tiles
     int leftTile = ClampToRange(entityBounds.x / m_MapTileSize, 0, m_MapWidth - 1);
     int rightTile = ClampToRange((entityBounds.x + entityBounds.w) / m_MapTileSize, 0, m_MapWidth - 1);
 
-    // Calcula os índices das tiles envolvidas verticalmente, com ajuste circular
+    // Calculates the indexes of vertically wrapped tiles, with circular adjustment
     int topTile = WrapTileIndex(entityBounds.y / m_MapTileSize, m_MapHeight);
     int bottomTile = WrapTileIndex((entityBounds.y + entityBounds.h) / m_MapTileSize, m_MapHeight);
 
-    // Ajusta para evitar desconexões verticais devido ao mapeamento circular
+    // Adjusts to avoid vertical disconnections due to circular mapping
     if (topTile > bottomTile) {
-        bottomTile = topTile + (m_MapHeight - topTile);
+        bottomTile = topTile + ( (m_MapHeight - 1) - topTile);
     }
 
-    // Itera pelas tiles nos intervalos calculados
+    // Iterates through the tiles in the calculated intervals
     for (int i = leftTile; i <= rightTile; ++i) {
         for (int j = topTile; j <= bottomTile; ++j) {
-            if (m_CollisionTileMap[j][i] > 0) {
+            if (m_CollisionTileMatrix[j][i] > 0) {
                 return (j == bottomTile) ? Below : Top;
             }
         }
     }
 
-    return None; // Nenhuma colisão detectada
+    return None; // Nenhuma colisão detectada    
 }
 
 int CollisionHandler::ClampToRange(int value, int min, int max) {

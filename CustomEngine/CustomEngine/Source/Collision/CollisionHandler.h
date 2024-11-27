@@ -14,14 +14,14 @@ class CollisionHandler{
 		int ClampToRange(int value, int min, int max);
 		int WrapTileIndex(int value, int mapHeight);
 		bool CheckCollision(SDL_Rect a, SDL_Rect b);
-		void SetCollisionMap(TileMatrix tilemap, int tilesize);
+		void SetCollisionMap(TileMatrix tilematrix, int tilesize);
 
 		inline static CollisionHandler* GetInstance() { return s_Instance = (s_Instance != nullptr) ? s_Instance : new CollisionHandler(); }
 
 	private:
 		CollisionHandler();
 		
-		TileMatrix m_CollisionTileMap;
+		TileMatrix m_CollisionTileMatrix;
 		TileLayer* m_CollisionLayer;
 		static CollisionHandler* s_Instance;
 

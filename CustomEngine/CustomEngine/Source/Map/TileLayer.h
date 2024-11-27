@@ -25,6 +25,10 @@ class TileLayer : public Layer{
 		inline int GetTileWidth() { return m_ColCount; }
 		inline int GetTileHeight() { return m_RowCount; }
 
+		std::unique_ptr<Layer> Clone() const override {
+			return std::make_unique<TileLayer>(*this);
+		}
+
 	private:
 		int m_TileSize;
 		int m_RowCount, m_ColCount;

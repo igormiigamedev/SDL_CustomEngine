@@ -8,11 +8,11 @@
 
 class MapParser{
 	public:
-		bool Load();
+		bool SetUpXmlMaps();
 		void Clean();
 
-		inline std::shared_ptr<TileMap> GetMap(int id) { return m_MapDict[id]; };
-		inline std::shared_ptr<TileMap> GetLastMap() { return m_MapDict.rbegin()->second;};
+		std::shared_ptr<TileMap> getRandomTileMapOfType(int type);
+
 		static MapParser* GetInstance() {
 			return s_Instance = (s_Instance != nullptr) ? s_Instance : new MapParser();
 		}
@@ -20,11 +20,12 @@ class MapParser{
 	private:
 		bool Parse(int id, std::string source);
 		std::shared_ptr <TileSet> ParseTileSet(TiXmlElement* xmlTileSet);
-		TileLayer* ParseTileLayer(TiXmlElement* xmlLayer, std::vector< std::shared_ptr<TileSet>> tileSets, int tileSize, int rowCount, int colCount);
+		std::unique_ptr <TileLayer> ParseTileLayer(TiXmlElement* xmlLayer, std::vector< std::shared_ptr<TileSet>> tileSets, int tileSize, int rowCount, int colCount);
 
 	private:
 		MapParser() {}
 		static MapParser* s_Instance;
-		std::map<int, std::shared_ptr<TileMap>> m_MapDict;
+
+		std::map<int, std::vector<std::shared_ptr<TileMap>>> m_templateMapDict;
 };
 

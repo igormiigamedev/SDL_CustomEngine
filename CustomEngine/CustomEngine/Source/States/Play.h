@@ -49,7 +49,15 @@ class Play : public GameState{
 
 		void UpdateCollisionLayers();
 
+		std::pair<int, TileMatrix> JoinMatrixOfActiveMaps();
+
+		size_t EstimateMapTotalRows() const;
+
+		TileLayer* GetCollisionLayerFromMap(const std::shared_ptr<TileMap>& map) const;
+
 		void UpdateMaps();
+
+		void AddMapAtPosition(int type, int YPosition);
 
 	private:
 		bool m_EditMode;

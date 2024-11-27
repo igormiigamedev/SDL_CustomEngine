@@ -1,10 +1,48 @@
 #include "MapParser.h"
+#include <random>
 
 MapParser* MapParser::s_Instance = nullptr;
 
-bool MapParser::Load(){
-	int id = m_MapDict.size();
-	return Parse(id, "Assets/Maps/map.tmx");
+bool MapParser::SetUpXmlMaps() {
+	TiXmlDocument xml;
+	std::string sourcePath = "Assets/GameMaps.xml";
+	xml.LoadFile(sourcePath);
+
+	if (xml.Error()) {
+		std::cerr << "failed to load: " << sourcePath << std::endl;
+		return false;
+	}
+
+	TiXmlElement* root = xml.RootElement();
+	for (TiXmlElement* e = root->FirstChildElement(); e != nullptr; e = e->NextSiblingElement()) {
+		if (e->Value() == std::string("maps")) {
+			int type;
+			std::string source;
+			source = e->Attribute("source");
+			e->Attribute("type", &type);
+			Parse(type, source);
+		}
+		else {
+			std::cout<< "failed to find 'maps' in: " << sourcePath << std::endl;
+		}
+	}
+	return true;
+}
+
+std::shared_ptr<TileMap> MapParser::getRandomTileMapOfType(int type) {
+	// Checks if the type exists in the map
+	if (m_templateMapDict.find(type) == m_templateMapDict.end() || m_templateMapDict[type].empty()) {
+		return nullptr; 
+	}
+
+	// Generates a random index
+	std::random_device rd;
+	std::mt19937 gen(rd());
+	std::uniform_int_distribution<> dis(0, m_templateMapDict[type].size() - 1);
+
+	int randomIndex = dis(gen);
+
+	return std::make_shared<TileMap>(*m_templateMapDict[type][randomIndex]);
 }
 
 bool MapParser::Parse(int id, std::string source){
@@ -35,13 +73,13 @@ bool MapParser::Parse(int id, std::string source){
 	std::shared_ptr<TileMap> gameMap = std::make_shared<TileMap>();
 	for (TiXmlElement* e = root->FirstChildElement(); e != nullptr; e = e->NextSiblingElement()) {
 		if (e->Value() == std::string("layer")) {
-			TileLayer* tilelayer = ParseTileLayer(e, tilesets, tileSize, rowCount, colCount);
-			gameMap->GetMapLayers().push_back(tilelayer);
+			std::unique_ptr <TileLayer> tilelayer = ParseTileLayer(e, tilesets, tileSize, rowCount, colCount);
+			gameMap->GetMapLayers().push_back(std::move(tilelayer));
 			gameMap->SetSize(rowCount* tileSize, colCount* tileSize);
 		}
 	}
 
-	m_MapDict[id] = gameMap;
+	m_templateMapDict[id].push_back(gameMap);
 	return true;
 }
 
@@ -69,7 +107,7 @@ std::shared_ptr <TileSet> MapParser::ParseTileSet(TiXmlElement* xmlTileSet){
 
 }
 
-TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, std::vector< std::shared_ptr<TileSet>> tileSets, int tileSize, int rowCount, int colCount){
+std::unique_ptr <TileLayer> MapParser::ParseTileLayer(TiXmlElement* xmlLayer, std::vector< std::shared_ptr<TileSet>> tileSets, int tileSize, int rowCount, int colCount){
 
 	if (xmlLayer == nullptr) {
 		throw std::invalid_argument("xmlLayer is NULL.");
@@ -107,14 +145,12 @@ TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, std::vector< std::s
 			}
 		}
 	}
+	std::unique_ptr <TileLayer> tileLayer = std::make_unique<TileLayer>(tileSize, rowCount, colCount, tilemap, tileSets);
 
-	return (new TileLayer(tileSize, rowCount, colCount, tilemap, tileSets));
+	return tileLayer;
 }
 
 void MapParser::Clean(){
 	std::map<std::string, TileMap>::iterator it;
-	/*for (it = m_MapDict.begin(); it != m_MapDict.end(); it++) {
-		it->second = NULL;
-	}*/
-	m_MapDict.clear();
+	m_templateMapDict.clear();
 }

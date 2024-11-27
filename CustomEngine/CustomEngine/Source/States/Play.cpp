@@ -18,52 +18,27 @@ void Play::Events(){
 	SDL_Delay(100);*/
 }
 
-bool Play::Init(){
+bool Play::Init() {
 	m_EditMode = false;
 	m_Ctxt = Engine::GetInstance()->GetRenderer();
 
-	
+
 	// --------- Parse Textures
-	
+
 	TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");
 	/*Parser::GetInstance()->ParseTextures("Assets/GameTextures.xml");*/
 
-	/*if (!MapParser::GetInstance()->Load()) {
-		std::cout << "Failed to load map" << std::endl;
-	}
-	m_LevelMap = MapParser::GetInstance()->GetMap("MAP");
-
-	TileLayer* collisionLayer;
-	if (!m_LevelMap->GetMapLayers().empty()) {
-		collisionLayer = (TileLayer*)m_LevelMap->GetMapLayers().back();
-		int tileSize = collisionLayer->GetTileSize();
-		int width = collisionLayer->GetTileWidth() * tileSize;
-		int height = collisionLayer->GetTileHeight() * tileSize;
-
-		Camera::GetInstance()->SetSceneLimit(width, height);
-		CollisionHandler::GetInstance()->SetCollisionMap(collisionLayer->GetTileMap(), tileSize);
-	}
-	else {
-		std::cout << "Map layers are empty!" << std::endl;
-	}*/
-
 	//---------------------
-	if (!MapParser::GetInstance()->Load()) {
-		std::cout << "Failed to load map" << std::endl;
-		return false;
+	if (MapParser::GetInstance()->SetUpXmlMaps()) {
+		std::cout << "Failed to SetUp Xml Maps" << std::endl;
 	}
-
-	std::shared_ptr<TileMap> initialMap = MapParser::GetInstance()->GetLastMap();
-	m_ActiveMaps.push_back(initialMap);
-
-	if (!MapParser::GetInstance()->Load()) {
-		std::cout << "Failed to load map" << std::endl;
-		return false;
-	}
-	// Carregar mapa acima do primeiro
-	std::shared_ptr<TileMap> nextMap = MapParser::GetInstance()->GetLastMap();
-	nextMap->SetPosition(0, -initialMap->GetHeight());
-	m_ActiveMaps.push_back(nextMap);
+	// Add first map
+	AddMapAtPosition(0, 0);
+	// add map above the first
+	std::shared_ptr<TileMap> initialMap;
+	initialMap = m_ActiveMaps.front();
+	int positionY = -initialMap->GetHeight();
+	AddMapAtPosition(1, positionY);
 	//---------------------
 
 	m_ParalaxBg.push_back(new ImgLayer("bg", 0, -90, 0.5f, 1.0, 1.0 )); //("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f);
@@ -106,22 +81,14 @@ bool Play::Init(){
 }
 
 bool Play::Exit(){
-
-	/*m_LevelMap->Clean();
-	delete m_LevelMap;*/
-
 	// Limpa e desaloca todos os mapas ativos
 	for (std::shared_ptr<TileMap> map : m_ActiveMaps) {
-		/*if (map) {*/
 		map->Clean();
-			/*delete map;*/
-		//}
 	}
 	m_ActiveMaps.clear();
 
 	for (auto& gameobj : m_GameObjects) {
 		gameobj->Clean();
-		/*delete gameobj;*/
 	}
 
 	m_GameObjects.clear();
@@ -137,14 +104,8 @@ void Play::Update(){
 
 	if (!m_EditMode) {
 		float dt = Timer::GetInstance()->GetDeltaTime();
-
-		/*m_LevelMap->Update();*/
-
 		// Atualiza os mapas ativos
 		UpdateMaps();
-
-		// Atualiza as camadas de colisão para os mapas ativos
-		UpdateCollisionLayers();
 
 		for (auto& gameobj : m_GameObjects) {
 			gameobj->Update(dt);
@@ -162,7 +123,6 @@ void Play::Render(){
 	for (auto imgLayer : m_ParalaxBg)
 		imgLayer->Render();
 
-	/*m_LevelMap->Render();*/
 	for (auto map : m_ActiveMaps) {
 		map->Render();
 	}
@@ -191,80 +151,106 @@ void Play::PauseGame()
 }
 
 void Play::UpdateCollisionLayers() {
-	// Atualiza as camadas de colisão para os mapas ativos
-	TileMatrix matrixOfAllMaps;
-	int tileSize = 0;
+	std::pair<int, TileMatrix> result = JoinMatrixOfActiveMaps();
+	int tileSize = result.first;
+	TileMatrix matrixOfAllMaps = result.second;
+	
+	if (tileSize == -1) {
+		return; 
+	}
 
-	// Estimar o número total de linhas para evitar realocações
+	CollisionHandler::GetInstance()->SetCollisionMap(matrixOfAllMaps, tileSize);
+}
+
+std::pair<int, TileMatrix> Play::JoinMatrixOfActiveMaps() {
+	TileMatrix matrixOfAllMaps;
+	int tileSize = -1;  // Invalid value to signal error
+
+	// Estimate the total number of rows to avoid reallocations
+	size_t totalRows = EstimateMapTotalRows();
+
+	matrixOfAllMaps.reserve(totalRows);
+
+	// Iterate over active maps
+	for (const auto& map : m_ActiveMaps) {
+		if (map == nullptr) {
+			std::cerr << "Null map encountered in active maps!" << std::endl;
+			continue;
+		}
+
+		TileLayer* collisionLayer = GetCollisionLayerFromMap(map);
+		if (collisionLayer == nullptr) {
+			continue;
+		}
+
+		// Checks if the tile size is consistent
+		if (tileSize == -1) {
+			tileSize = collisionLayer->GetTileSize();
+		}
+		else if (tileSize != collisionLayer->GetTileSize()) {
+			std::cerr << "Inconsistent tile sizes between maps!" << std::endl;
+			return { -1, TileMatrix() };  // Returns error with empty matrix
+		}
+
+		// Adds the tilemap matrix to the total matrix
+		const auto& tileMapMatrix = collisionLayer->GetTileMapMatrix();
+		if (!tileMapMatrix.empty()) {
+			matrixOfAllMaps.insert(matrixOfAllMaps.end(), tileMapMatrix.begin(), tileMapMatrix.end());
+		}
+	}
+
+	return { tileSize, matrixOfAllMaps };
+}
+
+size_t Play::EstimateMapTotalRows() const {
 	size_t totalRows = 0;
+
 	for (const auto& map : m_ActiveMaps) {
 		if (map && !map->GetMapLayers().empty()) {
-			TileLayer* layer = dynamic_cast<TileLayer*>(map->GetMapLayers().back());
+			TileLayer* layer = dynamic_cast<TileLayer*>(map->GetMapLayers().back().get());
 			if (layer) {
 				totalRows += layer->GetTileMapMatrix().size();
 			}
 		}
 	}
-	matrixOfAllMaps.reserve(totalRows);
 
-	// Iterar sobre mapas ativos
-	for (const auto& map : m_ActiveMaps) {
-		if (!map) {
-			std::cerr << "Null map encountered in active maps!" << std::endl;
-			continue;
-		}
-
-		if (!map->GetMapLayers().empty()) {
-			TileLayer* collisionLayer = dynamic_cast<TileLayer*>(map->GetMapLayers().back());
-			if (!collisionLayer) {
-				std::cerr << "Invalid layer type for collision!" << std::endl;
-				continue;
-			}
-
-			// Obtem o tamanho dos tiles e configura a camada de colisão
-			if (tileSize == 0) {
-				tileSize = collisionLayer->GetTileSize();
-			}
-			else if (tileSize != collisionLayer->GetTileSize()) {
-				std::cerr << "Inconsistent tile sizes between maps!" << std::endl;
-				return;
-			}
-
-			const auto& tileMapMatrix = collisionLayer->GetTileMapMatrix();
-
-			if (!tileMapMatrix.empty()) {
-				matrixOfAllMaps.insert(matrixOfAllMaps.end(), tileMapMatrix.begin(), tileMapMatrix.end());
-			}
-		}
-		else {
-			std::cerr << "Map layers are empty for a map!" << std::endl;
-		}
-	}
-
-	// Configurar o mapa de colisões
-	CollisionHandler::GetInstance()->SetCollisionMap(matrixOfAllMaps, tileSize);
+	return totalRows;
 }
 
+TileLayer* Play::GetCollisionLayerFromMap(const std::shared_ptr<TileMap>& map) const {
+	if (map && !map->GetMapLayers().empty()) {
+		return dynamic_cast<TileLayer*>(map->GetMapLayers().back().get());
+	}
+	else {
+		std::cerr << "Invalid or empty map layers!" << std::endl;
+		return nullptr;
+	}
+}
+
+
 void Play::UpdateMaps() {
-	// Verifica o mapa atual mais próximo ao topo da tela
+	// Check the current map closest to the top of the screen
 	if (!m_ActiveMaps.empty()) {
 		std::shared_ptr<TileMap> topMap = m_ActiveMaps.back();
 
-		// Se o topo do mapa estiver fora da tela, carregue um novo acima
+		// If the top of the map is off screen, load a new one above
 		if (Camera::GetInstance()->GetPosition().Y < topMap->GetPosition().Y) {
-			if (!MapParser::GetInstance()->Load()) {
-				std::cout << "Failed to load map" << std::endl;
-				return;
-			}
-			std::shared_ptr<TileMap> newMap = MapParser::GetInstance()->GetLastMap();
-			newMap->SetPosition(0, topMap->GetPosition().Y - topMap->GetHeight());
-			m_ActiveMaps.push_back(newMap);
+			int positionY = topMap->GetPosition().Y - topMap->GetHeight();
+ 			AddMapAtPosition(1, positionY);
 		}
 
-		// Verifica o mapa inferior para remoção
+		// Check the bottom map for removal
 		std::shared_ptr<TileMap> bottomMap = m_ActiveMaps.front();
 		if (bottomMap->GetPosition().Y - bottomMap->GetHeight() > Camera::GetInstance()->GetPosition().Y) {
 			m_ActiveMaps.erase(m_ActiveMaps.begin());
+			UpdateCollisionLayers();
 		}
 	}
+}
+
+void Play::AddMapAtPosition(int type, int YPosition) {
+	std::shared_ptr<TileMap> newMap = MapParser::GetInstance()->getRandomTileMapOfType(type);
+	newMap->SetPosition(0, YPosition);
+	m_ActiveMaps.push_back(newMap);
+	UpdateCollisionLayers();
 }
