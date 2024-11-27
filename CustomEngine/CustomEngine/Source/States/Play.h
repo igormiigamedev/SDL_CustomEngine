@@ -47,6 +47,10 @@ class Play : public GameState{
 		static void OpenMenu();
 		static void PauseGame();
 
+		void UpdateCollisionLayers();
+
+		void UpdateMaps();
+
 	private:
 		bool m_EditMode;
 		TileMap* m_LevelMap;
@@ -54,5 +58,7 @@ class Play : public GameState{
 
 		std::vector<std::unique_ptr<GameObject>> m_GameObjects;
 		std::vector<std::unique_ptr<GameObject>> m_SceneObjects;
+
+		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
 };
 

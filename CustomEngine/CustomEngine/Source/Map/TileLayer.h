@@ -3,6 +3,7 @@
 #include "Layer.h"
 #include <string>
 #include <vector>
+#include "TileMap.h"
 
 struct TileSet{
 	int FirstId, LastId;
@@ -11,15 +12,15 @@ struct TileSet{
 	std::string Name, Source;
 };
 
-using TileSetList = std::vector<TileSet>;
+//TODO - Delete using
 using TileMatrix = std::vector < std::vector<int> >;
 
 class TileLayer : public Layer{
 	public:
-		TileLayer(int tileSize, int rowCount, int colCount, TileMatrix tileMap, TileSetList tileSets);
+		TileLayer(int tileSize, int rowCount, int colCount, TileMatrix tileMap, std::vector< std::shared_ptr<TileSet>> tileSets);
 		virtual void Render();
 		virtual void Update();
-		inline TileMatrix GetTileMap() { return m_TileMap; }
+		inline TileMatrix& GetTileMapMatrix() { return m_TileMatrix; }
 		inline int GetTileSize() { return m_TileSize; }
 		inline int GetTileWidth() { return m_ColCount; }
 		inline int GetTileHeight() { return m_RowCount; }
@@ -28,7 +29,7 @@ class TileLayer : public Layer{
 		int m_TileSize;
 		int m_RowCount, m_ColCount;
 
-		TileMatrix m_TileMap;
-		TileSetList m_TileSets;
+		TileMatrix m_TileMatrix;
+		std::vector< std::shared_ptr<TileSet>> m_TileSets;
 };
 

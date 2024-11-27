@@ -81,7 +81,7 @@ class RigidBody{
 
 		// Process collision response when BLOCK is detected
 		void ProcessBlockCollision(float dt) {
-			switch (CollisionHandler::GetInstance()->MapCollision(m_ColliderRB->Get())) {
+			switch (CollisionHandler::GetInstance()->DetectTileCollision(m_ColliderRB->Get())) {
 			case CollisionLocation::Below:
 				ResolveGroundCollision(dt);
 				break;

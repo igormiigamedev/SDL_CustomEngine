@@ -3,10 +3,11 @@
 MapParser* MapParser::s_Instance = nullptr;
 
 bool MapParser::Load(){
-	return Parse("MAP", "Assets/Maps/map.tmx");
+	int id = m_MapDict.size();
+	return Parse(id, "Assets/Maps/map.tmx");
 }
 
-bool MapParser::Parse(std::string id, std::string source){
+bool MapParser::Parse(int id, std::string source){
 	TiXmlDocument xml;
 	xml.LoadFile(source);
 
@@ -23,7 +24,7 @@ bool MapParser::Parse(std::string id, std::string source){
 	root->Attribute("tilewidth", &tileSize);
 
 	//Parse Tile Sets
-	TileSetList tilesets;
+	std::vector< std::shared_ptr<TileSet>> tilesets;
 	for (TiXmlElement* e = root->FirstChildElement(); e != nullptr; e = e->NextSiblingElement()) {
 		if (e->Value() == std::string("tileset")) {
 			tilesets.push_back(ParseTileSet(e));
@@ -31,11 +32,12 @@ bool MapParser::Parse(std::string id, std::string source){
 	}
 
 	//Parse Layers
-	TileMap* gameMap = new TileMap();
+	std::shared_ptr<TileMap> gameMap = std::make_shared<TileMap>();
 	for (TiXmlElement* e = root->FirstChildElement(); e != nullptr; e = e->NextSiblingElement()) {
 		if (e->Value() == std::string("layer")) {
 			TileLayer* tilelayer = ParseTileLayer(e, tilesets, tileSize, rowCount, colCount);
 			gameMap->GetMapLayers().push_back(tilelayer);
+			gameMap->SetSize(rowCount* tileSize, colCount* tileSize);
 		}
 	}
 
@@ -43,7 +45,7 @@ bool MapParser::Parse(std::string id, std::string source){
 	return true;
 }
 
-TileSet MapParser::ParseTileSet(TiXmlElement* xmlTileSet){
+std::shared_ptr <TileSet> MapParser::ParseTileSet(TiXmlElement* xmlTileSet){
 	TileSet tileset;
 	tileset.Name = xmlTileSet->Attribute("name");
 	xmlTileSet->Attribute("firstgid", &tileset.FirstId);
@@ -63,11 +65,11 @@ TileSet MapParser::ParseTileSet(TiXmlElement* xmlTileSet){
 	else
 		tileset.Source = xmlTileSet->Attribute("source");
 
-	return tileset;
+	return std::make_shared<TileSet>(tileset);
 
 }
 
-TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TileSetList tileSets, int tileSize, int rowCount, int colCount){
+TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, std::vector< std::shared_ptr<TileSet>> tileSets, int tileSize, int rowCount, int colCount){
 
 	if (xmlLayer == nullptr) {
 		throw std::invalid_argument("xmlLayer is NULL.");
@@ -110,9 +112,9 @@ TileLayer* MapParser::ParseTileLayer(TiXmlElement* xmlLayer, TileSetList tileSet
 }
 
 void MapParser::Clean(){
-	std::map<std::string, TileMap*>::iterator it;
-	for (it = m_MapDict.begin(); it != m_MapDict.end(); it++) {
-		it->second = nullptr;
-	}
+	std::map<std::string, TileMap>::iterator it;
+	/*for (it = m_MapDict.begin(); it != m_MapDict.end(); it++) {
+		it->second = NULL;
+	}*/
 	m_MapDict.clear();
 }

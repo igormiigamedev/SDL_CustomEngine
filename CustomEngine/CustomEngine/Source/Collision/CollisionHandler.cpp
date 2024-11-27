@@ -17,48 +17,40 @@ void CollisionHandler::SetCollisionMap(TileMatrix tilemap, int tilesize) {
 	m_MapWidth = tilemap[0].size();
 }
 
-CollisionLocation CollisionHandler::MapCollision(SDL_Rect a){ 
-	/*int tileSize = 32;
-	int colCount = 40;
-	int rowCount = 30;*/
+CollisionLocation CollisionHandler::DetectTileCollision(const SDL_Rect& entityBounds) {
+    // Calcula os índices das tiles envolvidas horizontalmente
+    int leftTile = ClampToRange(entityBounds.x / m_MapTileSize, 0, m_MapWidth - 1);
+    int rightTile = ClampToRange((entityBounds.x + entityBounds.w) / m_MapTileSize, 0, m_MapWidth - 1);
 
-	int left_tile = a.x / m_MapTileSize;
-	int right_tile = (a.x + a.w) / m_MapTileSize;
+    // Calcula os índices das tiles envolvidas verticalmente, com ajuste circular
+    int topTile = WrapTileIndex(entityBounds.y / m_MapTileSize, m_MapHeight);
+    int bottomTile = WrapTileIndex((entityBounds.y + entityBounds.h) / m_MapTileSize, m_MapHeight);
 
-	int top_tile = a.y / m_MapTileSize;
-	int botton_tile = (a.y + a.h) / m_MapTileSize;
+    // Ajusta para evitar desconexões verticais devido ao mapeamento circular
+    if (topTile > bottomTile) {
+        bottomTile = topTile + (m_MapHeight - topTile);
+    }
 
-	//limit range
-	if (left_tile < 0) {
-		left_tile = 0;
-	}
-	if (right_tile >= m_MapWidth) {
-		right_tile = m_MapWidth - 1;
-	}
-	if (top_tile < 0) {
-		top_tile = 0;
-	}
-	if (botton_tile >= m_MapHeight) {
-		botton_tile = m_MapHeight - 1;
-	}
+    // Itera pelas tiles nos intervalos calculados
+    for (int i = leftTile; i <= rightTile; ++i) {
+        for (int j = topTile; j <= bottomTile; ++j) {
+            if (m_CollisionTileMap[j][i] > 0) {
+                return (j == bottomTile) ? Below : Top;
+            }
+        }
+    }
 
-	for (int i = left_tile; i <= right_tile; ++i) {
-		for (int j = top_tile; j <= botton_tile; ++j) {
-			if (m_CollisionTileMap[j][i] > 0) {
-				/*std::cout << "Valor de j: " << j << std::endl;
-				std::cout << "Valor de botton_tile: " << botton_tile << std::endl;
-				std::cout << "Valor de top_tile: " << top_tile << std::endl;*/
-				if (j == botton_tile ) {
-					return Below;
-				}
-				else {
-					return Top;
-				}
-			}
-		}
-	}
-	return None;
+    return None; // Nenhuma colisão detectada
 }
+
+int CollisionHandler::ClampToRange(int value, int min, int max) {
+    return std::max(min, std::min(value, max));
+}
+
+int CollisionHandler::WrapTileIndex(int value, int mapHeight) {
+    return (value % mapHeight + mapHeight) % mapHeight;
+}
+
 
 bool CollisionHandler::CheckCollision(SDL_Rect a, SDL_Rect b){
 	bool x_overlaps = (a.x < b.x + b.w) && (a.x + a.w > b.x);

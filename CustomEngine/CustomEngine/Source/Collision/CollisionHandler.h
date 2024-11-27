@@ -10,7 +10,9 @@ enum CollisionLocation { None, Top, Below };
 class CollisionHandler{
 
 	public:
-		CollisionLocation MapCollision(SDL_Rect a);
+		CollisionLocation DetectTileCollision(const SDL_Rect& entityBounds);
+		int ClampToRange(int value, int min, int max);
+		int WrapTileIndex(int value, int mapHeight);
 		bool CheckCollision(SDL_Rect a, SDL_Rect b);
 		void SetCollisionMap(TileMatrix tilemap, int tilesize);
 
