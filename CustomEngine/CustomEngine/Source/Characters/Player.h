@@ -2,8 +2,6 @@
 
 #include "Character.h"
 #include "../Animation/SpriteAnimation.h"
-#include "../Physics/RigidBody.h"
-#include "../Physics/Collider.h"
 #include "../Physics/Vector2D.h"
 
 #define JUMP_TIME 3.0f
@@ -28,6 +26,8 @@ class Player : public Character{
 
 	public:
 		Player(const Properties& props, Transform transform);
+
+		GameObjectType GetType() const override { return GameObjectType::PLAYER; };
 
 		virtual void Draw();
 		virtual void Clean();
@@ -57,16 +57,21 @@ class Player : public Character{
 		void UpdatePlayerPositionY(float dt);
 		bool IsSpacePressed() const;
 
+		//Death
+		void HandlePlayerDeath();
+
+		void OnCollision(const CollisionEvent& event);
+
 	private:
 		PlayerConfig playerConfig;
 
+		bool m_IsDead = false;
 		bool m_IsJumping;
 		bool m_IsGrounded;
 		bool m_IsFalling;
 		bool m_UsedDoubleJump = false;
 
 		SpriteAnimation* m_Animation;
-		RigidBody* m_RigidBody;
 
 		int playerDirection = 1;
 		

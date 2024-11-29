@@ -12,7 +12,7 @@ class CollisionManager {
     public:
         // Construtor para definir os valores iniciais
         CollisionManager() { //BLOCK, IGNORE, OVERLAP
-            responseMap[PhysicsBody] = BLOCK;
+            responseMap[PhysicsBody] = OVERLAP;
             responseMap[WorldFloor] = BLOCK;
             responseMap[WorldWall] = BLOCK;
         }

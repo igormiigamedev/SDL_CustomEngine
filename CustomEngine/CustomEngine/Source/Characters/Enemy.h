@@ -1,8 +1,6 @@
 #pragma once
 
 #include "Character.h"
-#include "../Physics/RigidBody.h"
-//#include "../Physics/Collider.h"
 #include "../Animation/SequenceAnimation.h"
 #include "../Animation/SpriteAnimation.h"
 
@@ -17,6 +15,8 @@ class Enemy : public Character{
 
 public:
 	Enemy(const Properties& props, Transform transform);
+
+	GameObjectType GetType() const override { return GameObjectType::ENEMY; };
 	
 	virtual void Draw();
 	virtual void Clean();
@@ -31,10 +31,11 @@ private:
 
 	void UpdateCharacterPositionY(float dt);
 
+	void OnCollision(const CollisionEvent& event);
+
 private:
 	EnemyConfig enemyConfig;
 
-	RigidBody* m_RigidBody;
 	SequenceAnimation* m_Animation;
 
 	int characterDirection = 1;

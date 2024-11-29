@@ -4,6 +4,8 @@
 #include "../Collision/CollisionTypes.h"
 #include "Collider.h"
 #include "../Collision/CollisionHandler.h"
+#include "../Events/EventDispatcher.h"
+#include "../Collision/PhysicsWorld.h"
 
 #define UNI_MASS 1.0f
 #define GRAVITY 9.8f
@@ -16,10 +18,9 @@
 
 class RigidBody{
 	public:
-		RigidBody() {
-			m_Mass = UNI_MASS;
-			m_Gravity = GRAVITY;
-			m_ColliderRB = new Collider();
+		RigidBody(GameObject* owner)
+			: m_Owner(owner), m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
+			m_ColliderRB = std::make_unique<Collider>();
 		}
 
 		//Setter Gravity & Mass
@@ -45,9 +46,14 @@ class RigidBody{
 		inline Vector2D GetDeltaPosition() { return m_DeltaPosition; }
 		inline Vector2D GetVelocity() { return m_Velocity; }
 		inline Vector2D GetAcceleration() { return m_Acceleration; }
-		inline Collider* GetCollider() { return m_ColliderRB; }
+		inline Collider* GetCollider() const {
+			return m_ColliderRB.get();
+		}
+
+		GameObject* GetOwner() const {
+			return m_Owner.get(); 
+		}
 		
-		// Update Methods
 		void Update(float dt) {
 			UpdateAcceleration();
 			HandleCollision(dt);
@@ -55,7 +61,6 @@ class RigidBody{
 			UpdatePosition(dt);
 		}
 
-		// Calculate acceleration based on forces and mass
 		void UpdateAcceleration() {
 			m_Acceleration.X = (m_Force.X + m_Friction.X) / m_Mass;
 			m_Acceleration.Y = m_Gravity + (m_Force.Y / m_Mass);
@@ -69,7 +74,7 @@ class RigidBody{
 			case IGNORE:
 				break;
 			case BLOCK:
-				ProcessBlockCollision(dt);
+				CheckMapCollision(dt);
 				break;
 			case OVERLAP:
 				// Handle overlap case if needed
@@ -77,10 +82,33 @@ class RigidBody{
 			default:
 				break;
 			}
+
+			switch (m_ColliderRB->GetCollisionResponse(PhysicsBody)) {
+			case IGNORE:
+				break;
+			case BLOCK:
+				break;
+			case OVERLAP:
+				CheckCollisionWithRigidBodies();
+				break;
+			default:
+				break;
+			}
 		}
 
-		// Process collision response when BLOCK is detected
-		void ProcessBlockCollision(float dt) {
+		void CheckCollisionWithRigidBodies() {
+			auto& rigidBodies = PhysicsWorld::GetInstance()->GetRigidBodies();
+			for (const auto& other : rigidBodies) {
+				if (other.get() == this) continue;
+
+				if (CollisionHandler::GetInstance()->CheckCollision(m_ColliderRB->Get(), other->GetCollider()->Get())) {
+					CollisionEvent event(this, other.get());
+					EventDispatcher::GetInstance()->DispatchCollisionEvent(event);
+				}
+			}
+		}
+
+		void CheckMapCollision(float dt) {
 			switch (CollisionHandler::GetInstance()->DetectTileCollision(m_ColliderRB->Get())) {
 			case CollisionLocation::Below:
 				ResolveGroundCollision(dt);
@@ -108,13 +136,11 @@ class RigidBody{
 			}
 		}
 
-		// Update velocity based on acceleration
 		void UpdateVelocity(float dt) {
 			m_Velocity.X += m_Acceleration.X * dt;
 			m_Velocity.Y += m_Acceleration.Y * dt;
 		}
 
-		// Update position based on velocity
 		void UpdatePosition(float dt) {
 			m_DeltaPosition = m_Velocity * dt;
 		}
@@ -131,5 +157,7 @@ class RigidBody{
 		Vector2D m_Velocity;
 		Vector2D m_Acceleration;
 
-		Collider* m_ColliderRB;
+		std::unique_ptr<Collider> m_ColliderRB;
+
+		std::shared_ptr<GameObject> m_Owner;
 };

@@ -4,9 +4,11 @@
 static RegisterObject<Enemy> registerObject(GameObjectType::ENEMY);
 
 Enemy::Enemy(const Properties& props, Transform transform) : Character(props, transform){
-	m_RigidBody = new RigidBody();
-	m_RigidBody->SetGravity(360.0f);
-	m_RigidBody->GetCollider()->SetBuffer(0, 0, 0, 0);
+	EventDispatcher::GetInstance()->RegisterCollisionCallback(
+		[this](const CollisionEvent& event) { OnCollision(event); });
+
+	GetRigidBody()->SetGravity(360.0f);
+	GetRigidBody()->GetCollider()->SetBuffer(0, 0, 0, 0);
 
 	m_Animation = new SequenceAnimation(false);
 	m_Animation->Parse("Assets/GameAnimations.xml");
@@ -18,7 +20,7 @@ Enemy::Enemy(const Properties& props, Transform transform) : Character(props, tr
 
 void Enemy::Draw(){
 	m_Animation->DrawFrame(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
-	m_RigidBody->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, enemyConfig.m_EnemyWidth, (enemyConfig.m_EnemyHeight - 30));
+	GetRigidBody()->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, enemyConfig.m_EnemyWidth, (enemyConfig.m_EnemyHeight - 30));
 	/*m_RigidBody->GetCollider()->DrawDebugCollider();*/
 }
 
@@ -61,17 +63,31 @@ void Enemy::UpdateCharacterDirection() {
 }
 
 void Enemy::ApplyWalkingForce(float dt) {
-	m_RigidBody->SetVelocityX(WALK_VELOCITY * characterDirection);
-	m_RigidBody->Update(dt);
+	GetRigidBody()->SetVelocityX(WALK_VELOCITY * characterDirection);
+	GetRigidBody()->Update(dt);
 }
 
 void Enemy::UpdateCharacterPositionX(float dt) {
-	m_Transform.X += m_RigidBody->GetDeltaPosition().X;
-	m_RigidBody->GetCollider()->SetPositionX(m_Transform.X);
+	m_Transform.X += GetRigidBody()->GetDeltaPosition().X;
+	GetRigidBody()->GetCollider()->SetPositionX(m_Transform.X);
 }
 
 void Enemy::UpdateCharacterPositionY(float dt) {
 	/*m_RigidBody->Update(dt);*/
-	m_Transform.Y += m_RigidBody->GetDeltaPosition().Y;
-	m_RigidBody->GetCollider()->SetPositionY(m_Transform.Y);
+	m_Transform.Y += GetRigidBody()->GetDeltaPosition().Y;
+	GetRigidBody()->GetCollider()->SetPositionY(m_Transform.Y);
+}
+
+void Enemy::OnCollision(const CollisionEvent& event) {
+	// Verifique se o Player está envolvido na colisão
+	if (event.bodyA->GetOwner() == this || event.bodyB->GetOwner() == this) {
+		Character* other = dynamic_cast<Character*>(
+			event.bodyA->GetOwner() == this ? event.bodyB->GetOwner() : event.bodyA->GetOwner());
+
+		if (other) {
+			if (other->GetType() == GameObjectType::PLAYER) {
+				std::cout << "Enemy colidiu com Player!" << std::endl;
+			}
+		}
+	}
 }
