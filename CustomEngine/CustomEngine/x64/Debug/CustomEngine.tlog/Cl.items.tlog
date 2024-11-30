@@ -1,3 +1,8 @@
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Characters\IDamage.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\IDamage.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Events\EventDispatcher.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\EventDispatcher.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Object\EGameObjectType.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\EGameObjectType.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Parser\Parser.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\Parser.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Map\ImgLayer.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\ImgLayer.obj
 E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\States\Play.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\Play.obj
 E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\States\Menu.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\Menu.obj
 E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Factory\ObjectFactory.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\ObjectFactory.obj

@@ -4,8 +4,7 @@
 static RegisterObject<Enemy> registerObject(GameObjectType::ENEMY);
 
 Enemy::Enemy(const Properties& props, Transform transform) : Character(props, transform){
-	EventDispatcher::GetInstance()->RegisterCollisionCallback(
-		[this](const CollisionEvent& event) { OnCollision(event); });
+	RegisterCollisionCallback();
 
 	GetRigidBody()->SetGravity(360.0f);
 	GetRigidBody()->GetCollider()->SetBuffer(0, 0, 0, 0);
@@ -43,6 +42,9 @@ void Enemy::Update(float dt){
 	}
 }
 
+void Enemy::OnTakeDamage(float damage){
+}
+
 void Enemy::WalkMovement(float dt) {
 
 	UpdateCharacterDirection();
@@ -78,16 +80,12 @@ void Enemy::UpdateCharacterPositionY(float dt) {
 	GetRigidBody()->GetCollider()->SetPositionY(m_Transform.Y);
 }
 
-void Enemy::OnCollision(const CollisionEvent& event) {
-	// Verifique se o Player está envolvido na colisão
-	if (event.bodyA->GetOwner() == this || event.bodyB->GetOwner() == this) {
-		Character* other = dynamic_cast<Character*>(
-			event.bodyA->GetOwner() == this ? event.bodyB->GetOwner() : event.bodyA->GetOwner());
-
-		if (other) {
-			if (other->GetType() == GameObjectType::PLAYER) {
-				std::cout << "Enemy colidiu com Player!" << std::endl;
-			}
+void Enemy::OnCollision(std::shared_ptr<GameObject> target) {
+	if (target) {
+		auto character = std::dynamic_pointer_cast<Character>(target);
+		if (character && character->GetType() == GameObjectType::PLAYER) {
+			/*std::cout << "Enemy colidiu com Player!" << std::endl;*/
+			character->ApplyDamage(1);
 		}
 	}
 }

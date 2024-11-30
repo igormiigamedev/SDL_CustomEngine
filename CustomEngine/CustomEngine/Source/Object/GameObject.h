@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include"../Physics/Point.h"
 #include "EGameObjectTypes.h"
+#include <memory>
 
 struct Properties {
 
@@ -24,7 +25,7 @@ struct Properties {
         float ScaleX, ScaleY;
 };
 
-class GameObject : public IObject {
+class GameObject : public IObject, public std::enable_shared_from_this<GameObject> {
     public:
         GameObject(const Properties& props, Transform transform)
             : m_Properties(props), m_Transform(transform) {

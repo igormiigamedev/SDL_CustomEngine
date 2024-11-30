@@ -26,18 +26,23 @@ class Player : public Character{
 
 	public:
 		Player(const Properties& props, Transform transform);
+		~Player() { EventDispatcher::GetInstance()->UnregisterCallback(shared_from_this()); };
 
 		GameObjectType GetType() const override { return GameObjectType::PLAYER; };
 
 		virtual void Draw();
 		virtual void Clean();
 		virtual void Update(float dt);
+		virtual void OnTakeDamage(float damage);
+		virtual void OnCollision(std::shared_ptr<GameObject> target);
 
 		//Walk
 		void WalkMovement(float dt);
 
 		// Jump
 		void JumpMovement(float dt);
+
+		bool IsDead() { return m_IsDead; };
 		
 
 	private:
@@ -59,8 +64,6 @@ class Player : public Character{
 
 		//Death
 		void HandlePlayerDeath();
-
-		void OnCollision(const CollisionEvent& event);
 
 	private:
 		PlayerConfig playerConfig;

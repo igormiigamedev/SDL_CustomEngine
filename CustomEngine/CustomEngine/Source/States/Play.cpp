@@ -59,21 +59,23 @@ bool Play::Init() {
 
 	Parser::GetInstance()->ParseGameObjects("Assets/Level1.xml");
 
-	GameObject* player = SpawnGameObjectAtLocation<GameObject>(GameObjectType::PLAYER, playertf);
-	assert(player != nullptr && "Player object is null!"); // Debugging
-	GameObject* enemy = SpawnGameObjectAtLocation < GameObject >(GameObjectType::ENEMY, enemytf);
-	assert(enemy != nullptr && "Enemy object is null!"); // Debugging
+	/*std::shared_ptr<GameObject> player = SpawnGameObjectAtLocation<GameObject>(GameObjectType::PLAYER, playertf);*/
+	PlayerInstance = SpawnGameObjectAtLocation<Player>(GameObjectType::PLAYER, playertf);
+	assert(PlayerInstance != nullptr && "Player object is null!"); // Debugging
 
-	if (player == nullptr) {
+	EnemyList.push_back(SpawnGameObjectAtLocation < Enemy >(GameObjectType::ENEMY, enemytf));
+	assert(EnemyList.back() != nullptr && "Enemy object is null!"); // Debugging
+
+	if (PlayerInstance == nullptr) {
 		std::cout << "Failed to create player!" << std::endl;
 		return false;
 	}
-	if (enemy == nullptr) {
+	if (EnemyList.back() == nullptr) {
 		std::cout << "Failed to create enemy!" << std::endl;
 		return false;
 	}
 
-	Camera::GetInstance()->SetTarget(player->GetOrigin());
+	Camera::GetInstance()->SetTarget(PlayerInstance->GetOrigin());
 
 	/*Gui::GetInstance()->Init();*/
 	std::cout << "play initialized!" << std::endl;
@@ -87,8 +89,14 @@ bool Play::Exit(){
 	}
 	m_ActiveMaps.clear();
 
-	for (auto& gameobj : m_GameObjects) {
-		gameobj->Clean();
+	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
+		if (auto gameobj = it->lock()) { // Verifica se o objeto ainda existe
+			gameobj->Clean();
+			++it;
+		}
+		else {
+			it = m_GameObjects.erase(it); // Remove referências fracas para objetos destruídos
+		}
 	}
 
 	m_GameObjects.clear();
@@ -107,10 +115,22 @@ void Play::Update(){
 		// Atualiza os mapas ativos
 		UpdateMaps();
 
-		for (auto& gameobj : m_GameObjects) {
-			gameobj->Update(dt);
+		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
+			if (auto gameobj = it->lock()) { // Verifica se o objeto ainda existe
+				gameobj->Update(dt);
+				++it;
+			}
+			else {
+				it = m_GameObjects.erase(it); // Remove referências para objetos destruídos
+			}
 		}
+
 		Camera::GetInstance()->Update(dt);
+
+		if (PlayerInstance && PlayerInstance->IsDead()) {
+			std::cout << "Morreu" << std::endl;
+			/*PlayerInstance.reset();*/
+		}
 	}
 }
 
@@ -127,8 +147,15 @@ void Play::Render(){
 		map->Render();
 	}
 
-	for (auto& gameobj : m_GameObjects) {
-		gameobj->Draw();
+	// Renderiza os GameObjects
+	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
+		if (auto gameobj = it->lock()) { // Verifica se o objeto ainda existe
+			gameobj->Draw();
+			++it;
+		}
+		else {
+			it = m_GameObjects.erase(it); // Remove referências para objetos destruídos
+		}
 	}
 
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();

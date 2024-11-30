@@ -10,8 +10,7 @@
 static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 
 Player::Player(const Properties& props, Transform transform) : Character(props, transform){
-	EventDispatcher::GetInstance()->RegisterCollisionCallback(
-		[this](const CollisionEvent& event) { OnCollision(event); });
+	RegisterCollisionCallback();
 
 	GetRigidBody()->SetGravity(360.0f);
 	GetRigidBody()->GetCollider()->SetBuffer(0, 0, 0, 0);
@@ -44,6 +43,10 @@ void Player::Update(float dt){
 	m_Origin->Y = m_Transform.Y;// + playerConfig.m_PlayerHeight / 2;
 
 	m_Animation->Update(dt);
+}
+
+void Player::OnTakeDamage(float damage){
+	HandlePlayerDeath();
 }
 
 void Player::WalkMovement(float dt) {
@@ -173,28 +176,6 @@ void Player::HandlePlayerDeath() {
 	}
 }
 
-void Player::OnCollision(const CollisionEvent& event) {
-	// Check if the Player is involved in the collision
-	if (event.bodyA->GetOwner() == this || event.bodyB->GetOwner() == this) {
-		Character* other = dynamic_cast<Character*>(
-			event.bodyA->GetOwner() == this ? event.bodyB->GetOwner() : event.bodyA->GetOwner());
-
-		if (other) {
-			if (other->GetType() == GameObjectType::ENEMY) {
-				std::cout << "Player colidiu com Enemy!" << std::endl;
-				HandlePlayerDeath();
-			}
-		}
-	}
+void Player::OnCollision(std::shared_ptr<GameObject> target) {
+	
 }
-
-//void Player::OnCollision(const CollisionEvent& event) {
-//	// Check if the Player is involved in the collision
-//	if (event.bodyA->GetOwner() == this || event.bodyB->GetOwner() == this) {
-//		auto other = (event.bodyA->GetOwner() == this) ? event.bodyB->GetOwner() : event.bodyA->GetOwner();
-//		if (dynamic_cast<Enemy*>(other)) {
-//			std::cout << "Player colidiu com Enemy!" << std::endl;
-//			HandlePlayerDeath();
-//		}
-//	}
-//}

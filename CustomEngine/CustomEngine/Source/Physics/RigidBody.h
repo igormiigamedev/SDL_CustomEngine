@@ -50,8 +50,8 @@ class RigidBody{
 			return m_ColliderRB.get();
 		}
 
-		GameObject* GetOwner() const {
-			return m_Owner.get(); 
+		std::shared_ptr<GameObject> GetOwner() const {
+			return m_Owner;
 		}
 		
 		void Update(float dt) {

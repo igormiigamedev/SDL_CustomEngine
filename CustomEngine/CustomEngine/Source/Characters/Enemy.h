@@ -15,12 +15,15 @@ class Enemy : public Character{
 
 public:
 	Enemy(const Properties& props, Transform transform);
+	~Enemy() { EventDispatcher::GetInstance()->UnregisterCallback(shared_from_this()); };
 
 	GameObjectType GetType() const override { return GameObjectType::ENEMY; };
 	
 	virtual void Draw();
 	virtual void Clean();
 	virtual void Update(float dt);
+	virtual void OnTakeDamage(float damage);
+	virtual void OnCollision(std::shared_ptr<GameObject> target);
 
 private:
 	//Walk
@@ -30,8 +33,6 @@ private:
 	void UpdateCharacterPositionX(float dt);
 
 	void UpdateCharacterPositionY(float dt);
-
-	void OnCollision(const CollisionEvent& event);
 
 private:
 	EnemyConfig enemyConfig;

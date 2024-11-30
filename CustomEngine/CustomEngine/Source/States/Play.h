@@ -28,7 +28,7 @@ class Play : public GameState{
 		virtual void Render();
 
 		template <typename T, typename = std::enable_if_t<std::is_base_of_v<GameObject, T>>>
-		T* SpawnGameObjectAtLocation(const GameObjectType type, const Transform& transform) {
+		std::shared_ptr<T> SpawnGameObjectAtLocation(const GameObjectType type, const Transform& transform) {
 			const Properties* props = Parser::GetInstance()->GetGameObjectPropertiesByType(type);
 			if (!props) {
 				std::cout << "Failed to get properties for GameObject: " << GameObjectTypeToString(type) << std::endl;
@@ -39,8 +39,8 @@ class Play : public GameState{
 				std::cout << "Failed to create GameObject: " << GameObjectTypeToString(type) << std::endl;
 				return nullptr;
 			}
-			m_GameObjects.push_back(std::move(game_object));
-			return static_cast<T*>(m_GameObjects.back().get());
+			m_GameObjects.push_back(game_object);
+			return std::dynamic_pointer_cast<T>(game_object);
 		}
 
 	private:
@@ -64,8 +64,11 @@ class Play : public GameState{
 		TileMap* m_LevelMap;
 		std::vector<ImgLayer*> m_ParalaxBg;
 
-		std::vector<std::unique_ptr<GameObject>> m_GameObjects;
-		std::vector<std::unique_ptr<GameObject>> m_SceneObjects;
+		std::shared_ptr<Player> PlayerInstance;
+		std::vector<std::shared_ptr<Enemy>> EnemyList;
+		std::vector<std::weak_ptr<GameObject>> m_GameObjects;
+
+		/*std::vector<std::unique_ptr<GameObject>> m_SceneObjects;*/
 
 		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
 };
