@@ -19,7 +19,15 @@ class Camera{
 		inline void MoveX(float x) { m_Position.X = x; }
 		inline void MoveY(float y) { m_Position.Y = y; }
 
-		inline void SetTarget(Point* target) { m_Target = target; }
+		inline void SetTarget(Point* target) { 
+			m_Target = target; 
+			SetCameraInitalPosition(0, static_cast<int>(std::round(target->Y)) - 500);
+		}
+
+		inline void SetCameraInitalPosition(int x, int y) {
+			m_ViewBox = { x, y, SCREEN_WIDTH, SCREEN_HEIGHT };
+		}
+
 		inline void SetSceneLimit(int w, int h) { m_SceneWidth = w; m_SceneHeight = h; }
 
 		inline static Camera* GetInstance() {
@@ -27,7 +35,7 @@ class Camera{
 		}
 
 	private:
-		Camera() {m_ViewBox = { 0, 5*SCREEN_HEIGHT/3, SCREEN_WIDTH, SCREEN_HEIGHT }; }
+		Camera() { }
 		
 		Point* m_Target;
 		Vector2D m_Position;
