@@ -1,4 +1,6 @@
 #include "TileLayer.h"
+//#include <filesystem>
+//#include <SDL.h>
 #include "../Graphics/TextureManager.h"
 #include <iostream>
 
@@ -7,9 +9,41 @@ TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMatrix tileMa
 	m_TileSize (tileSize), m_ColCount (colCount), m_RowCount (rowCount), m_TileMatrix (tileMap), m_TileSets (tileSets){ 
 
 	for (unsigned int i = 0; i < m_TileSets.size(); i++) {
-		TextureManager::GetInstance()->Load(m_TileSets[i]->Name, "../Assets/Maps" + m_TileSets[i]->Source);
+		TextureManager::GetInstance()->Load(m_TileSets[i]->Name, ResolveRelativePath(m_TileSets[i]->Source) );
 	}
 }
+
+// Manual override solution
+std::string TileLayer::ResolveRelativePath(const std::string& inputPath) {
+	std::string outputPath = inputPath;
+
+	// Remove "../" and replace with the desired prefix
+	size_t pos = outputPath.find("../");
+	while (pos != std::string::npos) {
+		// Remove "../"
+		outputPath.erase(pos, 3);
+		// Replace with base path
+		outputPath.insert(pos, "Assets/");
+		pos = outputPath.find("../");
+	}
+
+	return outputPath;
+}
+
+// TODO - More general solution
+//std::string TileLayer::ResolvePath(const std::string& inputPath) {
+//	// Caminho base (onde sua aplicação está executando)
+//	std::string basePath = SDL_GetBasePath();
+//
+//	// Resolve o caminho relativo com base no diretório de trabalho atual
+//	std::filesystem::path resolvedPath = std::filesystem::path(basePath) / inputPath;
+//
+//	// Normaliza o caminho (remove "../" e outras inconsistências)
+//	resolvedPath = std::filesystem::canonical(resolvedPath);
+//
+//	// Converte para string e retorna
+//	return resolvedPath.string();
+//}
 
 void TileLayer::Render(){
 	for (unsigned int row = 0; row < m_RowCount; row++) {

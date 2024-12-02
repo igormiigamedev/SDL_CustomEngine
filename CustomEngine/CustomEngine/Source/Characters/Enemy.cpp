@@ -19,8 +19,8 @@ Enemy::Enemy(const Properties& props, Transform transform) : Character(props, tr
 
 void Enemy::Draw(){
 	m_Animation->DrawFrame(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
-	GetRigidBody()->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, enemyConfig.m_EnemyWidth, (enemyConfig.m_EnemyHeight - 30));
-	/*m_RigidBody->GetCollider()->DrawDebugCollider();*/
+	GetRigidBody()->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, enemyConfig.m_EnemyWidth, (enemyConfig.m_EnemyHeight));
+	GetRigidBody()->GetCollider()->DrawDebugCollider();
 }
 
 void Enemy::Clean(){

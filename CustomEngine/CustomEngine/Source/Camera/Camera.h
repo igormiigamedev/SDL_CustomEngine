@@ -27,7 +27,7 @@ class Camera{
 		}
 
 	private:
-		Camera() {m_ViewBox = { 0, SCREEN_HEIGHT / 3, SCREEN_WIDTH, SCREEN_HEIGHT }; }
+		Camera() {m_ViewBox = { 0, 5*SCREEN_HEIGHT/3, SCREEN_WIDTH, SCREEN_HEIGHT }; }
 		
 		Point* m_Target;
 		Vector2D m_Position;

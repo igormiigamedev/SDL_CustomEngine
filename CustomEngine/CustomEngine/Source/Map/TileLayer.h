@@ -18,6 +18,8 @@ using TileMatrix = std::vector < std::vector<int> >;
 class TileLayer : public Layer{
 	public:
 		TileLayer(int tileSize, int rowCount, int colCount, TileMatrix tileMap, std::vector< std::shared_ptr<TileSet>> tileSets);
+		std::string ResolveRelativePath(const std::string& inputPath);
+		std::string ResolvePath(const std::string& inputPath);
 		virtual void Render();
 		virtual void Update();
 		inline TileMatrix& GetTileMapMatrix() { return m_TileMatrix; }

@@ -12,7 +12,7 @@ static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 Player::Player(const Properties& props, Transform transform) : Character(props, transform){
 	RegisterCollisionCallback();
 
-	GetRigidBody()->SetGravity(360.0f);
+	GetRigidBody()->SetGravity(450.0f);
 	GetRigidBody()->GetCollider()->SetBuffer(0, 0, 0, 0);
 
 	m_Animation = new SpriteAnimation();
@@ -24,7 +24,7 @@ Player::Player(const Properties& props, Transform transform) : Character(props, 
 
 void Player::Draw(){
 	m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.Width, m_Properties.Height, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
-	GetRigidBody()->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight - 30));
+	GetRigidBody()->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight));
 
 	GetRigidBody()->GetCollider()->DrawDebugCollider();
 }

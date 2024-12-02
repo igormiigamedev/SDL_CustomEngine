@@ -48,9 +48,9 @@ bool Play::Init() {
 	float imageScalling = 0.7f;
 	Transform playertf, enemytf;
 	playertf.X = 50;
-	playertf.Y = SCREEN_HEIGHT;
+	playertf.Y = 2.2*SCREEN_HEIGHT;
 	enemytf.X = 50;
-	enemytf.Y = SCREEN_HEIGHT - 150;
+	enemytf.Y = 2*SCREEN_HEIGHT - 150;
 	/*Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
 	Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);*/
 
@@ -129,7 +129,8 @@ void Play::Update(){
 
 		if (PlayerInstance && PlayerInstance->IsDead()) {
 			std::cout << "Morreu" << std::endl;
-			/*PlayerInstance.reset();*/
+			// TODO - Implement and handle Character resets
+			/*PlayerInstance.reset();*/ 
 		}
 	}
 }
@@ -140,8 +141,8 @@ void Play::Render(){
 
 	//TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
 
-	for (auto imgLayer : m_ParalaxBg)
-		imgLayer->Render();
+	/*for (auto imgLayer : m_ParalaxBg)
+		imgLayer->Render();*/
 
 	for (auto map : m_ActiveMaps) {
 		map->Render();

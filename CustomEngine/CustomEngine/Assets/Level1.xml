@@ -5,10 +5,10 @@
 
     <object id="SOBJECT" category="0" textureId="sky" w="0" h="0" flip="0" sX="0" sY="0" sratio="0.0" rot="0" imgScalling="1.0"/> -->
 
-    <object type="PLAYER" width="240" height="207" scaleX="0.7" scaleY="0.7" />
+    <object type="PLAYER" width="240" height="207" scaleX="1.1" scaleY="1.1" />
 
-    <object type="ENEMY" width="120" height="159" scaleX="0.7" scaleY="0.7" />
+    <object type="ENEMY" width="120" height="159" scaleX="1" scaleY="1" />
 
 
-
+ 
 </objects>
