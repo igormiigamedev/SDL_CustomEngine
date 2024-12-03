@@ -20,7 +20,7 @@ class RigidBody{
 	public:
 		RigidBody(GameObject* owner)
 			: m_Owner(owner), m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
-			m_ColliderRB = nullptr; // Initialize with nullptr, to be configured later.
+			SetCollider(std::make_unique<RectCollider>(0, 0, 100, 100)); // Initializes a default rectangular collision by default
 		}
 
 		//Setter Gravity & Mass
