@@ -4,7 +4,7 @@
 #include "../Animation/SequenceAnimation.h"
 #include "../Animation/SpriteAnimation.h"
 
-#define WALK_VELOCITY 350.0f
+#define WALK_VELOCITY 300.0f
 
 struct EnemyConfig {
 	float m_EnemyWidth;
@@ -22,6 +22,7 @@ public:
 	virtual void Draw();
 	virtual void Clean();
 	virtual void Update(float dt);
+	Transform GetBodyCenterPosition();
 	virtual void OnTakeDamage(float damage);
 	virtual void OnCollision(std::shared_ptr<GameObject> target);
 

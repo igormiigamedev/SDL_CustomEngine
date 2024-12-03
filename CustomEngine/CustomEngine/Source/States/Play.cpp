@@ -48,9 +48,9 @@ bool Play::Init() {
 	float imageScalling = 0.7f;
 	Transform playertf, enemytf;
 	playertf.X = 50;
-	playertf.Y = 2.2*SCREEN_HEIGHT;
+	playertf.Y = 1.65*SCREEN_HEIGHT;
 	enemytf.X = 50;
-	enemytf.Y = 2*SCREEN_HEIGHT - 150;
+	enemytf.Y = SCREEN_HEIGHT;
 	/*Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
 	Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);*/
 

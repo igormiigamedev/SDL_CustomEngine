@@ -20,12 +20,15 @@ class RigidBody{
 	public:
 		RigidBody(GameObject* owner)
 			: m_Owner(owner), m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
-			m_ColliderRB = std::make_unique<Collider>();
+			m_ColliderRB = nullptr; // Initialize with nullptr, to be configured later.
 		}
 
 		//Setter Gravity & Mass
 		inline void SetMass(float mass) { m_Mass = mass; }
 		inline void SetGravity(float gravity) { m_Gravity = gravity; }
+		void SetCollider(std::unique_ptr<Collider> collider) {
+			m_ColliderRB = std::move(collider);
+		}
 
 		//Force
 		inline void ApplyForce(Vector2D force) { m_Force = force; }
@@ -99,9 +102,9 @@ class RigidBody{
 		void CheckCollisionWithRigidBodies() {
 			auto& rigidBodies = PhysicsWorld::GetInstance()->GetRigidBodies();
 			for (const auto& other : rigidBodies) {
-				if (other.get() == this) continue;
+				if (other.get() == this || !m_ColliderRB || !other->GetCollider()) continue;
 
-				if (CollisionHandler::GetInstance()->CheckCollision(m_ColliderRB->Get(), other->GetCollider()->Get())) {
+				if (CollisionHandler::GetInstance()->CheckCollision(*m_ColliderRB, *other->GetCollider())) {
 					CollisionEvent event(this, other.get());
 					EventDispatcher::GetInstance()->DispatchCollisionEvent(event);
 				}
@@ -109,7 +112,7 @@ class RigidBody{
 		}
 
 		void CheckMapCollision(float dt) {
-			switch (CollisionHandler::GetInstance()->DetectTileCollision(m_ColliderRB->Get())) {
+			switch (CollisionHandler::GetInstance()->DetectTileCollision(*m_ColliderRB)) {
 			case CollisionLocation::Below:
 				ResolveGroundCollision(dt);
 				break;

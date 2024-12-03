@@ -12,19 +12,21 @@ static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 Player::Player(const Properties& props, Transform transform) : Character(props, transform){
 	RegisterCollisionCallback();
 
-	GetRigidBody()->SetGravity(450.0f);
-	GetRigidBody()->GetCollider()->SetBuffer(0, 0, 0, 0);
+	GetRigidBody()->SetGravity(700.0f);
 
 	m_Animation = new SpriteAnimation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
 
 	playerConfig.m_PlayerWidth = m_Properties.ScaleX * (m_Properties.Width / playerConfig.m_PlayerWalkFrameCount);
 	playerConfig.m_PlayerHeight = m_Properties.ScaleY * (m_Properties.Height / playerConfig.m_PlayerWalkSpriteRow);
+
+	float radius = (playerConfig.m_PlayerHeight - 80) / 2;
+	auto center = GetBodyCenterPosition();
+	SetColliderAsCircle(center.X, center.Y, radius);
 }
 
 void Player::Draw(){
 	m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.Width, m_Properties.Height, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
-	GetRigidBody()->GetCollider()->SetProperties(m_Transform.X, m_Transform.Y, playerConfig.m_PlayerWidth, (playerConfig.m_PlayerHeight));
 
 	GetRigidBody()->GetCollider()->DrawDebugCollider();
 }
@@ -43,6 +45,19 @@ void Player::Update(float dt){
 	m_Origin->Y = m_Transform.Y;// + playerConfig.m_PlayerHeight / 2;
 
 	m_Animation->Update(dt);
+}
+
+Transform Player::GetBodyCenterPosition() {
+	Transform centerTransform;
+
+	// Adjust to ignore the non-body part of the image
+	constexpr float imageTopMargin = 35.0f;
+
+	// Calculates the X and Y position of the center of the body
+	centerTransform.X = m_Transform.X + (playerConfig.m_PlayerWidth / 2.0f);
+	centerTransform.Y = m_Transform.Y + (playerConfig.m_PlayerHeight / 2.0f) + imageTopMargin;
+
+	return centerTransform;
 }
 
 void Player::OnTakeDamage(float damage){
@@ -75,7 +90,8 @@ void Player::ApplyWalkingForce(float dt) {
 
 void Player::UpdatePlayerPositionX(float dt) {
 	m_Transform.X += GetRigidBody()->GetDeltaPosition().X;
-	GetRigidBody()->GetCollider()->SetPositionX(m_Transform.X);
+	GetRigidBody()->GetCollider()->SetPositionX(GetBodyCenterPosition().X);
+	/*std::cout << "pos:" << m_Transform.X << std::endl;*/
 }
 
 void Player::JumpMovement(float dt) {
@@ -134,7 +150,7 @@ void Player::HandleFallingState() {
 void Player::UpdatePlayerPositionY(float dt) {
 	GetRigidBody()->Update(dt);
 	m_Transform.Y += GetRigidBody()->GetDeltaPosition().Y;
-	GetRigidBody()->GetCollider()->SetPositionY(m_Transform.Y);
+	GetRigidBody()->GetCollider()->SetPositionY(GetBodyCenterPosition().Y);
 }
 
 bool Player::IsSpacePressed() const {

@@ -52,6 +52,15 @@ class Character : public GameObject, public IDamage
 			);
 		}
 
+		// Method to set Collider type
+		void SetColliderAsCircle(float x, float y, float radius) {
+			m_RigidBody->SetCollider(std::make_unique<CircleCollider>(x, y, radius));
+		}
+
+		void SetColliderAsRect(float x, float y, float width, float height) {
+			m_RigidBody->SetCollider(std::make_unique<RectCollider>(x, y, width, height));
+		}
+
 	protected:
 
 		std::string m_Name;

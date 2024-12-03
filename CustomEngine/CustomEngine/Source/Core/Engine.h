@@ -10,7 +10,7 @@
 #include "../States/GameState.h"
 
 #define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 750 //640
+#define SCREEN_HEIGHT 980 //750
 
 class Engine {
 

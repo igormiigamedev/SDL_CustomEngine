@@ -5,9 +5,12 @@ Camera* Camera::s_Instance = nullptr;
 void Camera::Update(float dt) {
     if (m_Target == nullptr) return;
     
+    const float screenUpperLimitFactor = SCREEN_HEIGHT * 0.4f;  // Represents x% of the screen height
+    const float screenLowerLimitFactor = SCREEN_HEIGHT * 0.71f; // Represents x% of the screen height
+
     // Calculates the upper and lower limits of the viewing area
-    const float upperLimit = m_ViewBox.y + SCREEN_HEIGHT * 0.4f;
-    const float lowerLimit = m_ViewBox.y + SCREEN_HEIGHT * 0.7f;
+    const float upperLimit = m_ViewBox.y + screenUpperLimitFactor;
+    const float lowerLimit = m_ViewBox.y + screenLowerLimitFactor;
 
     // Calculates the desired camera position to center the target
     /*float targetX = m_Target->X - SCREEN_WIDTH / 2;*/
@@ -16,11 +19,11 @@ void Camera::Update(float dt) {
 
     // Centers the camera if the character is beyond the middle of the screen
     if ( m_Target->Y <= upperLimit) {
-        newViewboxY = m_ViewBox.y - (SCREEN_HEIGHT * 0.4);
+        newViewboxY = m_ViewBox.y - (screenUpperLimitFactor);
     }
     //In an extreme case: If the character is below the camera on the y-axis, reset targetY
     if (m_Target->Y >= lowerLimit) {
-        newViewboxY = m_ViewBox.y + (SCREEN_HEIGHT * 0.7);
+        newViewboxY = m_ViewBox.y + (screenLowerLimitFactor);
     }
 
     // Limits the desired position within the screen limits
@@ -34,7 +37,7 @@ void Camera::Update(float dt) {
     /*if (targetY > (m_SceneHeight - m_ViewBox.h)) targetY = (m_SceneHeight - m_ViewBox.h);*/
 
     // Linear interpolation to smooth camera transition
-    constexpr float lerpFactor = 0.01f; // Adjust this value to control the speed of smoothing
+    constexpr float lerpFactor = 0.011f; // Adjust this value to control the speed of smoothing
     /*m_ViewBox.x += (targetX - m_ViewBox.x) * lerpFactor;*/
     m_ViewBox.y += (newViewboxY - m_ViewBox.y) * lerpFactor;
 

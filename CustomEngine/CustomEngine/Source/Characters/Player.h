@@ -4,9 +4,9 @@
 #include "../Animation/SpriteAnimation.h"
 #include "../Physics/Vector2D.h"
 
-#define JUMP_VELOCITY 600.0f //450.0f
+#define JUMP_VELOCITY 800.0f //450.0f
 
-#define WALK_VELOCITY 500.0f //400.0f
+#define WALK_VELOCITY 700.0f //400.0f
 
 struct PlayerConfig {
 	/*std::string m_PlayerTextureID;*/  
@@ -30,6 +30,7 @@ class Player : public Character{
 		virtual void Draw();
 		virtual void Clean();
 		virtual void Update(float dt);
+		Transform GetBodyCenterPosition();
 		virtual void OnTakeDamage(float damage);
 		virtual void OnCollision(std::shared_ptr<GameObject> target);
 

@@ -17,14 +17,14 @@ void CollisionHandler::SetCollisionMap(TileMatrix tilematrix, int tilesize) {
 	m_MapWidth = tilematrix[0].size();
 }
 
-CollisionLocation CollisionHandler::DetectTileCollision(const SDL_Rect& entityBounds) {
+CollisionLocation CollisionHandler::DetectTileCollision( Collider& entityBounds) {
     // Calculates the indexes of horizontally wrapped tiles
-    int leftTile = ClampToRange(entityBounds.x / m_MapTileSize, 0, m_MapWidth - 1);
-    int rightTile = ClampToRange((entityBounds.x + entityBounds.w) / m_MapTileSize, 0, m_MapWidth - 1);
+    int leftTile = ClampToRange( (entityBounds.GetCenterPositionX() - (entityBounds.GetWeight()/2) ) / m_MapTileSize, 0, m_MapWidth - 1);
+    int rightTile = ClampToRange( (entityBounds.GetCenterPositionX() + (entityBounds.GetWeight()/2) ) / m_MapTileSize, 0, m_MapWidth - 1);
 
     // Calculates the indexes of vertically wrapped tiles, with circular adjustment
-    int topTile = WrapTileIndex(entityBounds.y / m_MapTileSize, m_MapHeight);
-    int bottomTile = WrapTileIndex((entityBounds.y + entityBounds.h) / m_MapTileSize, m_MapHeight);
+    int topTile = WrapTileIndex( (entityBounds.GetCenterPositionY() - (entityBounds.GetHeigth() / 2) ) / m_MapTileSize, m_MapHeight);
+    int bottomTile = WrapTileIndex( (entityBounds.GetCenterPositionY() + (entityBounds.GetHeigth()/2) ) / m_MapTileSize, m_MapHeight);
 
     // Adjusts to avoid vertical disconnections due to circular mapping
     if (topTile > bottomTile) {
@@ -52,8 +52,54 @@ int CollisionHandler::WrapTileIndex(int value, int mapHeight) {
 }
 
 
-bool CollisionHandler::CheckCollision(SDL_Rect a, SDL_Rect b){
-	bool x_overlaps = (a.x < b.x + b.w) && (a.x + a.w > b.x);
-	bool y_overlaps = (a.y < b.y + b.h) && (a.y + a.h > b.y);
-	return (x_overlaps && y_overlaps);
+bool CollisionHandler::CheckCollision(Collider& checker, Collider& other) {
+    if (checker.GetType() == Collider::ColliderType::RECTANGLE && other.GetType() == Collider::ColliderType::RECTANGLE) {
+        auto* rectA = dynamic_cast<RectCollider*>(&checker);
+        auto* rectB = dynamic_cast<RectCollider*>(&other);
+        if (rectA && rectB) {
+            return SDL_HasIntersection(&rectA->GetBox(), &rectB->GetBox());
+        }
+    }
+    else if (checker.GetType() == Collider::ColliderType::CIRCLE && other.GetType() == Collider::ColliderType::CIRCLE) {
+        auto* circleA = dynamic_cast<CircleCollider*>(&checker);
+        auto* circleB = dynamic_cast<CircleCollider*>(&other);
+        if (circleA && circleB) {
+            return CheckCircleCollision(*circleA, *circleB);
+        }
+    }
+    else if (checker.GetType() == Collider::ColliderType::RECTANGLE && other.GetType() == Collider::ColliderType::CIRCLE) {
+        auto* rect = dynamic_cast<RectCollider*>(&checker);
+        auto* circle = dynamic_cast<CircleCollider*>(&other);
+        if (rect && circle) {
+            return CheckRectCircleCollision(*circle, *rect);
+        }
+    }
+    else if (checker.GetType() == Collider::ColliderType::CIRCLE && other.GetType() == Collider::ColliderType::RECTANGLE) {
+        auto* circle = dynamic_cast<CircleCollider*>(&checker);
+        auto* rect = dynamic_cast<RectCollider*>(&other);
+        if (circle && rect) {
+            return CheckRectCircleCollision(*circle, *rect);
+        }
+    }
+    return false;
 }
+
+bool CollisionHandler::CheckRectCircleCollision(const CircleCollider& circleCollider, const RectCollider& rectCollider) const {
+    int closestX = std::max(rectCollider.GetBox().x,
+        std::min(static_cast<int>(circleCollider.GetCircle().x), rectCollider.GetBox().x + rectCollider.GetBox().w));
+    int closestY = std::max(rectCollider.GetBox().y,
+        std::min(static_cast<int>(circleCollider.GetCircle().y), rectCollider.GetBox().y + rectCollider.GetBox().h));
+
+    int dx = static_cast<int>(circleCollider.GetCircle().x) - closestX;
+    int dy = static_cast<int>(circleCollider.GetCircle().y) - closestY;
+    return (dx * dx + dy * dy) <= (circleCollider.GetCircle().radius * circleCollider.GetCircle().radius);
+}
+
+bool CollisionHandler::CheckCircleCollision(const CircleCollider& checker, const CircleCollider& other) const {
+    float dx = checker.GetCircle().x - other.GetCircle().x;
+    float dy = checker.GetCircle().y - other.GetCircle().y;
+    float distanceSquared = dx * dx + dy * dy;
+    float radiusSum = checker.GetCircle().radius + other.GetCircle().radius;
+    return distanceSquared <= radiusSum * radiusSum;
+}
+

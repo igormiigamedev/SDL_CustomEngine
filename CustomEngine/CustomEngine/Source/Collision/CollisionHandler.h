@@ -4,17 +4,23 @@
 #include <vector>
 #include "../Map/TileLayer.h"
 #include "../Map/TileMap.h"
+#include "../Physics/Collider.h"
+#include "../Physics/RectCollider.h"
+#include "../Physics/CircleCollider.h"
 
 enum CollisionLocation { None, Top, Below };
 
 class CollisionHandler{
 
 	public:
-		CollisionLocation DetectTileCollision(const SDL_Rect& entityBounds);
+		CollisionLocation DetectTileCollision( Collider& entityBounds);
 		int ClampToRange(int value, int min, int max);
 		int WrapTileIndex(int value, int mapHeight);
-		bool CheckCollision(SDL_Rect a, SDL_Rect b);
+		bool CheckCollision(Collider& a, Collider& b);
 		void SetCollisionMap(TileMatrix tilematrix, int tilesize);
+
+		bool CheckRectCircleCollision(const CircleCollider& circleCollider, const RectCollider& rectCollider) const;
+		bool CheckCircleCollision(const CircleCollider& checker, const CircleCollider& other) const;
 
 		inline static CollisionHandler* GetInstance() { return s_Instance = (s_Instance != nullptr) ? s_Instance : new CollisionHandler(); }
 

@@ -2,40 +2,26 @@
 
 #include "SDL.h"
 #include "../Camera/Camera.h"
-#include <unordered_map>
-#include "../Collision/CollisionManager.h"    
+#include <cmath>
+#include <algorithm>
 #include "../Core/Engine.h"
+#include "../Collision/CollisionManager.h"
 
-class Collider : public CollisionManager{
+class Collider : public CollisionManager {
+public:
+    virtual ~Collider() = default;
 
-	public:
+    virtual void DrawDebugCollider() = 0;
 
-		inline SDL_Rect Get() { return m_Box; }
-		inline void SetBuffer(int x, int y, int w, int h) { m_Buffer = { x, y, w, h }; }
+    virtual void SetPositionX(float x) = 0;
+    virtual void SetPositionY(float y) = 0;
 
-		void SetProperties( int x, int y, int w, int h) {
-			m_Box = {
-				x - m_Buffer.x,
-				y - m_Buffer.y,
-				w - m_Buffer.w,
-				h - m_Buffer.h
-			};
-		}
+    virtual float GetCenterPositionX() = 0;
+    virtual float GetCenterPositionY() = 0;
 
-		void SetPositionX(int x) { m_Box.x = x; }
+    virtual float GetWeight() = 0;
+    virtual float GetHeigth() = 0;
 
-		void SetPositionY(int y) { m_Box.y = y; }
-
-		void DrawDebugCollider() {
-			Vector2D cam = Camera::GetInstance()->GetPosition();
-			SDL_Rect debugBox = m_Box;
-			/*m_Box.x -= cam.X;*/
-			debugBox.y -= cam.Y;
-			SDL_RenderDrawRect(Engine::GetInstance()->GetRenderer(), &debugBox); 
-		}
-
-	private:
-		SDL_Rect m_Box;
-		SDL_Rect m_Buffer;
+    enum ColliderType { RECTANGLE, CIRCLE };
+    virtual ColliderType GetType() const = 0;
 };
-
