@@ -30,8 +30,8 @@ class GameObject : public IObject, public std::enable_shared_from_this<GameObjec
         GameObject(const Properties& props, Transform transform)
             : m_Properties(props), m_Transform(transform) {
 
-            float px = m_Transform.X + props.Width / 2;
-            float py = m_Transform.Y + props.Height / 2;
+            float px = m_Transform.X - props.Width/2;
+            float py = m_Transform.Y - props.Height;
             m_Origin = new Point(px, py);
         }
 

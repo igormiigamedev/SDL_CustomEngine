@@ -10,7 +10,7 @@ CollisionHandler::CollisionHandler() {
 	m_CollisionTileMap = m_CollisionLayer->GetTileMap();*/
 }
 
-void CollisionHandler::SetCollisionMap(TileMatrix tilematrix, int tilesize) {
+void CollisionHandler::SetCollisionMap(Tile::Matrix tilematrix, int tilesize) {
 	m_CollisionTileMatrix = tilematrix;
 	m_MapTileSize = tilesize;
 	m_MapHeight = tilematrix.size();
@@ -35,12 +35,16 @@ CollisionLocation CollisionHandler::DetectTileCollision( Collider& entityBounds)
     for (int i = leftTile; i <= rightTile; ++i) {
         for (int j = topTile; j <= bottomTile; ++j) {
             if (m_CollisionTileMatrix[j][i] > 0) {
-                return (j == bottomTile) ? Below : Top;
+                return AreCloseTo(j, bottomTile) ? Below : Top;
             }
         }
     }
 
-    return None; // Nenhuma colisão detectada    
+    return None; // No collisions detected 
+}
+
+bool CollisionHandler::AreCloseTo(int checker, int other) {
+    return (checker == other || checker == other - 1);
 }
 
 int CollisionHandler::ClampToRange(int value, int min, int max) {

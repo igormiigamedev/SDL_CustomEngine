@@ -1,12 +1,10 @@
 #include "TileLayer.h"
-//#include <filesystem>
-//#include <SDL.h>
 #include "../Graphics/TextureManager.h"
 #include <iostream>
 
 
-TileLayer::TileLayer(int tileSize, int rowCount, int colCount, TileMatrix tileMap, std::vector< std::shared_ptr<TileSet>> tileSets):
-	m_TileSize (tileSize), m_ColCount (colCount), m_RowCount (rowCount), m_TileMatrix (tileMap), m_TileSets (tileSets){ 
+TileLayer::TileLayer(int tileSize, int rowCount, int colCount, Tile::Matrix tilematrix, std::vector< std::shared_ptr<TileSet>> tileSets):
+	m_TileSize (tileSize), m_ColCount (colCount), m_RowCount (rowCount), m_TileMatrix (tilematrix), m_TileSets (tileSets){
 
 	for (unsigned int i = 0; i < m_TileSets.size(); i++) {
 		TextureManager::GetInstance()->Load(m_TileSets[i]->Name, ResolveRelativePath(m_TileSets[i]->Source) );
@@ -44,6 +42,68 @@ std::string TileLayer::ResolveRelativePath(const std::string& inputPath) {
 //	// Converte para string e retorna
 //	return resolvedPath.string();
 //}
+
+void TileLayer::UpdateFloorCollisionInformations(){
+	floorCollisionIndexGroups = findFloors(m_TileMatrix);
+
+	heightsBetweenFloors = calculateHeightsBetweenFloors(floorCollisionIndexGroups);
+}
+
+std::vector<std::vector<int>> TileLayer::findFloors(const Tile::Matrix& matrix) {
+	std::vector<std::vector<int>> floorIndexGroups; // Stores groups of consecutive lines
+	std::vector<int> currentGroup; // Current group of consecutive lines
+
+	for (int row = 0; row < matrix.size(); ++row) {
+		bool hasNonZero = false;
+
+		// Checks if the line has at least one non-zero value
+		for (int col = 0; col < matrix[row].size(); ++col) {
+			if (matrix[row][col] != 0) {
+				hasNonZero = true;
+				break;
+			}
+		}
+
+		if (hasNonZero) {
+			// Adds current line to group
+			currentGroup.push_back(row);
+		}
+		else if (!currentGroup.empty()) {
+			// Ends the current group if the line is null
+			floorIndexGroups.push_back(currentGroup);
+			currentGroup.clear();
+		}
+	}
+
+	// If the last group has not been added
+	if (!currentGroup.empty()) {
+		floorIndexGroups.push_back(currentGroup);
+	}
+
+	return floorIndexGroups;
+}
+
+
+std::vector<int> TileLayer::calculateHeightsBetweenFloors(const std::vector<std::vector<int>>& floorCollisionIndexGroups) {
+	std::vector<int> heights;
+	for (size_t i = 1; i < floorCollisionIndexGroups.size(); ++i) {
+		int distanceBetweenIndices = (floorCollisionIndexGroups[i].back() - floorCollisionIndexGroups[i - 1].front());
+		if (distanceBetweenIndices > 1) {
+			heights.push_back(distanceBetweenIndices * GetTileSize());
+		}
+	}
+	return heights;
+}
+
+int TileLayer::GetFloorSize(int floorNumber) {
+	int index = floorNumber - 1;
+	return floorCollisionIndexGroups[index].size() * GetTileSize();
+}
+
+int TileLayer::GetFloorTopPosition(int floorNumber) {
+	int index = floorNumber - 1;
+	return (floorCollisionIndexGroups[index].back() + 1) * GetTileSize();
+}
 
 void TileLayer::Render(){
 	for (unsigned int row = 0; row < m_RowCount; row++) {

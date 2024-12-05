@@ -21,7 +21,7 @@ class Camera{
 
 		inline void SetTarget(Point* target) { 
 			m_Target = target; 
-			float cameraVerticalOffset = (0.86*SCREEN_HEIGHT);
+			float cameraVerticalOffset = (0.4*SCREEN_HEIGHT);
 			SetCameraInitalPosition(0, static_cast<int>(std::round(target->Y - cameraVerticalOffset)) );
 		}
 

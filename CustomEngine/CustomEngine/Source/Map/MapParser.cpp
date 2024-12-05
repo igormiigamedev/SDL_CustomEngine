@@ -130,7 +130,7 @@ std::unique_ptr <TileLayer> MapParser::ParseTileLayer(TiXmlElement* xmlLayer, st
 	std::istringstream iss(matrix);
 	std::string id;
 
-	TileMatrix tilemap(rowCount, std::vector<int>(colCount, 0));
+	Tile::Matrix tilematrix(rowCount, std::vector<int>(colCount, 0));
 
 	for (int row = 0; row < rowCount; row++) {
 		for (int col = 0; col < colCount; col++) {
@@ -138,14 +138,14 @@ std::unique_ptr <TileLayer> MapParser::ParseTileLayer(TiXmlElement* xmlLayer, st
 				throw std::runtime_error("Insufficient number of tile IDs in the data array.");
 			}
 			std::stringstream convertor(id);
-			convertor >> tilemap[row][col];
+			convertor >> tilematrix[row][col];
 
 			if (!iss.good()) {
 				break;
 			}
 		}
 	}
-	std::unique_ptr <TileLayer> tileLayer = std::make_unique<TileLayer>(tileSize, rowCount, colCount, tilemap, tileSets);
+	std::unique_ptr <TileLayer> tileLayer = std::make_unique<TileLayer>(tileSize, rowCount, colCount, tilematrix, tileSets);
 
 	return tileLayer;
 }

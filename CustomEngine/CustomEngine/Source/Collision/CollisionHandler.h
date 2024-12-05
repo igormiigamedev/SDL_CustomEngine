@@ -14,10 +14,12 @@ class CollisionHandler{
 
 	public:
 		CollisionLocation DetectTileCollision( Collider& entityBounds);
+
+		bool AreCloseTo(int checker, int other);
 		int ClampToRange(int value, int min, int max);
 		int WrapTileIndex(int value, int mapHeight);
 		bool CheckCollision(Collider& a, Collider& b);
-		void SetCollisionMap(TileMatrix tilematrix, int tilesize);
+		void SetCollisionMap(Tile::Matrix tilematrix, int tilesize);
 
 		bool CheckRectCircleCollision(const CircleCollider& circleCollider, const RectCollider& rectCollider) const;
 		bool CheckCircleCollision(const CircleCollider& checker, const CircleCollider& other) const;
@@ -27,7 +29,7 @@ class CollisionHandler{
 	private:
 		CollisionHandler();
 		
-		TileMatrix m_CollisionTileMatrix;
+		Tile::Matrix m_CollisionTileMatrix;
 		TileLayer* m_CollisionLayer;
 		static CollisionHandler* s_Instance;
 

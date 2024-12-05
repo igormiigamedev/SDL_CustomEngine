@@ -1,4 +1,5 @@
 #include "Play.h"
+#include <random>
 //#include "Gui.h"
 
 Play::Play(){}
@@ -28,10 +29,13 @@ bool Play::Init() {
 	TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");
 	/*Parser::GetInstance()->ParseTextures("Assets/GameTextures.xml");*/
 
+	Parser::GetInstance()->ParseGameObjects("Assets/Level1.xml");
+
 	//---------------------
-	if (MapParser::GetInstance()->SetUpXmlMaps()) {
+	if (!MapParser::GetInstance()->SetUpXmlMaps()) {
 		std::cout << "Failed to SetUp Xml Maps" << std::endl;
 	}
+	
 	// Add first map
 	AddMapAtPosition(0, 0);
 	// add map above the first
@@ -57,23 +61,21 @@ bool Play::Init() {
 	/*Properties* playerProps = new Properties(player_texture_width, player_texture_height, imageScalling, imageScalling);*/
 	/*Properties* enemyProps = new Properties( 120, 159, imageScalling, imageScalling);*/
 
-	Parser::GetInstance()->ParseGameObjects("Assets/Level1.xml");
-
 	/*std::shared_ptr<GameObject> player = SpawnGameObjectAtLocation<GameObject>(GameObjectType::PLAYER, playertf);*/
 	PlayerInstance = SpawnGameObjectAtLocation<Player>(GameObjectType::PLAYER, playertf);
 	assert(PlayerInstance != nullptr && "Player object is null!"); // Debugging
 
-	EnemyList.push_back(SpawnGameObjectAtLocation < Enemy >(GameObjectType::ENEMY, enemytf));
-	assert(EnemyList.back() != nullptr && "Enemy object is null!"); // Debugging
+	//EnemyList.push_back(SpawnGameObjectAtLocation < Enemy >(GameObjectType::ENEMY, enemytf));
+	//assert(EnemyList.back() != nullptr && "Enemy object is null!"); // Debugging
 
 	if (PlayerInstance == nullptr) {
 		std::cout << "Failed to create player!" << std::endl;
 		return false;
 	}
-	if (EnemyList.back() == nullptr) {
+	/*if (EnemyList.back() == nullptr) {
 		std::cout << "Failed to create enemy!" << std::endl;
 		return false;
-	}
+	}*/
 
 	Camera::GetInstance()->SetTarget(PlayerInstance->GetOrigin());
 
@@ -132,6 +134,11 @@ void Play::Update(){
 			// TODO - Implement and handle Character resets
 			/*PlayerInstance.reset();*/ 
 		}
+
+		if (InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_P)) {
+			/*Play::Exit();
+			Play::Init();*/
+		}
 	}
 }
 
@@ -179,25 +186,25 @@ void Play::PauseGame()
 }
 
 void Play::UpdateCollisionLayers() {
-	std::pair<int, TileMatrix> result = JoinMatrixOfActiveMaps();
+	std::pair<int, Tile::Matrix> result = JoinMatrixOfActiveMaps();
 	int tileSize = result.first;
-	TileMatrix matrixOfAllMaps = result.second;
+	Tile::Matrix matrixOfCurrentMapsOnScreen = result.second;
 	
 	if (tileSize == -1) {
 		return; 
 	}
 
-	CollisionHandler::GetInstance()->SetCollisionMap(matrixOfAllMaps, tileSize);
+	CollisionHandler::GetInstance()->SetCollisionMap(matrixOfCurrentMapsOnScreen, tileSize);
 }
 
-std::pair<int, TileMatrix> Play::JoinMatrixOfActiveMaps() {
-	TileMatrix matrixOfAllMaps;
+std::pair<int, Tile::Matrix> Play::JoinMatrixOfActiveMaps() {
+	Tile::Matrix matrixOfCurrentMapsOnScreen;
 	int tileSize = -1;  // Invalid value to signal error
 
 	// Estimate the total number of rows to avoid reallocations
 	size_t totalRows = EstimateMapTotalRows();
 
-	matrixOfAllMaps.reserve(totalRows);
+	matrixOfCurrentMapsOnScreen.reserve(totalRows);
 
 	// Iterate over active maps
 	for (const auto& map : m_ActiveMaps) {
@@ -217,17 +224,17 @@ std::pair<int, TileMatrix> Play::JoinMatrixOfActiveMaps() {
 		}
 		else if (tileSize != collisionLayer->GetTileSize()) {
 			std::cerr << "Inconsistent tile sizes between maps!" << std::endl;
-			return { -1, TileMatrix() };  // Returns error with empty matrix
+			return { -1, Tile::Matrix() };  // Returns error with empty matrix
 		}
 
 		// Adds the tilemap matrix to the total matrix
 		const auto& tileMapMatrix = collisionLayer->GetTileMapMatrix();
 		if (!tileMapMatrix.empty()) {
-			matrixOfAllMaps.insert(matrixOfAllMaps.end(), tileMapMatrix.begin(), tileMapMatrix.end());
+			matrixOfCurrentMapsOnScreen.insert(matrixOfCurrentMapsOnScreen.end(), tileMapMatrix.begin(), tileMapMatrix.end());
 		}
 	}
 
-	return { tileSize, matrixOfAllMaps };
+	return { tileSize, matrixOfCurrentMapsOnScreen };
 }
 
 size_t Play::EstimateMapTotalRows() const {
@@ -247,7 +254,7 @@ size_t Play::EstimateMapTotalRows() const {
 
 TileLayer* Play::GetCollisionLayerFromMap(const std::shared_ptr<TileMap>& map) const {
 	if (map && !map->GetMapLayers().empty()) {
-		return dynamic_cast<TileLayer*>(map->GetMapLayers().back().get());
+		return dynamic_cast<TileLayer*>(map->GetMapCollisionLayer().get());
 	}
 	else {
 		std::cerr << "Invalid or empty map layers!" << std::endl;
@@ -277,8 +284,62 @@ void Play::UpdateMaps() {
 }
 
 void Play::AddMapAtPosition(int type, int YPosition) {
+	// Creates a new map of the specified type and adjusts its position
 	std::shared_ptr<TileMap> newMap = MapParser::GetInstance()->getRandomTileMapOfType(type);
 	newMap->SetPosition(0, YPosition);
 	m_ActiveMaps.push_back(newMap);
+
+	// Updates the active map's collision layers
 	UpdateCollisionLayers();
+
+	// Sets the first available floor depending on the map type
+	int firstAvailableFloor = (type == 0) ? 2 : 1;
+
+	// Generates the enemy list for the new map
+	SpawnNewEnemyList(firstAvailableFloor, newMap);
+}
+
+void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
+	// Get map and collision layer information
+	auto collisionLayer = dynamic_cast<TileLayer*>(map->GetMapCollisionLayer().get());
+	if (!collisionLayer) {
+		throw std::runtime_error("Camada de colisão inválida!");
+	}
+
+	int totalFloors = collisionLayer->GetAmountOfFloorCollision();
+	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
+	int maxEnemiesPerMap = maxAvailableFloors - 1;
+	int enemiesPerFloor = 1;
+
+	int mapBottomY = map->GetPosition().Y + map->GetHeight();
+	int verticalOffset = 4 * collisionLayer->GetTileSize();
+
+	// Random number generator setup
+	std::random_device randomDevice;
+	std::mt19937 randomGenerator(randomDevice());
+	std::uniform_int_distribution<> enemyCountDistribution(2, maxEnemiesPerMap);
+
+	// Determines the number of enemies to be spawned
+	int numberOfEnemiesToSpawn = enemyCountDistribution(randomGenerator);
+
+	// Enemy generation for each floor
+	for (int i = 0; i < numberOfEnemiesToSpawn; i++) {
+		for (int j = 0; j < enemiesPerFloor; j++) {
+			// Random positioning on the X axis
+			std::uniform_int_distribution<> xPositionDistribution(1, SCREEN_WIDTH);
+			int randomXPosition = xPositionDistribution(randomGenerator);
+
+			// Calculates position at the top of the floor
+			int floorTopY = collisionLayer->GetFloorTopPosition(firstAvailableFloor + i);
+
+			// Sets the enemy's final position
+			Transform enemyPosition;
+			enemyPosition.X = randomXPosition;
+			enemyPosition.Y = mapBottomY - floorTopY - verticalOffset;
+
+			// Create and add enemy to list
+			EnemyList.push_back(SpawnGameObjectAtLocation<Enemy>(GameObjectType::ENEMY, enemyPosition));
+		}
+	}
+	
 }

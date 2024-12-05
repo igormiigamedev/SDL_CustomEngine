@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <memory>
-#include "Layer.h"
+#include "TileLayer.h"
 #include "../Physics/Transform.h"
 
 class TileMap {
@@ -17,6 +17,7 @@ public:
         for (const auto& layer : other.m_MapLayers) {
             m_MapLayers.push_back(std::unique_ptr<Layer>(layer->Clone()));
         }
+        dynamic_cast<TileLayer*>(GetMapCollisionLayer().get())->UpdateFloorCollisionInformations();
     }
 
     TileMap& operator=(const TileMap& other) {
@@ -67,6 +68,8 @@ public:
     int GetHeight() {
         return height;
     }
+
+    std::unique_ptr<Layer>& GetMapCollisionLayer() { return m_MapLayers.back(); }
 
     std::vector<std::unique_ptr<Layer>>& GetMapLayers() { return m_MapLayers; }
 
