@@ -25,7 +25,12 @@ class RegisterObject {
 
 	public:
 		RegisterObject(GameObjectType className) {
-			ObjectFactory::GetInstance()->RegisterType(className, [](const Properties& props, Transform transform)->std::shared_ptr<GameObject> {return  std::make_shared<Type>(props, transform); }); //std::shared_ptr<Type>(new Type(props, transform)); });
+			ObjectFactory::GetInstance()->RegisterType(className, [](const Properties& props, Transform transform)->std::shared_ptr<GameObject> {
+				auto obj = std::make_shared<Type>(props, transform);
+				obj->InitGameObject();
+				return  obj;
+				
+				});
 		}
 };
 

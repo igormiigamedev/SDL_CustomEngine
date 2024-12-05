@@ -1,7 +1,9 @@
 #pragma once
-#include "../Physics/RigidBody.h"  
+#include "../Physics/RigidBody.h"
 #include <vector>
 #include <memory>
+#include <algorithm>
+#include <unordered_set>
 
 class PhysicsWorld {
 public:
@@ -10,21 +12,22 @@ public:
         return &instance;
     }
 
-    void RegisterRigidBody(std::shared_ptr<RigidBody> body) {
-        m_RigidBodies.push_back(body);
+    // Registra um RigidBody no mundo da física
+    void RegisterRigidBody(RigidBody* rigidBody) {
+        m_RigidBodies.insert(rigidBody);
     }
 
-    void UnregisterRigidBody(const std::shared_ptr<RigidBody>& body) {
-        m_RigidBodies.erase(std::remove(m_RigidBodies.begin(), m_RigidBodies.end(), body), m_RigidBodies.end());
+    // Remove um RigidBody pelo ponteiro
+    void UnregisterRigidBody(RigidBody* rigidBody) {
+        m_RigidBodies.erase(rigidBody);
     }
 
-    const std::vector<std::shared_ptr<RigidBody>>& GetRigidBodies() const {
+    // Acesso a todos os RigidBodies ativos
+    const std::unordered_set<RigidBody*>& GetRigidBodies() const {
         return m_RigidBodies;
     }
 
 private:
-    std::vector<std::shared_ptr<RigidBody>> m_RigidBodies;
+    // Vetor de referências fracas para RigidBodies
+    std::unordered_set<RigidBody*> m_RigidBodies;
 };
-
-
-

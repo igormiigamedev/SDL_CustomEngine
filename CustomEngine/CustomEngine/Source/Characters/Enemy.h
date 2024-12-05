@@ -15,7 +15,6 @@ class Enemy : public Character{
 
 public:
 	Enemy(const Properties& props, Transform transform);
-	~Enemy() { EventDispatcher::GetInstance()->UnregisterCallback(shared_from_this()); };
 
 	GameObjectType GetType() const override { return GameObjectType::ENEMY; };
 	

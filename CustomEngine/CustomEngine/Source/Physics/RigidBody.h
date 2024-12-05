@@ -18,9 +18,19 @@
 
 class RigidBody{
 	public:
-		RigidBody(GameObject* owner)
-			: m_Owner(owner), m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
+		RigidBody()
+			: m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
 			SetCollider(std::make_unique<RectCollider>(0, 0, 100, 100)); // Initializes a default rectangular collision by default
+			PhysicsWorld::GetInstance()->RegisterRigidBody(this);
+		}
+
+		std::shared_ptr<RigidBody> GetSharedPtr() {
+			return std::shared_ptr<RigidBody>(this, [](RigidBody*) { /* no-op deleter */ });
+		}
+
+		~RigidBody() {
+			std::cout << "RigidBody destroyed\n";
+			PhysicsWorld::GetInstance()->UnregisterRigidBody(this);
 		}
 
 		//Setter Gravity & Mass
@@ -53,8 +63,12 @@ class RigidBody{
 			return m_ColliderRB.get();
 		}
 
+		void SetOwner(const std::shared_ptr<GameObject>& owner) {
+			m_Owner = owner; // Sets the owner to weak_ptr
+		}
+
 		std::shared_ptr<GameObject> GetOwner() const {
-			return m_Owner;
+			return m_Owner.lock(); // Promotes weak_ptr to shared_ptr if valid
 		}
 		
 		void Update(float dt) {
@@ -100,16 +114,18 @@ class RigidBody{
 		}
 
 		void CheckCollisionWithRigidBodies() {
-			auto& rigidBodies = PhysicsWorld::GetInstance()->GetRigidBodies();
-			for (const auto& other : rigidBodies) {
-				if (other.get() == this || !m_ColliderRB || !other->GetCollider()) continue;
+			const auto& rigidBodies = PhysicsWorld::GetInstance()->GetRigidBodies();
+
+			for (RigidBody* other : rigidBodies) {
+				if (other == this || !m_ColliderRB || !other->GetCollider()) continue;
 
 				if (CollisionHandler::GetInstance()->CheckCollision(*m_ColliderRB, *other->GetCollider())) {
-					CollisionEvent event(this, other.get());
+					CollisionEvent event(this, other);
 					EventDispatcher::GetInstance()->DispatchCollisionEvent(event);
 				}
 			}
 		}
+
 
 		void CheckMapCollision(float dt) {
 			switch (CollisionHandler::GetInstance()->DetectTileCollision(*m_ColliderRB)) {
@@ -162,5 +178,5 @@ class RigidBody{
 
 		std::unique_ptr<Collider> m_ColliderRB;
 
-		std::shared_ptr<GameObject> m_Owner;
+		std::weak_ptr<GameObject> m_Owner;
 };

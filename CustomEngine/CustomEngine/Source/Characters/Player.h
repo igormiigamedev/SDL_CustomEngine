@@ -23,7 +23,6 @@ class Player : public Character{
 
 	public:
 		Player(const Properties& props, Transform transform);
-		~Player() { EventDispatcher::GetInstance()->UnregisterCallback(shared_from_this()); };
 
 		GameObjectType GetType() const override { return GameObjectType::PLAYER; };
 

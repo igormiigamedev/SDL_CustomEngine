@@ -1,8 +1,10 @@
 #pragma once
 #include <functional>
 #include <vector>
+#include <memory>
 #include "../Object/GameObject.h"
-// Early declaration to avoid circular dependency
+
+// Forward declaration to avoid circular dependencies
 class RigidBody;
 
 struct CollisionEvent {
@@ -19,10 +21,14 @@ public:
 
     static EventDispatcher* GetInstance();
 
+    // Register a callback for collision events
     void RegisterCollisionCallback(std::weak_ptr<GameObject> owner, CollisionCallback callback, CollisionFilter filter);
+
+    // Dispatch a collision event to all registered callbacks
     void DispatchCollisionEvent(const CollisionEvent& event);
 
-    void UnregisterCallback(const std::weak_ptr<GameObject>& owner);
+    // Unregister all callbacks associated with a specific owner
+    void UnregisterCallback(const GameObject* owner);
 
 private:
     struct CallbackEntry {
@@ -33,7 +39,6 @@ private:
 
     std::vector<CallbackEntry> m_CollisionCallbacks;
 
-    EventDispatcher() = default;
+    // Clean up invalid (expired) entries from the callback list
+    void CleanupInvalidCallbacks();
 };
-
-

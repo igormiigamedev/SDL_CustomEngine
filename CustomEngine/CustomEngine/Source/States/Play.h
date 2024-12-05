@@ -27,6 +27,9 @@ class Play : public GameState{
 		virtual void Update();
 		virtual void Render();
 
+		void DestroyPlayer();
+		void DestroyEnemy(std::shared_ptr<Enemy> enemy);
+
 		template <typename T, typename = std::enable_if_t<std::is_base_of_v<GameObject, T>>>
 		std::shared_ptr<T> SpawnGameObjectAtLocation(const GameObjectType type, const Transform& transform) {
 			const Properties* props = Parser::GetInstance()->GetGameObjectPropertiesByType(type);
@@ -34,11 +37,13 @@ class Play : public GameState{
 				std::cout << "Failed to get properties for GameObject: " << GameObjectTypeToString(type) << std::endl;
 				return nullptr;
 			}
+
 			auto game_object = ObjectFactory::GetInstance()->CreateGameObject(type, *props, transform);
 			if (!game_object) {
 				std::cout << "Failed to create GameObject: " << GameObjectTypeToString(type) << std::endl;
 				return nullptr;
 			}
+
 			m_GameObjects.push_back(game_object);
 			return std::dynamic_pointer_cast<T>(game_object);
 		}
@@ -60,6 +65,8 @@ class Play : public GameState{
 		void AddMapAtPosition(int type, int YPosition);
 
 		void SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& map);
+
+		void RemoveOutOfScreenEnemies();
 
 	private:
 		bool m_EditMode;

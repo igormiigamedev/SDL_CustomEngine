@@ -13,19 +13,18 @@
 class Character : public GameObject, public IDamage
 {
 	public:
-		Character(const Properties& props, Transform transform) : GameObject(props, transform) {
-			m_RigidBody = std::make_shared<RigidBody>(this);
-			PhysicsWorld::GetInstance()->RegisterRigidBody(m_RigidBody);
+		Character(const Properties& props, Transform transform)
+			: GameObject(props, transform) {
 		}
 
-		virtual ~Character() {
-			
-			if (m_RigidBody) {
-				PhysicsWorld::GetInstance()->UnregisterRigidBody(m_RigidBody);
-				m_RigidBody.reset(); // Explicitly frees memory
-			}
+		void InitGameObject() override {
+			RegisterCollisionCallback();
+			m_RigidBody.SetOwner(shared_from_this());
+		}
 
-			/*EventDispatcher::GetInstance()->UnregisterCallback(shared_from_this());*/
+
+		virtual ~Character() {
+			std::cout << "Character destroyed\n";
 		}
 
 		virtual GameObjectType GetType() const = 0;
@@ -35,9 +34,10 @@ class Character : public GameObject, public IDamage
 		virtual void Update(float dt) = 0;
 		virtual void OnCollision(std::shared_ptr<GameObject> target) = 0;
 
-		std::shared_ptr<RigidBody> GetRigidBody() const {
+		RigidBody& GetRigidBody() {
 			return m_RigidBody;
 		}
+
 
 		void RegisterCollisionCallback() {
 			EventDispatcher::GetInstance()->RegisterCollisionCallback(
@@ -54,11 +54,11 @@ class Character : public GameObject, public IDamage
 
 		// Method to set Collider type
 		void SetColliderAsCircle(float x, float y, float radius) {
-			m_RigidBody->SetCollider(std::make_unique<CircleCollider>(x, y, radius));
+			m_RigidBody.SetCollider(std::make_unique<CircleCollider>(x, y, radius));
 		}
 
 		void SetColliderAsRect(float x, float y, float width, float height) {
-			m_RigidBody->SetCollider(std::make_unique<RectCollider>(x, y, width, height));
+			m_RigidBody.SetCollider(std::make_unique<RectCollider>(x, y, width, height));
 		}
 
 	protected:
@@ -67,7 +67,7 @@ class Character : public GameObject, public IDamage
 		virtual void OnTakeDamage(float damage) = 0;
 
 	private:
-		std::shared_ptr<RigidBody> m_RigidBody;
+		RigidBody m_RigidBody;
 
 		void TakeDamage(float damage)override {
 			OnTakeDamage(damage);

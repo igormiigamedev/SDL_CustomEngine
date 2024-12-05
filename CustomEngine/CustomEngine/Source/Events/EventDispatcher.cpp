@@ -1,48 +1,63 @@
 #include "EventDispatcher.h"
 #include "../Physics/RigidBody.h"
+#include <iostream>
+#include <algorithm>
 
 EventDispatcher* EventDispatcher::GetInstance() {
     static EventDispatcher instance;
     return &instance;
 }
 
-void EventDispatcher::RegisterCollisionCallback(std::weak_ptr<GameObject> owner, CollisionCallback callback, CollisionFilter filter) {
+void EventDispatcher::RegisterCollisionCallback(
+    std::weak_ptr<GameObject> owner,
+    CollisionCallback callback,
+    CollisionFilter filter
+) {
     m_CollisionCallbacks.push_back({ owner, callback, filter });
 }
 
 void EventDispatcher::DispatchCollisionEvent(const CollisionEvent& event) {
+    // Remove expired entries before dispatching events
+    CleanupInvalidCallbacks();
+
     for (auto& entry : m_CollisionCallbacks) {
-        if(!entry.owner.expired()){
-            auto owner = entry.owner.lock(); // Try promoting weak_ptr to shared_ptr
+        if (auto owner = entry.owner.lock()) { // Check if owner is still valid
             if (entry.filter(event)) {
-                RigidBody* otherBody = (event.bodyA->GetOwner() == owner) ? event.bodyB : event.bodyA;
+                RigidBody* otherBody = (event.bodyA->GetOwner().get() == owner.get()) ? event.bodyB : event.bodyA;
                 entry.callback(otherBody);
             }
-        }
-        else {
-            std::cerr << "Warning: Owner object has been destroyed" << std::endl; 
         }
     }
 }
 
-void EventDispatcher::UnregisterCallback(const std::weak_ptr<GameObject>& owner) {
-    // Try promoting the weak_ptr to a shared_ptr to confirm which object is being removed
-    auto ownerShared = owner.lock();
-    if (!ownerShared) {
-        std::cerr << "Unregister failed: owner already expired!" << std::endl;
-        return; // If the object has already been destroyed, there is nothing to do
-    }
-
-    // Removes all callbacks whose owner matches the given object
+void EventDispatcher::UnregisterCallback(const GameObject* owner) {
+    // Remove all entries that match the given owner
     m_CollisionCallbacks.erase(
         std::remove_if(
             m_CollisionCallbacks.begin(),
             m_CollisionCallbacks.end(),
-            [&ownerShared](const CallbackEntry& entry) {
-                return entry.owner.lock() == ownerShared;
+            [owner](const CallbackEntry& entry) {
+                // Check if the owner matches (ignore expired entries)
+                if (auto sharedOwner = entry.owner.lock()) {
+                    return sharedOwner.get() == owner;
+                }
+                return false; // Keep expired entries for cleanup
             }
         ),
         m_CollisionCallbacks.end()
     );
 }
 
+void EventDispatcher::CleanupInvalidCallbacks() {
+    // Remove all expired callbacks
+    m_CollisionCallbacks.erase(
+        std::remove_if(
+            m_CollisionCallbacks.begin(),
+            m_CollisionCallbacks.end(),
+            [](const CallbackEntry& entry) {
+                return entry.owner.expired(); // Remove if the owner is no longer valid
+            }
+        ),
+        m_CollisionCallbacks.end()
+    );
+}

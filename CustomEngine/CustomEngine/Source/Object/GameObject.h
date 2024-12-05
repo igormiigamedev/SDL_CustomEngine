@@ -45,6 +45,12 @@ class GameObject : public IObject, public std::enable_shared_from_this<GameObjec
             /*delete m_Transform;*/ // Libera a memória alocada
         }
 
+        virtual void InitGameObject() = 0;
+
+        inline const Transform& getTransform() const {
+            return m_Transform;
+        }
+
     protected:
         Point* m_Origin;
         Transform m_Transform;

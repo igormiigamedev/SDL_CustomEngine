@@ -5,6 +5,11 @@
 Play::Play(){}
 
 void Play::Events(){
+	if (!m_EditMode && InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_P)) {
+		Play::Exit();
+		Play::Init();
+	}
+
 	/*if (!m_EditMode && InputHandler::GetInstance()->GetKeyDown(SDL_SCANCODE_M)) {
 		OpenMenu();
 	}*/
@@ -55,27 +60,14 @@ bool Play::Init() {
 	playertf.Y = 1.65*SCREEN_HEIGHT;
 	enemytf.X = 50;
 	enemytf.Y = SCREEN_HEIGHT;
-	/*Properties* playerProps = new Properties("Player_Walk", 50, SCREEN_HEIGHT, player_texture_width, player_texture_height, SDL_FLIP_NONE, imageScalling);
-	Properties* enemyProps = new Properties("spikeMan_Walk", 50, SCREEN_HEIGHT - 150, 120, 159, SDL_FLIP_NONE, imageScalling);*/
 
-	/*Properties* playerProps = new Properties(player_texture_width, player_texture_height, imageScalling, imageScalling);*/
-	/*Properties* enemyProps = new Properties( 120, 159, imageScalling, imageScalling);*/
-
-	/*std::shared_ptr<GameObject> player = SpawnGameObjectAtLocation<GameObject>(GameObjectType::PLAYER, playertf);*/
 	PlayerInstance = SpawnGameObjectAtLocation<Player>(GameObjectType::PLAYER, playertf);
 	assert(PlayerInstance != nullptr && "Player object is null!"); // Debugging
-
-	//EnemyList.push_back(SpawnGameObjectAtLocation < Enemy >(GameObjectType::ENEMY, enemytf));
-	//assert(EnemyList.back() != nullptr && "Enemy object is null!"); // Debugging
 
 	if (PlayerInstance == nullptr) {
 		std::cout << "Failed to create player!" << std::endl;
 		return false;
 	}
-	/*if (EnemyList.back() == nullptr) {
-		std::cout << "Failed to create enemy!" << std::endl;
-		return false;
-	}*/
 
 	Camera::GetInstance()->SetTarget(PlayerInstance->GetOrigin());
 
@@ -85,23 +77,26 @@ bool Play::Init() {
 }
 
 bool Play::Exit(){
-	// Limpa e desaloca todos os mapas ativos
+
 	for (std::shared_ptr<TileMap> map : m_ActiveMaps) {
 		map->Clean();
 	}
 	m_ActiveMaps.clear();
 
 	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
-		if (auto gameobj = it->lock()) { // Verifica se o objeto ainda existe
+		if (auto gameobj = it->lock()) { // Checks if the object still exists
 			gameobj->Clean();
 			++it;
 		}
 		else {
-			it = m_GameObjects.erase(it); // Remove referências fracas para objetos destruídos
+			it = m_GameObjects.erase(it); // Remove weak references to destroyed objects
 		}
 	}
 
 	m_GameObjects.clear();
+	PlayerInstance.reset(); 
+	EnemyList.clear();
+
 	TextureManager::GetInstance()->Clean();
 	std::cout << "Exit Play" << std::endl;
 
@@ -114,33 +109,48 @@ void Play::Update(){
 
 	if (!m_EditMode) {
 		float dt = Timer::GetInstance()->GetDeltaTime();
-		// Atualiza os mapas ativos
+
+		Camera::GetInstance()->Update(dt);
+
 		UpdateMaps();
 
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
-			if (auto gameobj = it->lock()) { // Verifica se o objeto ainda existe
+			if (auto gameobj = it->lock()) { // Checks if the object still exists
 				gameobj->Update(dt);
 				++it;
 			}
 			else {
-				it = m_GameObjects.erase(it); // Remove referências para objetos destruídos
+				it = m_GameObjects.erase(it); // Remove references to destroyed objects
 			}
 		}
 
-		Camera::GetInstance()->Update(dt);
-
 		if (PlayerInstance && PlayerInstance->IsDead()) {
 			std::cout << "Morreu" << std::endl;
-			// TODO - Implement and handle Character resets
-			/*PlayerInstance.reset();*/ 
-		}
 
-		if (InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_P)) {
-			/*Play::Exit();
-			Play::Init();*/
+			/*DestroyPlayer();*/
 		}
 	}
 }
+
+void Play::DestroyPlayer() {
+	if (PlayerInstance) {
+		PlayerInstance.reset();
+	}
+}
+
+
+void Play::DestroyEnemy(std::shared_ptr<Enemy> enemy) {
+	if (!enemy) return;
+
+	// Remove from enemies list
+	EnemyList.erase(
+		std::remove(EnemyList.begin(), EnemyList.end(), enemy),
+		EnemyList.end()
+	);
+
+	enemy.reset();
+}
+
 
 void Play::Render(){
 	SDL_SetRenderDrawColor(m_Ctxt, 48, 96, 130, 255); //SDL_SetRenderDrawColor(m_Ctxt, 124, 218, 254, 255);
@@ -279,6 +289,7 @@ void Play::UpdateMaps() {
 		if (bottomMap->GetPosition().Y - bottomMap->GetHeight() > Camera::GetInstance()->GetPosition().Y) {
 			m_ActiveMaps.erase(m_ActiveMaps.begin());
 			UpdateCollisionLayers();
+			RemoveOutOfScreenEnemies();
 		}
 	}
 }
@@ -286,7 +297,7 @@ void Play::UpdateMaps() {
 void Play::AddMapAtPosition(int type, int YPosition) {
 	// Creates a new map of the specified type and adjusts its position
 	std::shared_ptr<TileMap> newMap = MapParser::GetInstance()->getRandomTileMapOfType(type);
-	newMap->SetPosition(0, YPosition);
+ 	newMap->SetPosition(0, YPosition);
 	m_ActiveMaps.push_back(newMap);
 
 	// Updates the active map's collision layers
@@ -309,6 +320,7 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 	int totalFloors = collisionLayer->GetAmountOfFloorCollision();
 	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
 	int maxEnemiesPerMap = maxAvailableFloors - 1;
+	int minEnemiesPerMap = std::ceil(maxEnemiesPerMap/2);
 	int enemiesPerFloor = 1;
 
 	int mapBottomY = map->GetPosition().Y + map->GetHeight();
@@ -341,5 +353,25 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 			EnemyList.push_back(SpawnGameObjectAtLocation<Enemy>(GameObjectType::ENEMY, enemyPosition));
 		}
 	}
-	
+}
+
+void Play::RemoveOutOfScreenEnemies() {
+	// Camera position, which defines the visible area
+	int cameraTop = Camera::GetInstance()->GetPosition().Y;
+	int cameraBottom = cameraTop + SCREEN_HEIGHT;
+
+	// Iterates over the list of enemies and removes those that are no longer visible
+	for (auto it = EnemyList.begin(); it != EnemyList.end(); ) {
+		auto enemy = *it;
+		int enemyY = enemy->getTransform().Y;
+
+		// Checks if the enemy is below the screen
+		if (enemyY > cameraBottom) {
+			it = EnemyList.erase(it);  // Remove enemy
+			std::cout << "inimigo apagado" << std::endl;
+		}
+		else {
+			++it;
+		}
+	}
 }

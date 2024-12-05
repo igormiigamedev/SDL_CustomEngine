@@ -4,9 +4,7 @@
 static RegisterObject<Enemy> registerObject(GameObjectType::ENEMY);
 
 Enemy::Enemy(const Properties& props, Transform transform) : Character(props, transform){
-	RegisterCollisionCallback();
-
-	GetRigidBody()->SetGravity(360.0f);
+	GetRigidBody().SetGravity(360.0f);
 
 	m_Animation = new SequenceAnimation(false);
 	m_Animation->Parse("Assets/GameAnimations.xml");
@@ -24,7 +22,7 @@ Enemy::Enemy(const Properties& props, Transform transform) : Character(props, tr
 void Enemy::Draw(){
 	m_Animation->DrawFrame(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
 	
-	GetRigidBody()->GetCollider()->DrawDebugCollider();
+	GetRigidBody().GetCollider()->DrawDebugCollider();
 }
 
 void Enemy::Clean(){
@@ -82,19 +80,19 @@ void Enemy::UpdateCharacterDirection() {
 }
 
 void Enemy::ApplyWalkingForce(float dt) {
-	GetRigidBody()->SetVelocityX(WALK_VELOCITY * characterDirection);
-	GetRigidBody()->Update(dt);
+	GetRigidBody().SetVelocityX(WALK_VELOCITY * characterDirection);
+	GetRigidBody().Update(dt);
 }
 
 void Enemy::UpdateCharacterPositionX(float dt) {
-	m_Transform.X += GetRigidBody()->GetDeltaPosition().X;
-	GetRigidBody()->GetCollider()->SetPositionX(GetBodyCenterPosition().X);
+	m_Transform.X += GetRigidBody().GetDeltaPosition().X;
+	GetRigidBody().GetCollider()->SetPositionX(GetBodyCenterPosition().X);
 }
 
 void Enemy::UpdateCharacterPositionY(float dt) {
 	/*m_RigidBody->Update(dt);*/
-	m_Transform.Y += GetRigidBody()->GetDeltaPosition().Y;
-	GetRigidBody()->GetCollider()->SetPositionY(GetBodyCenterPosition().Y);
+	m_Transform.Y += GetRigidBody().GetDeltaPosition().Y;
+	GetRigidBody().GetCollider()->SetPositionY(GetBodyCenterPosition().Y);
 }
 
 void Enemy::OnCollision(std::shared_ptr<GameObject> target) {

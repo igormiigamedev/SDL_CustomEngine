@@ -10,9 +10,8 @@
 static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 
 Player::Player(const Properties& props, Transform transform) : Character(props, transform){
-	RegisterCollisionCallback();
 
-	GetRigidBody()->SetGravity(700.0f);
+	GetRigidBody().SetGravity(700.0f);
 
 	m_Animation = new SpriteAnimation();
 	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
@@ -28,7 +27,7 @@ Player::Player(const Properties& props, Transform transform) : Character(props, 
 void Player::Draw(){
 	m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.Width, m_Properties.Height, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
 
-	GetRigidBody()->GetCollider()->DrawDebugCollider();
+	GetRigidBody().GetCollider()->DrawDebugCollider();
 }
 
 void Player::Clean(){
@@ -84,13 +83,13 @@ void Player::UpdatePlayerDirection() {
 }
 
 void Player::ApplyWalkingForce(float dt) {
-	GetRigidBody()->SetVelocityX(WALK_VELOCITY * playerDirection);
-	GetRigidBody()->Update(dt);
+	GetRigidBody().SetVelocityX(WALK_VELOCITY * playerDirection);
+	GetRigidBody().Update(dt);
 }
 
 void Player::UpdatePlayerPositionX(float dt) {
-	m_Transform.X += GetRigidBody()->GetDeltaPosition().X;
-	GetRigidBody()->GetCollider()->SetPositionX(GetBodyCenterPosition().X);
+	m_Transform.X += GetRigidBody().GetDeltaPosition().X;
+	GetRigidBody().GetCollider()->SetPositionX(GetBodyCenterPosition().X);
 	/*std::cout << "pos:" << m_Transform.X << std::endl;*/
 }
 
@@ -126,19 +125,19 @@ void Player::StartJump() {
 
 void Player::ApplyJumpForce(float dt) {
 	if (m_IsJumping) {
-		GetRigidBody()->SetVelocityY(UPWARD * JUMP_VELOCITY);
-		GetRigidBody()->GetCollider()->SetCollisionResponse(WorldFloor, OVERLAP);
+		GetRigidBody().SetVelocityY(UPWARD * JUMP_VELOCITY);
+		GetRigidBody().GetCollider()->SetCollisionResponse(WorldFloor, OVERLAP);
 	}
 }
 
 void Player::HandleFallingState() {
-	if (GetRigidBody()->GetVelocity().Y > 0 && !m_IsGrounded) {
-		GetRigidBody()->GetCollider()->SetCollisionResponse(WorldFloor, BLOCK);
+	if (GetRigidBody().GetVelocity().Y > 0 && !m_IsGrounded) {
+		GetRigidBody().GetCollider()->SetCollisionResponse(WorldFloor, BLOCK);
 		m_IsFalling = true;
 		m_IsJumping = false;
 	}
 	else{
-		if (GetRigidBody()->GetVelocity().Y == 0) {
+		if (GetRigidBody().GetVelocity().Y == 0) {
 			m_IsGrounded = true;
 			m_IsJumping = false;
 			m_UsedDoubleJump = false;
@@ -148,9 +147,9 @@ void Player::HandleFallingState() {
 }
 
 void Player::UpdatePlayerPositionY(float dt) {
-	GetRigidBody()->Update(dt);
-	m_Transform.Y += GetRigidBody()->GetDeltaPosition().Y;
-	GetRigidBody()->GetCollider()->SetPositionY(GetBodyCenterPosition().Y);
+	GetRigidBody().Update(dt);
+	m_Transform.Y += GetRigidBody().GetDeltaPosition().Y;
+	GetRigidBody().GetCollider()->SetPositionY(GetBodyCenterPosition().Y);
 }
 
 bool Player::IsSpacePressed() const {
@@ -186,9 +185,9 @@ void Player::AnimationState(){
 
 void Player::HandlePlayerDeath() {
 	m_IsDead = true;
-	GetRigidBody()->SetVelocityX(0);
+	GetRigidBody().SetVelocityX(0);
 	if (m_IsJumping) {
-		GetRigidBody()->SetVelocityY(GetRigidBody()->GetVelocity().Y/2);
+		GetRigidBody().SetVelocityY(GetRigidBody().GetVelocity().Y/2);
 	}
 }
 
