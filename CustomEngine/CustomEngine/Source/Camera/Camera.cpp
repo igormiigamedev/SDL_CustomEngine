@@ -3,7 +3,9 @@
 Camera* Camera::s_Instance = nullptr;
 
 void Camera::Update(float dt) {
-    if (m_Target == nullptr) return;
+    if (m_Target.expired()) return;
+
+    auto target = m_Target.lock();
     
     const float screenUpperLimitFactor = SCREEN_HEIGHT * 0.4f;  // Represents x% of the screen height
     const float screenLowerLimitFactor = SCREEN_HEIGHT * 0.71f; // Represents x% of the screen height
@@ -13,16 +15,14 @@ void Camera::Update(float dt) {
     const float lowerLimit = m_ViewBox.y + screenLowerLimitFactor;
 
     // Calculates the desired camera position to center the target
-    /*float targetX = m_Target->X - SCREEN_WIDTH / 2;*/
     float newViewboxY = m_ViewBox.y;
-    /*std::cout << "m_Target->Y - newViewboxY: " << m_Target->Y - newViewboxY << std::endl;*/
 
     // Centers the camera if the character is beyond the middle of the screen
-    if ( m_Target->Y <= upperLimit) {
+    if (target->GetTransform().Y <= upperLimit) {
         newViewboxY = m_ViewBox.y - (screenUpperLimitFactor);
     }
     //In an extreme case: If the character is below the camera on the y-axis, reset targetY
-    if (m_Target->Y >= lowerLimit) {
+    if (target->GetTransform().Y >= lowerLimit) {
         newViewboxY = m_ViewBox.y + (screenLowerLimitFactor);
     }
 

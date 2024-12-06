@@ -1,9 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <animations>
+    <!-- Player Pigeon -->
+    <spriteSheet id="Pigeon_Walk" frameCount="12" rowCount="2" colCount="7" speed="65" width="980" height="504"> </spriteSheet> 
+    <spriteSheet id="Pigeon_Jump" frameCount="9" rowCount="2" colCount="7" speed="70" width="980" height="544"> </spriteSheet> 
+    
+    
+    <!-- Player Coelhovo -->
+    <spriteSheet id="Player_Walk" frameCount="2" rowCount="1" colCount="2" speed="100" width="240" height="207"> </spriteSheet>
+    <spriteSheet id="Player_Jump" frameCount="2" rowCount="1" colCount="2" speed="100" width="270" height="191"> </spriteSheet>
+
+
     <!-- Enemy -->
-    <sequence id="spikeMan_Walk" frameCount="2" speed="100" width="120" height="159">
-        <frame textureID="spikeMan_Walk1"/>
-        <frame textureID="spikeMan_Walk2"/>
+    <sequence id="Enemy_Walk" frameCount="12" speed="90" width="394" height="158">
+        <frame textureID="Enemy_Walk00"/>
+        <frame textureID="Enemy_Walk01"/>
+        <frame textureID="Enemy_Walk02"/>
+        <frame textureID="Enemy_Walk03"/>
+        <frame textureID="Enemy_Walk04"/>
+        <frame textureID="Enemy_Walk05"/>
+        <frame textureID="Enemy_Walk06"/>
+        <frame textureID="Enemy_Walk07"/>
+        <frame textureID="Enemy_Walk08"/>
+        <frame textureID="Enemy_Walk09"/>
+        <frame textureID="Enemy_Walk10"/>
+        <frame textureID="Enemy_Walk11"/>
     </sequence>
+    <!-- <sequence id="Pombo_Jump" frameCount="60" speed="100" width="500" height="500">
+        <frame textureID="00"/>
+        <frame textureID="01"/>
+        <frame textureID="02"/>
+        <frame textureID="03"/>
+        <frame textureID="04"/>
+        <frame textureID="05"/>
+        <frame textureID="06"/>
+        <frame textureID="07"/>
+        <frame textureID="08"/>
+        <frame textureID="09"/>
+        <frame textureID="10"/>
+        <frame textureID="11"/>
+    </sequence> -->
 
 </animations>

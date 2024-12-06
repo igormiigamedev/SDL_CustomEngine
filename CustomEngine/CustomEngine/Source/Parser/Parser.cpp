@@ -24,13 +24,11 @@ void Parser::ParseGameObjects(std::string source/*, std::vector<std::unique_ptr<
 			/*double rot = 0;*/
 			/*int category = -1;*/
 
-			e->Attribute("width", &width);
-			e->Attribute("height", &height);
 			e->Attribute("scaleX", &scaleX);
 			e->Attribute("scaleY", &scaleY);
 			/*e->Attribute("sratio", &sratio);*/
 
-			Properties* props = new Properties(width, height, scaleX, scaleY);
+			Properties* props = new Properties(scaleX, scaleY);
 
 			objType = e->Attribute("type");
 			GameObjectType type = StringToGameObjectType(objType);

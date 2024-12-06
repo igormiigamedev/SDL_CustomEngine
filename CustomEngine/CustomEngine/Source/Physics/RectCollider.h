@@ -17,7 +17,7 @@ public:
     }
 
     void SetPositionX(float x) override { m_Box.x = static_cast<int>(x) - (m_Box.w / 2); }
-    void SetPositionY(float y) override { m_Box.y = static_cast<int>(y) - (m_Box.w / 2); }
+    void SetPositionY(float y) override { m_Box.y = static_cast<int>(y) - (m_Box.h / 2); }
 
     SDL_Rect &GetBox() { return m_Box; }
     const SDL_Rect& GetBox() const { return m_Box; }

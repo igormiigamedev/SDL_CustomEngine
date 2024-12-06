@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<objects>
+
+    
+    <object type="PLAYER" scaleX="0.9" scaleY="0.9" />
+
+    <object type="ENEMY" scaleX="0.5" scaleY="0.5" />
+
+
+ 
+</objects>

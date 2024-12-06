@@ -4,11 +4,13 @@
 #include "../Animation/SequenceAnimation.h"
 #include "../Animation/SpriteAnimation.h"
 
-#define WALK_VELOCITY 300.0f
+#define WALK_VELOCITY 280.0f
 
 struct EnemyConfig {
 	float m_EnemyWidth;
 	float m_EnemyHeight;
+	float tailWidth;
+	float bodyWidth;
 };
 
 class Enemy : public Character{

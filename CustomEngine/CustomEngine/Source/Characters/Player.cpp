@@ -11,27 +11,29 @@ static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 
 Player::Player(const Properties& props, Transform transform) : Character(props, transform){
 
-	GetRigidBody().SetGravity(700.0f);
+	GetRigidBody().SetGravity(580.0f);
 
 	m_Animation = new SpriteAnimation();
-	m_Animation->SetProps(m_TextureID, playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
+	m_Animation->Parse();
+	m_Flip = SDL_FLIP_HORIZONTAL;
+	m_Animation->SetAnimation("Pigeon_Walk");
 
-	playerConfig.m_PlayerWidth = m_Properties.ScaleX * (m_Properties.Width / playerConfig.m_PlayerWalkFrameCount);
-	playerConfig.m_PlayerHeight = m_Properties.ScaleY * (m_Properties.Height / playerConfig.m_PlayerWalkSpriteRow);
+	playerConfig.m_PlayerWidth = m_Properties.ScaleX * m_Animation->GetCurrentSpriteWidth();
+	playerConfig.m_PlayerHeight = m_Properties.ScaleY * m_Animation->GetCurrentSpriteHeight();
 
 	float radius = (playerConfig.m_PlayerHeight - 80) / 2;
-	auto center = GetBodyCenterPosition();
+	const auto& center = GetBodyCenterPosition();
 	SetColliderAsCircle(center.X, center.Y, radius);
 }
 
 void Player::Draw(){
-	m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.Width, m_Properties.Height, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
+	m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
 
-	GetRigidBody().GetCollider()->DrawDebugCollider();
+	/*GetRigidBody().GetCollider()->DrawDebugCollider();*/
 }
 
 void Player::Clean(){
-	TextureManager::GetInstance()->Drop(m_TextureID);
+
 }
 
 void Player::Update(float dt){
@@ -40,13 +42,10 @@ void Player::Update(float dt){
 	JumpMovement(dt);
 	AnimationState();
 
-	m_Origin->X = m_Transform.X;// + playerConfig.m_PlayerWidth  / 2;
-	m_Origin->Y = m_Transform.Y;// + playerConfig.m_PlayerHeight / 2;
-
 	m_Animation->Update(dt);
 }
 
-Transform Player::GetBodyCenterPosition() {
+Transform Player::GetBodyCenterPosition()  {
 	Transform centerTransform;
 
 	// Adjust to ignore the non-body part of the image
@@ -74,11 +73,11 @@ void Player::WalkMovement(float dt) {
 void Player::UpdatePlayerDirection() {
 	if (m_Transform.X >= (SCREEN_WIDTH - playerConfig.m_PlayerWidth)) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
 		playerDirection = BACKWARD;
-		m_Flip = SDL_FLIP_HORIZONTAL;
+		m_Flip = SDL_FLIP_NONE; 
 	}
 	else if (m_Transform.X <= 0) { //TODO (scenery collision) - Check if you collided with an object with the tag "wall"
 		playerDirection = FORWARD;
-		m_Flip = SDL_FLIP_NONE;
+		m_Flip = SDL_FLIP_HORIZONTAL;
 	}
 }
 
@@ -158,27 +157,18 @@ bool Player::IsSpacePressed() const {
 
 void Player::AnimationState(){
 
-	m_Animation->SetProps("Player_Walk", playerConfig.m_PlayerWalkSpriteRow, playerConfig.m_PlayerWalkFrameCount, playerConfig.m_PlayerWalkAnimSpeed);
-	/*m_SpriteSheetWidth = 240;
-	m_SpriteSheetHeight = 207;*/
+	m_Animation->SetAnimation("Pigeon_Walk");
 
 	if (m_IsDead) {
-		m_Animation->SetProps("Player_Jump", 1, 2, 180);
+		m_Animation->SetAnimation("Pigeon_Jump");
 	}
 
 	if (m_IsJumping) {
-		//m_ImageScalling = 2;
-		/*m_SpriteSheetWidth = 1500;
-		m_SpriteSheetHeight = 500;
-		m_Animation->SetProps("Pombo_Jump", 1, 3, 180);*/
-		m_Animation->SetProps("Player_Jump", 1, 2, 180);
+		m_Animation->SetAnimation("Pigeon_Jump");
 	}
 
 	if (m_IsFalling) {
-		/*m_SpriteSheetWidth = 1500;
-		m_SpriteSheetHeight = 500;
-		m_Animation->SetProps("Pombo_Jump", 1, 3, 180);*/
-		m_Animation->SetProps("Player_Jump", 1, 2, 180);
+		m_Animation->SetAnimation("Pigeon_Jump");
 	}
 
 }

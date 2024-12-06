@@ -1,14 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <textures>
-    <!-- Player -->
+    <!-- Player CoelhOvo -->
     <texture id="Player_Walk" source="Assets/Player/CoelhOvo/Walk/PlayerWalk.png"/>
     <texture id="Player_Jump" source="Assets/Player/CoelhOvo/Jump/PlayerJump.png"/>
+
+    <!-- Player Pigeon -->
+    <texture id="Pigeon_Walk" source="Assets/Player/Pigeon/Walk/Pigeon_Walk_Atlas.png"/>
+    <texture id="Pigeon_Jump" source="Assets/Player/Pigeon/Jump/Pigeon_Jump_Atlas.png"/>
 
     <!-- Scenario -->
     <texture id="bg" source="Assets/Images/BackGround.png"/>
 
+    <!-- Enemy SpikeMan -->
+    <!-- <texture id="spikeMan_Walk1" source="Assets/Enemy/SpikeMan/Walk/spikeMan_walk1.png"/>
+    <texture id="spikeMan_Walk2" source="Assets/Enemy/SpikeMan/Walk/spikeMan_walk2.png"/> -->
+
     <!-- Enemy -->
-    <texture id="spikeMan_Walk1" source="Assets/Enemy/SpikeMan/Walk/spikeMan_walk1.png"/>
-    <texture id="spikeMan_Walk2" source="Assets/Enemy/SpikeMan/Walk/spikeMan_walk2.png"/>
+    <texture id="Enemy_Walk00" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk00.png"/>
+    <texture id="Enemy_Walk01" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk01.png"/>
+    <texture id="Enemy_Walk02" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk02.png"/>
+    <texture id="Enemy_Walk03" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk03.png"/>
+    <texture id="Enemy_Walk04" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk04.png"/>
+    <texture id="Enemy_Walk05" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk05.png"/>
+    <texture id="Enemy_Walk06" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk06.png"/>
+    <texture id="Enemy_Walk07" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk07.png"/>
+    <texture id="Enemy_Walk08" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk08.png"/>
+    <texture id="Enemy_Walk09" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk09.png"/>
+    <texture id="Enemy_Walk10" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk10.png"/>
+    <texture id="Enemy_Walk11" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk11.png"/>
+
+
 
 </textures>

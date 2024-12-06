@@ -1,8 +1,18 @@
 #pragma once
 
 #include <SDL.h>
+#include <map>
 #include <string>
 #include "Animation.h"
+
+struct SpriteSheet {
+	int Speed;
+	int FrameCount;
+	int RowCount;
+	int ColCount;
+	int Width, Height;
+	std::string TextureID;
+};
 
 class SpriteAnimation : public Animation {
 
@@ -10,19 +20,19 @@ class SpriteAnimation : public Animation {
 		SpriteAnimation(bool repeat = true);
 
 		virtual void Update(float dt);
-		void Draw(float x, float y, int spriteWidth, int spriteHeight, float scaleX = 1.0f, float scaleY = 1.0f, SDL_RendererFlip flip = SDL_FLIP_NONE);
-		void SetProps(std::string textureID, int spriteRow, int frameCount, int animSpeed);
+		void Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, SDL_RendererFlip flip = SDL_FLIP_NONE);
+		void Parse();
+		void SetAnimation(const std::string& textureID, int animSpeed = 0);
 
-		/*int GetCurrFrame() { return  m_CurrentFrame; }
+		bool IsValidTexture(const std::string& textureID);
+		void HandleInvalidTexture(const std::string& textureID);
 
-		int GetCurrSpriteRow() { return m_SpriteRow; }
-		void SetSpriteRow(int row) { m_SpriteRow = row; }
-		void IncrSpriteRow() { m_SpriteRow++; }
-		void DecrSpriteRow() { m_SpriteRow--; }*/
+		inline int GetCurrentSpriteHeight() { return m_CurrentSpriteSheet.Height / m_CurrentSpriteSheet.RowCount; }
+		inline int GetCurrentSpriteWidth() { return m_CurrentSpriteSheet.Width / m_CurrentSpriteSheet.ColCount; }
 
 	private:
-		int m_SpriteRow, m_SpriteFrame, m_FrameCount;
-		int m_AnimSpeed;
-		std::string m_TextureID;
+		int m_SpriteFrame;
+		SpriteSheet m_CurrentSpriteSheet;
+		std::map<std::string, SpriteSheet> m_SpriteSheetMap;
 
 };

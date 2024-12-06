@@ -1,9 +1,9 @@
 #pragma once
 
 #include "SDL.h"
-#include"../Physics/Point.h"
 #include "../Physics/Vector2D.h"
 #include "../Core/Engine.h" 
+#include "../Physics/Transform.h"
 #include <SDL.h>
 
 class Camera{
@@ -19,10 +19,14 @@ class Camera{
 		inline void MoveX(float x) { m_Position.X = x; }
 		inline void MoveY(float y) { m_Position.Y = y; }
 
-		inline void SetTarget(Point* target) { 
-			m_Target = target; 
-			float cameraVerticalOffset = (0.4*SCREEN_HEIGHT);
-			SetCameraInitalPosition(0, static_cast<int>(std::round(target->Y - cameraVerticalOffset)) );
+		inline void SetTarget(std::weak_ptr<GameObject> target) {
+			if (!target.expired()) {
+				m_Target = target;
+				auto targetShared = target.lock();
+
+				float cameraVerticalOffset = (0.6 * SCREEN_HEIGHT);
+				SetCameraInitalPosition(0, static_cast<int>(std::round(targetShared->GetTransform().Y - cameraVerticalOffset)));
+			}
 		}
 
 		inline void SetCameraInitalPosition(int x, int y) {
@@ -38,7 +42,7 @@ class Camera{
 	private:
 		Camera() { }
 		
-		Point* m_Target;
+		std::weak_ptr<GameObject> m_Target;
 		Vector2D m_Position;
 
 		SDL_Rect m_ViewBox;

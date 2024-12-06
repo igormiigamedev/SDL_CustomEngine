@@ -24,6 +24,9 @@ class SequenceAnimation : public Animation{
 		void SetRepeat(bool repeat) { m_Repeat = repeat; }
 		void DrawFrame(float x, float y, float xScale = 1, float yScale = 1, SDL_RendererFlip flip = SDL_FLIP_NONE);
 
+		inline int GetCurrentSpriteHeight() { return m_CurrentSeq.Height; }
+		inline int GetCurrentSpriteWidth() { return m_CurrentSeq.Width; }
+
 	private:
 		Sequence m_CurrentSeq;
 		std::map<std::string, Sequence> m_SeqMap;

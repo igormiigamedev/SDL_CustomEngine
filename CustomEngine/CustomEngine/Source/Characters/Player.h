@@ -4,20 +4,14 @@
 #include "../Animation/SpriteAnimation.h"
 #include "../Physics/Vector2D.h"
 
-#define JUMP_VELOCITY 800.0f //450.0f
+#define JUMP_VELOCITY 750.0f  //680.0f 
 
-#define WALK_VELOCITY 700.0f //400.0f
+#define WALK_VELOCITY 520.0f 
 
 struct PlayerConfig {
-	/*std::string m_PlayerTextureID;*/  
-	int m_PlayerWalkSpriteRow = 1;      
-	int m_PlayerWalkFrameCount = 2;     
-	int m_PlayerWalkAnimSpeed = 100;   
 	float m_PlayerWidth;
 	float m_PlayerHeight;
-	/*float m_PlayerTextureScalling = 0.7;*/
 };
-
 
 class Player : public Character{
 
@@ -74,6 +68,5 @@ class Player : public Character{
 		SpriteAnimation* m_Animation;
 
 		int playerDirection = 1;
-		
 
 };

@@ -34,7 +34,7 @@ bool Play::Init() {
 	TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");
 	/*Parser::GetInstance()->ParseTextures("Assets/GameTextures.xml");*/
 
-	Parser::GetInstance()->ParseGameObjects("Assets/Level1.xml");
+	Parser::GetInstance()->ParseGameObjects("Assets/GameObjectsInfos.xml");
 
 	//---------------------
 	if (!MapParser::GetInstance()->SetUpXmlMaps()) {
@@ -69,7 +69,7 @@ bool Play::Init() {
 		return false;
 	}
 
-	Camera::GetInstance()->SetTarget(PlayerInstance->GetOrigin());
+	Camera::GetInstance()->SetTarget(PlayerInstance);
 
 	/*Gui::GetInstance()->Init();*/
 	std::cout << "play initialized!" << std::endl;
@@ -319,8 +319,7 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 
 	int totalFloors = collisionLayer->GetAmountOfFloorCollision();
 	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
-	int maxEnemiesPerMap = maxAvailableFloors - 1;
-	int minEnemiesPerMap = std::ceil(maxEnemiesPerMap/2);
+	int minEnemiesPerMap = std::ceil( (maxAvailableFloors + 1)/2 ); 
 	int enemiesPerFloor = 1;
 
 	int mapBottomY = map->GetPosition().Y + map->GetHeight();
@@ -329,7 +328,7 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 	// Random number generator setup
 	std::random_device randomDevice;
 	std::mt19937 randomGenerator(randomDevice());
-	std::uniform_int_distribution<> enemyCountDistribution(2, maxEnemiesPerMap);
+	std::uniform_int_distribution<> enemyCountDistribution(minEnemiesPerMap, maxAvailableFloors);
 
 	// Determines the number of enemies to be spawned
 	int numberOfEnemiesToSpawn = enemyCountDistribution(randomGenerator);
@@ -363,7 +362,7 @@ void Play::RemoveOutOfScreenEnemies() {
 	// Iterates over the list of enemies and removes those that are no longer visible
 	for (auto it = EnemyList.begin(); it != EnemyList.end(); ) {
 		auto enemy = *it;
-		int enemyY = enemy->getTransform().Y;
+		int enemyY = enemy->GetTransform().Y;
 
 		// Checks if the enemy is below the screen
 		if (enemyY > cameraBottom) {
