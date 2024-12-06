@@ -17,25 +17,14 @@ void CollisionHandler::SetCollisionMap(Tile::Matrix tilematrix, int tilesize) {
 	m_MapWidth = tilematrix[0].size();
 }
 
-CollisionLocation CollisionHandler::DetectTileCollision( Collider& entityBounds) {
-    // Calculates the indexes of horizontally wrapped tiles
-    int leftTile = ClampToRange( (entityBounds.GetCenterPositionX() - (entityBounds.GetWeight()/2) ) / m_MapTileSize, 0, m_MapWidth - 1);
-    int rightTile = ClampToRange( (entityBounds.GetCenterPositionX() + (entityBounds.GetWeight()/2) ) / m_MapTileSize, 0, m_MapWidth - 1);
-
-    // Calculates the indexes of vertically wrapped tiles, with circular adjustment
-    int topTile = WrapTileIndex( (entityBounds.GetCenterPositionY() - (entityBounds.GetHeigth() / 2) ) / m_MapTileSize, m_MapHeight);
-    int bottomTile = WrapTileIndex( (entityBounds.GetCenterPositionY() + (entityBounds.GetHeigth()/2) ) / m_MapTileSize, m_MapHeight);
-
-    // Adjusts to avoid vertical disconnections due to circular mapping
-    if (topTile > bottomTile) {
-        bottomTile = topTile + ( (m_MapHeight - 1) - topTile);
-    }
+CollisionLocation CollisionHandler::DetectTileCollision( Collider& checker) {
+    EdgeIndices checkerIndices = CollisionHandler::WorldPositionToMapIndex(checker);
 
     // Iterates through the tiles in the calculated intervals
-    for (int i = leftTile; i <= rightTile; ++i) {
-        for (int j = topTile; j <= bottomTile; ++j) {
-            if (m_CollisionTileMatrix[j][i] > 0) {
-                return AreCloseTo(j, bottomTile) ? Below : Top;
+    for (int rowIndex = checkerIndices.leftIndex; rowIndex <= checkerIndices.rightIndex; ++rowIndex) {
+        for (int columnIndex = checkerIndices.topIndex; columnIndex <= checkerIndices.bottomIndex; ++columnIndex) {
+            if (m_CollisionTileMatrix[columnIndex][rowIndex] > 0) {
+                return AreCloseTo(columnIndex, checkerIndices.bottomIndex) ? Below : Top;
             }
         }
     }
@@ -43,16 +32,49 @@ CollisionLocation CollisionHandler::DetectTileCollision( Collider& entityBounds)
     return None; // No collisions detected 
 }
 
-bool CollisionHandler::AreCloseTo(int checker, int other) {
-    return (checker == other || checker == other - 1);
+EdgeIndices CollisionHandler::WorldPositionToMapIndex(Collider& worldComponent) {
+    EdgeIndices indices;
+
+    // Collider dimensions
+    const float halfWidth = worldComponent.GetWeight() / 2.0f;
+    const float halfHeight = worldComponent.GetHeigth() / 2.0f;
+
+    // Collider center
+    const float centerX = worldComponent.GetCenterPositionX();
+    const float centerY = worldComponent.GetCenterPositionY();
+
+    // Calculate collider edge positions
+    const float leftEdgeX = centerX - halfWidth;
+    const float rightEdgeX = centerX + halfWidth;
+    const float topEdgeY = centerY - halfHeight;
+    const float bottomEdgeY = centerY + halfHeight;
+
+    // Convert edge points to tile indices
+    indices.leftIndex = ClampToRange(static_cast<int>(leftEdgeX / m_MapTileSize), 0, m_MapWidth - 1);
+    indices.rightIndex = ClampToRange(static_cast<int>(rightEdgeX / m_MapTileSize), 0, m_MapWidth - 1);
+    indices.topIndex = WrapTileIndex(static_cast<int>(topEdgeY / m_MapTileSize), m_MapHeight);
+    indices.bottomIndex = WrapTileIndex(static_cast<int>(bottomEdgeY / m_MapTileSize), m_MapHeight);
+
+    // Adjust indices to avoid vertical disconnections in circular maps
+    if (indices.topIndex > indices.bottomIndex) {
+        indices.bottomIndex = m_MapHeight - 1;
+    }
+
+    return indices;
 }
 
+// Function to limit the value to a specific range
 int CollisionHandler::ClampToRange(int value, int min, int max) {
     return std::max(min, std::min(value, max));
 }
 
+// Function to adjust the index on circular maps
 int CollisionHandler::WrapTileIndex(int value, int mapHeight) {
     return (value % mapHeight + mapHeight) % mapHeight;
+}
+
+bool CollisionHandler::AreCloseTo(int checker, int other) {
+    return (checker == other || checker == other - 1);
 }
 
 

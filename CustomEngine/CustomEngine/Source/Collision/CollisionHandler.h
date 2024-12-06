@@ -9,6 +9,13 @@
 #include "../Physics/CircleCollider.h"
 
 enum CollisionLocation { None, Top, Below };
+struct EdgeIndices {
+	int leftIndex;
+	int rightIndex;
+	int topIndex;
+	int bottomIndex;
+};
+
 
 class CollisionHandler{
 
@@ -23,6 +30,8 @@ class CollisionHandler{
 
 		bool CheckRectCircleCollision(const CircleCollider& circleCollider, const RectCollider& rectCollider) const;
 		bool CheckCircleCollision(const CircleCollider& checker, const CircleCollider& other) const;
+
+		EdgeIndices WorldPositionToMapIndex(Collider& worldComponent);
 
 		inline static CollisionHandler* GetInstance() { return s_Instance = (s_Instance != nullptr) ? s_Instance : new CollisionHandler(); }
 
