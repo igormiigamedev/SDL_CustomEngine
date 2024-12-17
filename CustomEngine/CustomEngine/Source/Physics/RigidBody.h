@@ -2,7 +2,6 @@
 
 #include"Vector2D.h"
 #include "../Collision/CollisionTypes.h"
-#include "Collider.h"
 #include "../Collision/CollisionHandler.h"
 #include "../Events/EventDispatcher.h"
 #include "../Collision/PhysicsWorld.h"
@@ -20,8 +19,8 @@ class RigidBody{
 	public:
 		RigidBody()
 			: m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
-			SetCollider(std::make_unique<RectCollider>(0, 0, 100, 100)); // Initializes a default rectangular collision by default
-			PhysicsWorld::GetInstance()->RegisterRigidBody(this);
+			auto collider = std::make_shared<RectCollider>(0, 0, 100, 100); // Initializes a default rectangular collision by default
+			SetCollider(collider); 
 		}
 
 		std::shared_ptr<RigidBody> GetSharedPtr() {
@@ -30,14 +29,14 @@ class RigidBody{
 
 		~RigidBody() {
 			std::cout << "RigidBody destroyed\n";
-			PhysicsWorld::GetInstance()->UnregisterRigidBody(this);
 		}
 
 		//Setter Gravity & Mass
 		inline void SetMass(float mass) { m_Mass = mass; }
 		inline void SetGravity(float gravity) { m_Gravity = gravity; }
-		void SetCollider(std::unique_ptr<Collider> collider) {
+		void SetCollider(std::shared_ptr<Collider> collider) {
 			m_ColliderRB = std::move(collider);
+			PhysicsWorld::GetInstance()->RegisterCollider(m_ColliderRB);
 		}
 
 		//Force
@@ -64,11 +63,11 @@ class RigidBody{
 		}
 
 		void SetOwner(const std::shared_ptr<GameObject>& owner) {
-			m_Owner = owner; // Sets the owner to weak_ptr
+			m_ColliderRB->SetOwner(owner);
 		}
 
 		std::shared_ptr<GameObject> GetOwner() const {
-			return m_Owner.lock(); // Promotes weak_ptr to shared_ptr if valid
+			return m_ColliderRB->GetOwner();
 		}
 		
 		void Update(float dt) {
@@ -99,33 +98,7 @@ class RigidBody{
 			default:
 				break;
 			}
-
-			switch (m_ColliderRB->GetCollisionResponse(PhysicsBody)) {
-			case IGNORE:
-				break;
-			case BLOCK:
-				break;
-			case OVERLAP:
-				CheckCollisionWithRigidBodies();
-				break;
-			default:
-				break;
-			}
 		}
-
-		void CheckCollisionWithRigidBodies() {
-			const auto& rigidBodies = PhysicsWorld::GetInstance()->GetRigidBodies();
-
-			for (RigidBody* other : rigidBodies) {
-				if (other == this || !m_ColliderRB || !other->GetCollider()) continue;
-
-				if (CollisionHandler::GetInstance()->CheckCollision(*m_ColliderRB, *other->GetCollider())) {
-					CollisionEvent event(this, other);
-					EventDispatcher::GetInstance()->DispatchCollisionEvent(event);
-				}
-			}
-		}
-
 
 		void CheckMapCollision(float dt) {
 			switch (CollisionHandler::GetInstance()->DetectTileCollision(*m_ColliderRB)) {
@@ -176,7 +149,5 @@ class RigidBody{
 		Vector2D m_Velocity;
 		Vector2D m_Acceleration;
 
-		std::unique_ptr<Collider> m_ColliderRB;
-
-		std::weak_ptr<GameObject> m_Owner;
+		std::shared_ptr<Collider> m_ColliderRB;
 };

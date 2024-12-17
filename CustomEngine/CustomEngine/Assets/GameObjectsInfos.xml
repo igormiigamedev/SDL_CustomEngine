@@ -6,6 +6,8 @@
 
     <object type="ENEMY" scaleX="0.5" scaleY="0.5" />
 
+    <object type="COLLECTIBLE" scaleX="0.5" scaleY="0.5" />
+
 
  
 </objects>

@@ -1,3 +1,7 @@
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Collectibles\Collectible.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\Collectible.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Physics\Collider.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\Collider.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Physics\RectCollider.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\RectCollider.obj
+E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Physics\CircleCollider.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\CircleCollider.obj
 E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Characters\IDamage.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\IDamage.obj
 E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Events\EventDispatcher.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\EventDispatcher.obj
 E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\Source\Object\EGameObjectType.cpp;E:\SDL_Project\SDL_CustomEngine\CustomEngine\CustomEngine\x64\Debug\EGameObjectType.obj

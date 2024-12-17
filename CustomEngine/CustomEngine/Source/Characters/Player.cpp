@@ -11,7 +11,7 @@ static RegisterObject<Player> registerObject(GameObjectType::PLAYER);
 
 Player::Player(const Properties& props, Transform transform) : Character(props, transform){
 
-	GetRigidBody().SetGravity(580.0f);
+	GetRigidBody().SetGravity(680.0f);
 
 	m_Animation = new SpriteAnimation();
 	m_Animation->Parse();

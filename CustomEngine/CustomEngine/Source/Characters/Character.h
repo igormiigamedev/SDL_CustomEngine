@@ -27,8 +27,6 @@ class Character : public GameObject, public IDamage
 			std::cout << "Character destroyed\n";
 		}
 
-		virtual GameObjectType GetType() const = 0;
-
 		virtual void Draw() = 0;
 		virtual void Clean() = 0;
 		virtual void Update(float dt) = 0;
@@ -42,15 +40,30 @@ class Character : public GameObject, public IDamage
 		void RegisterCollisionCallback() {
 			EventDispatcher::GetInstance()->RegisterCollisionCallback(
 				shared_from_this(), // Callback owner (the object that is registering)
-				[this](RigidBody* otherBody) {
-					OnCollision(otherBody->GetOwner()); // Calls the OnCollision method
+
+				[this](GameObject* otherObject) {
+					// Convert GameObject* to weak_ptr
+					std::weak_ptr<GameObject> weakTarget = otherObject->GetWeakPtr();
+
+					// Promotes to shared_ptr only if still valid
+					if (auto target = weakTarget.lock()) {
+						OnCollision(target); 
+					}
 				},
+
 				[this](const CollisionEvent& event) {
-					// Filters events relevant to the owner
-					return event.bodyA->GetOwner().get() == this || event.bodyB->GetOwner().get() == this;
+					// Filter that checks if the event involves the Character
+					auto self = shared_from_this();
+					return IsSameObject(event.objectA, self) || IsSameObject(event.objectB, self);
 				}
 			);
 		}
+
+		// Function that checks if two weak_ptrs reference the same resource
+		bool IsSameObject(const std::weak_ptr<GameObject>& a, const std::weak_ptr<GameObject>& b) {
+			return !a.owner_before(b) && !b.owner_before(a);
+		}
+
 
 		// Method to set Collider type
 		void SetColliderAsCircle(float x, float y, float radius) {

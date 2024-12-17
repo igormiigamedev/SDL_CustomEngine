@@ -1,7 +1,6 @@
 #pragma once
 
 #include "../Map/TileLayer.h"
-#include "../Map/TileLayer.h"
 #include "../Map/TileMap.h"
 #include "../Vendor/tinyXML/tinyxml.h"
 #include "../Factory/ObjectFactory.h"

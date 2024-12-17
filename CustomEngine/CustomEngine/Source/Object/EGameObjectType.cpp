@@ -5,6 +5,7 @@ std::string GameObjectTypeToString(GameObjectType type) {
     switch (type) {
         case GameObjectType::PLAYER: return ENUM_TO_STRING(PLAYER);
         case GameObjectType::ENEMY: return ENUM_TO_STRING(ENEMY);
+        case GameObjectType::COLLECTIBLE: return ENUM_TO_STRING(COLLECTIBLE);
         default: return "UNKNOWN";
     }
 }
@@ -12,7 +13,8 @@ std::string GameObjectTypeToString(GameObjectType type) {
 GameObjectType StringToGameObjectType(const char* objType) {
     static const std::unordered_map<std::string, GameObjectType> typeMap = {
         {"PLAYER", GameObjectType::PLAYER},
-        {"ENEMY", GameObjectType::ENEMY}
+        {"ENEMY", GameObjectType::ENEMY},
+        { "COLLECTIBLE", GameObjectType::COLLECTIBLE }
     };
 
     auto it = typeMap.find(objType);

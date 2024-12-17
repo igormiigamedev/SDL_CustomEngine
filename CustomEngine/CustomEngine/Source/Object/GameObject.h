@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef GAMEOBJECT_H
-#define GAMEOBJECT_H
-
 #include "IObject.h"
 #include "../Physics/Transform.h"
 #include <SDL.h>
@@ -31,8 +28,14 @@ class GameObject : public IObject, public std::enable_shared_from_this<GameObjec
         virtual void Clean() = 0;
         virtual void Update(float dt) = 0;
 
+        virtual GameObjectType GetType() const = 0;
+
         virtual ~GameObject() {
             /*delete m_Transform;*/ // Libera a memória alocada
+        }
+
+        std::weak_ptr<GameObject> GetWeakPtr() {
+            return shared_from_this();
         }
 
         virtual void InitGameObject() = 0;
@@ -46,7 +49,5 @@ class GameObject : public IObject, public std::enable_shared_from_this<GameObjec
         SDL_RendererFlip m_Flip = SDL_FLIP_NONE;
         Properties m_Properties;
 };
-
-#endif // GAMEOBJECT_H
 
 

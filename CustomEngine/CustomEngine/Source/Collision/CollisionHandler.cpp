@@ -1,6 +1,8 @@
 #include "CollisionHandler.h"
 #include "../Core/Engine.h"
 #include <iostream>
+#include "PhysicsWorld.h"
+#include "../Events/EventDispatcher.h"
 
 CollisionHandler* CollisionHandler::s_Instance = nullptr;
 
@@ -127,5 +129,30 @@ bool CollisionHandler::CheckCircleCollision(const CircleCollider& checker, const
     float distanceSquared = dx * dx + dy * dy;
     float radiusSum = checker.GetCircle().radius + other.GetCircle().radius;
     return distanceSquared <= radiusSum * radiusSum;
+}
+
+void CollisionHandler::CheckCollisionsWithColliders(Collider& sourceCollider) {
+    // Get all valid colliders from PhysicsWorld
+    auto colliders = PhysicsWorld::GetInstance()->GetColliders();
+
+    // Iterate over colliders and check for collisions
+    for (const auto& targetCollider : colliders) {
+        // Ignore collision with Collider itself
+        if (targetCollider.get() == &sourceCollider) continue;
+
+        // Check collision between sourceCollider and targetCollider
+        if (CheckCollision(sourceCollider, *targetCollider)) {
+            // Get collider owners
+            auto ownerA = sourceCollider.GetOwner();  
+            auto ownerB = targetCollider.get()->GetOwner(); 
+
+            // Check if owners are still valid
+            if (ownerA && ownerB) {
+                // Generate collision event
+                CollisionEvent event(ownerA, ownerB);  
+                EventDispatcher::GetInstance()->DispatchCollisionEvent(event);
+            }
+        }
+    }
 }
 

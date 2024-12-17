@@ -26,7 +26,7 @@ Enemy::Enemy(const Properties& props, Transform transform) : Character(props, tr
 void Enemy::Draw(){
 	m_Animation->DrawFrame(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
 	
-	GetRigidBody().GetCollider()->DrawDebugCollider();
+	/*GetRigidBody().GetCollider()->DrawDebugCollider();*/
 }
 
 void Enemy::Clean(){
@@ -55,6 +55,7 @@ Transform Enemy::GetBodyCenterPosition() {
 		? m_Transform.X + (enemyConfig.bodyWidth / 2)
 		: m_Transform.X + enemyConfig.m_EnemyWidth - (enemyConfig.bodyWidth / 2);
 
+	centerTransform.X = centerX;
 	centerTransform.Y = m_Transform.Y + (enemyConfig.m_EnemyHeight / 2.0f);
 
 	return centerTransform;

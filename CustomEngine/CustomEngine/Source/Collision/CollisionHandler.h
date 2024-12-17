@@ -35,6 +35,8 @@ class CollisionHandler{
 
 		inline static CollisionHandler* GetInstance() { return s_Instance = (s_Instance != nullptr) ? s_Instance : new CollisionHandler(); }
 
+		void CheckCollisionsWithColliders(Collider& sourceCollider);
+
 	private:
 		CollisionHandler();
 		

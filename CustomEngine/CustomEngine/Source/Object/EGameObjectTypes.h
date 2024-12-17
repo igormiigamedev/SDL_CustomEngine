@@ -5,7 +5,7 @@
 
 #define ENUM_TO_STRING(e) #e
 
-enum class GameObjectType { PLAYER, ENEMY, UNKNOWN};
+enum class GameObjectType { PLAYER, ENEMY, COLLECTIBLE, UNKNOWN};
 
 std::string GameObjectTypeToString(GameObjectType type);
 

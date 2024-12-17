@@ -21,10 +21,15 @@ void EventDispatcher::DispatchCollisionEvent(const CollisionEvent& event) {
     CleanupInvalidCallbacks();
 
     for (auto& entry : m_CollisionCallbacks) {
-        if (auto owner = entry.owner.lock()) { // Check if owner is still valid
+        if (auto owner = entry.owner.lock()) {
             if (entry.filter(event)) {
-                RigidBody* otherBody = (event.bodyA->GetOwner().get() == owner.get()) ? event.bodyB : event.bodyA;
-                entry.callback(otherBody);
+                // Promote weak_ptr to shared_ptr to access objects securely
+                if (auto objectA = event.objectA.lock()) {
+                    if (auto objectB = event.objectB.lock()) {
+                        GameObject* otherObject = (objectA.get() == owner.get()) ? objectB.get() : objectA.get();
+                        entry.callback(otherObject);
+                    }
+                }
             }
         }
     }

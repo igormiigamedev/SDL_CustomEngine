@@ -8,15 +8,16 @@
 class RigidBody;
 
 struct CollisionEvent {
-    RigidBody* bodyA;
-    RigidBody* bodyB;
+    std::weak_ptr<GameObject> objectA;
+    std::weak_ptr<GameObject> objectB;
 
-    CollisionEvent(RigidBody* a, RigidBody* b) : bodyA(a), bodyB(b) {}
+    CollisionEvent(const std::weak_ptr<GameObject>& a, const std::weak_ptr<GameObject>& b)
+        : objectA(a), objectB(b) {}
 };
 
 class EventDispatcher {
 public:
-    using CollisionCallback = std::function<void(RigidBody*)>;
+    using CollisionCallback = std::function<void(GameObject*)>;
     using CollisionFilter = std::function<bool(const CollisionEvent&)>;
 
     static EventDispatcher* GetInstance();

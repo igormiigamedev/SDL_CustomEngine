@@ -1,5 +1,6 @@
 #include "Play.h"
 #include <random>
+#include "../Collision/PhysicsWorld.h"
 //#include "Gui.h"
 
 Play::Play(){}
@@ -96,6 +97,7 @@ bool Play::Exit(){
 	m_GameObjects.clear();
 	PlayerInstance.reset(); 
 	EnemyList.clear();
+	CollectibleList.clear();
 
 	TextureManager::GetInstance()->Clean();
 	std::cout << "Exit Play" << std::endl;
@@ -113,6 +115,8 @@ void Play::Update(){
 		Camera::GetInstance()->Update(dt);
 
 		UpdateMaps();
+
+		PhysicsWorld::GetInstance()->Update();
 
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
 			if (auto gameobj = it->lock()) { // Checks if the object still exists
@@ -151,6 +155,18 @@ void Play::DestroyEnemy(std::shared_ptr<Enemy> enemy) {
 	enemy.reset();
 }
 
+void Play::DestroyCollectible(std::shared_ptr<Collectible> collectible) {
+	if (!collectible) return;
+
+	// Remove from Collectible list
+	CollectibleList.erase(
+		std::remove(CollectibleList.begin(), CollectibleList.end(), collectible),
+		CollectibleList.end()
+	);
+
+	collectible.reset();
+}
+
 
 void Play::Render(){
 	SDL_SetRenderDrawColor(m_Ctxt, 48, 96, 130, 255); //SDL_SetRenderDrawColor(m_Ctxt, 124, 218, 254, 255);
@@ -165,14 +181,14 @@ void Play::Render(){
 		map->Render();
 	}
 
-	// Renderiza os GameObjects
+	// Renders the GameObjects
 	for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
-		if (auto gameobj = it->lock()) { // Verifica se o objeto ainda existe
+		if (auto gameobj = it->lock()) { // Checks if the object still exists
 			gameobj->Draw();
 			++it;
 		}
 		else {
-			it = m_GameObjects.erase(it); // Remove referências para objetos destruídos
+			it = m_GameObjects.erase(it); // Remove references to destroyed objects
 		}
 	}
 
@@ -290,6 +306,7 @@ void Play::UpdateMaps() {
 			m_ActiveMaps.erase(m_ActiveMaps.begin());
 			UpdateCollisionLayers();
 			RemoveOutOfScreenEnemies();
+			RemoveOutOfScreenCollectibles();
 		}
 	}
 }
@@ -306,36 +323,43 @@ void Play::AddMapAtPosition(int type, int YPosition) {
 	// Sets the first available floor depending on the map type
 	int firstAvailableFloor = (type == 0) ? 2 : 1;
 
-	// Generates the enemy list for the new map
+	// Generates the enemy and collectible lists for the new map
 	SpawnNewEnemyList(firstAvailableFloor, newMap);
+	SpawnNewCollectibleList(firstAvailableFloor, newMap);
 }
 
-void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	// Get map and collision layer information
+template<typename T>
+void Play::SpawnObjectsOnFloors(
+	GameObjectType objectType,
+	int firstAvailableFloor,
+	std::shared_ptr<TileMap>& map,
+	int objectsPerFloor,
+	int verticalOffsetMultiplier
+) {
+	// Check the map collision layer
 	auto collisionLayer = dynamic_cast<TileLayer*>(map->GetMapCollisionLayer().get());
 	if (!collisionLayer) {
-		throw std::runtime_error("Camada de colisão inválida!");
+		throw std::runtime_error("Invalid collision layer!");
 	}
 
 	int totalFloors = collisionLayer->GetAmountOfFloorCollision();
 	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
-	int minEnemiesPerMap = std::ceil( (maxAvailableFloors + 1)/2 ); 
-	int enemiesPerFloor = 1;
+	int minObjectsPerMap = std::ceil((maxAvailableFloors + 1) / 2);
 
 	int mapBottomY = map->GetPosition().Y + map->GetHeight();
-	int verticalOffset = 4 * collisionLayer->GetTileSize();
+	int verticalOffset = verticalOffsetMultiplier * collisionLayer->GetTileSize();
 
 	// Random number generator setup
 	std::random_device randomDevice;
 	std::mt19937 randomGenerator(randomDevice());
-	std::uniform_int_distribution<> enemyCountDistribution(minEnemiesPerMap, maxAvailableFloors);
+	std::uniform_int_distribution<> objectCountDistribution(minObjectsPerMap, maxAvailableFloors);
 
-	// Determines the number of enemies to be spawned
-	int numberOfEnemiesToSpawn = enemyCountDistribution(randomGenerator);
+	// Determines the number of objects to spawn
+	int numberOfObjectsToSpawn = objectCountDistribution(randomGenerator);
 
-	// Enemy generation for each floor
-	for (int i = 0; i < numberOfEnemiesToSpawn; i++) {
-		for (int j = 0; j < enemiesPerFloor; j++) {
+	// Generation of objects on each floor
+	for (int i = 0; i < numberOfObjectsToSpawn; i++) {
+		for (int j = 0; j < objectsPerFloor; j++) {
 			// Random positioning on the X axis
 			std::uniform_int_distribution<> xPositionDistribution(1, SCREEN_WIDTH);
 			int randomXPosition = xPositionDistribution(randomGenerator);
@@ -343,34 +367,56 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 			// Calculates position at the top of the floor
 			int floorTopY = collisionLayer->GetFloorTopPosition(firstAvailableFloor + i);
 
-			// Sets the enemy's final position
-			Transform enemyPosition;
-			enemyPosition.X = randomXPosition;
-			enemyPosition.Y = mapBottomY - floorTopY - verticalOffset;
+			// Defines the final position of the object
+			Transform objectPosition;
+			objectPosition.X = randomXPosition;
+			objectPosition.Y = mapBottomY - floorTopY - verticalOffset;
 
-			// Create and add enemy to list
-			EnemyList.push_back(SpawnGameObjectAtLocation<Enemy>(GameObjectType::ENEMY, enemyPosition));
+			// Create and add the object to the list
+			if constexpr (std::is_same<T, Enemy>::value) {
+				EnemyList.push_back(SpawnGameObjectAtLocation<T>(objectType, objectPosition));
+			}
+			else if constexpr (std::is_same<T, Collectible>::value) {
+				CollectibleList.push_back(SpawnGameObjectAtLocation<T>(objectType, objectPosition));
+			}
 		}
 	}
 }
 
-void Play::RemoveOutOfScreenEnemies() {
+void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
+	SpawnObjectsOnFloors<Enemy>(GameObjectType::ENEMY, firstAvailableFloor, map, 1);
+}
+
+void Play::SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
+	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1);
+}
+
+template<typename T>
+void Play::RemoveOutOfScreenObjects(std::vector<std::shared_ptr<T>>& objectList) {
 	// Camera position, which defines the visible area
 	int cameraTop = Camera::GetInstance()->GetPosition().Y;
 	int cameraBottom = cameraTop + SCREEN_HEIGHT;
 
-	// Iterates over the list of enemies and removes those that are no longer visible
-	for (auto it = EnemyList.begin(); it != EnemyList.end(); ) {
-		auto enemy = *it;
-		int enemyY = enemy->GetTransform().Y;
+	// Iterates over the list of objects and removes those that are off-screen
+	for (auto it = objectList.begin(); it != objectList.end(); ) {
+		auto object = *it;
+		int objectY = object->GetTransform().Y;
 
-		// Checks if the enemy is below the screen
-		if (enemyY > cameraBottom) {
-			it = EnemyList.erase(it);  // Remove enemy
-			std::cout << "inimigo apagado" << std::endl;
+		// Checks if the object is below the screen
+		if (objectY > cameraBottom) {
+			it = objectList.erase(it);  // Remove the object
+			std::cout << "Objeto removido" << std::endl;
 		}
 		else {
 			++it;
 		}
 	}
+}
+
+void Play::RemoveOutOfScreenEnemies() {
+	RemoveOutOfScreenObjects(EnemyList);
+}
+
+void Play::RemoveOutOfScreenCollectibles() {
+	RemoveOutOfScreenObjects(CollectibleList);
 }
