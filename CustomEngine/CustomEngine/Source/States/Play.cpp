@@ -55,12 +55,13 @@ bool Play::Init() {
 
 	int player_texture_width = 240;
 	int player_texture_height = 207;
-	float imageScalling = 0.7f;
-	Transform playertf, enemytf;
+	Transform playertf;
 	playertf.X = 50;
-	playertf.Y = 1.65*SCREEN_HEIGHT;
-	enemytf.X = 50;
-	enemytf.Y = SCREEN_HEIGHT;
+
+	int height_margin = 50;
+	auto collisionLayer = dynamic_cast<TileLayer*>(initialMap->GetMapCollisionLayer().get());
+
+	playertf.Y = collisionLayer->GetFloorTopPosition(1) - player_texture_height - height_margin;
 
 	PlayerInstance = SpawnGameObjectAtLocation<Player>(GameObjectType::PLAYER, playertf);
 	assert(PlayerInstance != nullptr && "Player object is null!"); // Debugging
@@ -346,7 +347,7 @@ void Play::SpawnObjectsOnFloors(
 	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
 	int minObjectsPerMap = std::ceil((maxAvailableFloors + 1) / 2);
 
-	int mapBottomY = map->GetPosition().Y + map->GetHeight();
+	int mapTopY = map->GetPosition().Y;
 	int verticalOffset = verticalOffsetMultiplier * collisionLayer->GetTileSize();
 
 	// Random number generator setup
@@ -370,7 +371,7 @@ void Play::SpawnObjectsOnFloors(
 			// Defines the final position of the object
 			Transform objectPosition;
 			objectPosition.X = randomXPosition;
-			objectPosition.Y = mapBottomY - floorTopY - verticalOffset;
+			objectPosition.Y = mapTopY + floorTopY - verticalOffset;
 
 			// Create and add the object to the list
 			if constexpr (std::is_same<T, Enemy>::value) {
@@ -384,11 +385,11 @@ void Play::SpawnObjectsOnFloors(
 }
 
 void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	SpawnObjectsOnFloors<Enemy>(GameObjectType::ENEMY, firstAvailableFloor, map, 1);
+	SpawnObjectsOnFloors<Enemy>(GameObjectType::ENEMY, firstAvailableFloor, map, 1, 1);
 }
 
 void Play::SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1);
+	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4);
 }
 
 template<typename T>

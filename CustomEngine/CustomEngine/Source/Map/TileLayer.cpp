@@ -53,11 +53,11 @@ std::vector<std::vector<int>> TileLayer::findFloors(const Tile::Matrix& matrix) 
 	std::vector<std::vector<int>> floorIndexGroups; // Stores groups of consecutive lines
 	std::vector<int> currentGroup; // Current group of consecutive lines
 
-	for (int row = 0; row < matrix.size(); ++row) {
+	for (int row = matrix.size()-1; row > 0; row--) {
 		bool hasNonZero = false;
 
 		// Checks if the line has at least one non-zero value
-		for (int col = 0; col < matrix[row].size(); ++col) {
+		for (int col = matrix[row].size()-1; col > 0 ; col--) {
 			if (matrix[row][col] != 0) {
 				hasNonZero = true;
 				break;
@@ -96,13 +96,19 @@ std::vector<int> TileLayer::calculateHeightsBetweenFloors(const std::vector<std:
 }
 
 int TileLayer::GetFloorSize(int floorNumber) {
-	int index = floorNumber - 1;
+	int index = 0;
+	if (floorNumber > 0) {
+		index = floorNumber - 1;
+	}
 	return floorCollisionIndexGroups[index].size() * GetTileSize();
 }
 
 int TileLayer::GetFloorTopPosition(int floorNumber) {
-	int index = floorNumber - 1;
-	return (floorCollisionIndexGroups[index].back() + 1) * GetTileSize();
+	int index = 0;
+	if (floorNumber > 0) {
+		index = floorNumber - 1;
+	}
+	return (floorCollisionIndexGroups[index].back() - 1) * GetTileSize();
 }
 
 void TileLayer::Render(){
