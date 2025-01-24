@@ -335,7 +335,9 @@ void Play::SpawnObjectsOnFloors(
 	int firstAvailableFloor,
 	std::shared_ptr<TileMap>& map,
 	int objectsPerFloor,
-	int verticalOffsetMultiplier
+	int verticalOffsetMultiplier,
+	int minObjectsPerMap,
+	int maxObjectsPerMap
 ) {
 	// Check the map collision layer
 	auto collisionLayer = dynamic_cast<TileLayer*>(map->GetMapCollisionLayer().get());
@@ -345,7 +347,15 @@ void Play::SpawnObjectsOnFloors(
 
 	int totalFloors = collisionLayer->GetAmountOfFloorCollision();
 	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
-	int minObjectsPerMap = std::ceil((maxAvailableFloors + 1) / 2);
+
+	if (maxObjectsPerMap < 0) {
+		maxObjectsPerMap = maxAvailableFloors;
+	}
+
+	if (minObjectsPerMap < 0) {
+		minObjectsPerMap = std::ceil((maxAvailableFloors + 1) / 2);
+	}
+	
 
 	int mapTopY = map->GetPosition().Y;
 	int verticalOffset = verticalOffsetMultiplier * collisionLayer->GetTileSize();
@@ -357,10 +367,27 @@ void Play::SpawnObjectsOnFloors(
 
 	// Determines the number of objects to spawn
 	int numberOfObjectsToSpawn = objectCountDistribution(randomGenerator);
+	/*std::cout << "Number to spawn" << numberOfObjectsToSpawn << std::endl;*/
+
+	int amountOfObjectsSpawned = 0;
 
 	// Generation of objects on each floor
-	for (int i = 0; i < numberOfObjectsToSpawn; i++) {
+	for (int i = 0; i < maxAvailableFloors; i++) {
+		if (amountOfObjectsSpawned == numberOfObjectsToSpawn) {
+			break;
+		}
+
+		if ((numberOfObjectsToSpawn - amountOfObjectsSpawned) < (maxAvailableFloors - i)) {
+			std::uniform_int_distribution<> willSpawnOnThisFloor(0, 1);
+			if (willSpawnOnThisFloor(randomGenerator) >= 0.5) {
+				/*std::cout << "Pulou o andar" << firstAvailableFloor + i << std::endl;*/
+				continue;
+			}
+		}
+		/*std::cout << "Spawnou no andar" << firstAvailableFloor + i  << std::endl;*/
+
 		for (int j = 0; j < objectsPerFloor; j++) {
+
 			// Random positioning on the X axis
 			std::uniform_int_distribution<> xPositionDistribution(1, SCREEN_WIDTH);
 			int randomXPosition = xPositionDistribution(randomGenerator);
@@ -376,9 +403,11 @@ void Play::SpawnObjectsOnFloors(
 			// Create and add the object to the list
 			if constexpr (std::is_same<T, Enemy>::value) {
 				EnemyList.push_back(SpawnGameObjectAtLocation<T>(objectType, objectPosition));
+				amountOfObjectsSpawned++;
 			}
 			else if constexpr (std::is_same<T, Collectible>::value) {
 				CollectibleList.push_back(SpawnGameObjectAtLocation<T>(objectType, objectPosition));
+				amountOfObjectsSpawned++;
 			}
 		}
 	}
@@ -389,7 +418,7 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 }
 
 void Play::SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4);
+	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 1, 3);
 }
 
 template<typename T>
