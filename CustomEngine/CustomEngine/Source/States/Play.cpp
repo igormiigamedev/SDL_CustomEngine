@@ -334,12 +334,12 @@ void Play::SpawnObjectsOnFloors(
 	GameObjectType objectType,
 	int firstAvailableFloor,
 	std::shared_ptr<TileMap>& map,
-	int objectsPerFloor,
+	int maxObjectsPerFloor,
 	int verticalOffsetMultiplier,
 	int minObjectsPerMap,
 	int maxObjectsPerMap
 ) {
-	// Check the map collision layer
+	// Validate collision layer
 	auto collisionLayer = dynamic_cast<TileLayer*>(map->GetMapCollisionLayer().get());
 	if (!collisionLayer) {
 		throw std::runtime_error("Invalid collision layer!");
@@ -348,15 +348,9 @@ void Play::SpawnObjectsOnFloors(
 	int totalFloors = collisionLayer->GetAmountOfFloorCollision();
 	int maxAvailableFloors = totalFloors - (firstAvailableFloor - 1);
 
-	if (maxObjectsPerMap < 0) {
-		maxObjectsPerMap = maxAvailableFloors;
-	}
-
-	if (minObjectsPerMap < 0) {
-		minObjectsPerMap = std::ceil((maxAvailableFloors + 1) / 2);
-	}
+	maxObjectsPerMap = (maxObjectsPerMap < 0) ? maxAvailableFloors : maxObjectsPerMap;
+	minObjectsPerMap = (minObjectsPerMap < 0) ? std::ceil((maxAvailableFloors + 1) / 2) : minObjectsPerMap;
 	
-
 	int mapTopY = map->GetPosition().Y;
 	int verticalOffset = verticalOffsetMultiplier * collisionLayer->GetTileSize();
 
@@ -364,36 +358,44 @@ void Play::SpawnObjectsOnFloors(
 	std::random_device randomDevice;
 	std::mt19937 randomGenerator(randomDevice());
 	std::uniform_int_distribution<> objectCountDistribution(minObjectsPerMap, maxAvailableFloors);
-
-	// Determines the number of objects to spawn
 	int numberOfObjectsToSpawn = objectCountDistribution(randomGenerator);
 	/*std::cout << "Number to spawn" << numberOfObjectsToSpawn << std::endl;*/
 
 	int amountOfObjectsSpawned = 0;
 
 	// Generation of objects on each floor
-	for (int i = 0; i < maxAvailableFloors; i++) {
-		if (amountOfObjectsSpawned == numberOfObjectsToSpawn) {
-			break;
-		}
+	for (int currentFloor = 0; currentFloor < maxAvailableFloors && amountOfObjectsSpawned < numberOfObjectsToSpawn; currentFloor++) {
 
-		if ((numberOfObjectsToSpawn - amountOfObjectsSpawned) < (maxAvailableFloors - i)) {
+		int deltaObjectsToSpawn = numberOfObjectsToSpawn - amountOfObjectsSpawned;
+		int deltaAvailableFloors = maxAvailableFloors - currentFloor;
+
+		if (deltaObjectsToSpawn < deltaAvailableFloors) {
+			// ramdomly decide if will spawn on this floor
 			std::uniform_int_distribution<> willSpawnOnThisFloor(0, 1);
-			if (willSpawnOnThisFloor(randomGenerator) >= 0.5) {
+			if (willSpawnOnThisFloor(randomGenerator) == 0) {
 				/*std::cout << "Pulou o andar" << firstAvailableFloor + i << std::endl;*/
 				continue;
 			}
 		}
 		/*std::cout << "Spawnou no andar" << firstAvailableFloor + i  << std::endl;*/
 
-		for (int j = 0; j < objectsPerFloor; j++) {
+		for (int j = 0; j < maxObjectsPerFloor && amountOfObjectsSpawned < numberOfObjectsToSpawn; j++) {
+
+			if (j > 0) {
+				// ramdomly decide if will spawn more objects on this floor
+				std::uniform_int_distribution<> willSpawnMoreObjecstOnThisFloor(0, 1);
+				if (willSpawnMoreObjecstOnThisFloor(randomGenerator) == 0) {
+					/*std::cout << "Pulou o andar" << firstAvailableFloor + i << std::endl;*/
+					continue;
+				}
+			}
 
 			// Random positioning on the X axis
 			std::uniform_int_distribution<> xPositionDistribution(1, SCREEN_WIDTH);
 			int randomXPosition = xPositionDistribution(randomGenerator);
 
 			// Calculates position at the top of the floor
-			int floorTopY = collisionLayer->GetFloorTopPosition(firstAvailableFloor + i);
+			int floorTopY = collisionLayer->GetFloorTopPosition(firstAvailableFloor + currentFloor);
 
 			// Defines the final position of the object
 			Transform objectPosition;

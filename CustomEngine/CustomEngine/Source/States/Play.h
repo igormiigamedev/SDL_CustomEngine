@@ -72,7 +72,7 @@ class Play : public GameState{
 		void SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map);
 
 		template<typename T>
-		void SpawnObjectsOnFloors(GameObjectType objectType, int firstAvailableFloor, std::shared_ptr<TileMap>& map, int objectsPerFloor, int verticalOffsetMultiplier = 4, int minObjectsPerMap = -1, int maxObjectsPerMap = -1);
+		void SpawnObjectsOnFloors(GameObjectType objectType, int firstAvailableFloor, std::shared_ptr<TileMap>& map, int maxObjectsPerFloor, int verticalOffsetMultiplier = 4, int minObjectsPerMap = -1, int maxObjectsPerMap = -1);
 
 		template<typename T>
 		void RemoveOutOfScreenObjects(std::vector<std::shared_ptr<T>>& objectList);
