@@ -102,7 +102,7 @@ void Enemy::OnCollision(std::shared_ptr<GameObject> target) {
 	if (target) {
 		auto character = std::dynamic_pointer_cast<Character>(target);
 		if (character && character->GetType() == GameObjectType::PLAYER) {
-			std::cout << "Enemy colidiu com Player!" << std::endl;
+			/*std::cout << "Enemy colidiu com Player!" << std::endl;*/
 			character->ApplyDamage(1);
 		}
 	}

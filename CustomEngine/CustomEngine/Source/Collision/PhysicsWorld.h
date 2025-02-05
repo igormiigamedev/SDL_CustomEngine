@@ -17,26 +17,32 @@ public:
     void Update() {
         CleanUpInvalidColliders();
 
-        for (auto collider : GetColliders()) {
-            collider.get()->Update();
+        for (auto collider : m_Colliders) {
+            if (auto validCollider = collider.lock()) {
+                validCollider->Update();
+            }
         }
     }
 
+    void Reset() {
+        m_Colliders.clear();
+    }
+
+
     void RegisterCollider(std::shared_ptr<Collider> collider) {
-        if (collider) {
-            m_Colliders.insert(collider);
-        }
+        if (!collider) return;
+
+        m_Colliders.push_back(collider);
     }
 
     void CleanUpInvalidColliders() {
-        for (auto it = m_Colliders.begin(); it != m_Colliders.end(); ) {
-            if (it->expired()) {
-                it = m_Colliders.erase(it); 
-            }
-            else {
-                ++it;
-            }
-        }
+        // Remove colliders expirados do vetor
+        m_Colliders.erase(
+            std::remove_if(m_Colliders.begin(), m_Colliders.end(),
+                [](const std::weak_ptr<Collider>& weakCollider) {
+                    return weakCollider.expired();
+                }),
+            m_Colliders.end());
     }
 
     // Get all valid Colliders
@@ -54,24 +60,6 @@ public:
         return validColliders;
     }
 
-
-    struct WeakPtrHash {
-        template <typename T>
-        std::size_t operator()(const std::weak_ptr<T>& weakPtr) const {
-            auto shared = weakPtr.lock();
-            return shared ? std::hash<std::shared_ptr<T>>{}(shared) : 0;
-        }
-    };
-
-    struct WeakPtrEqual {
-        template <typename T>
-        bool operator()(const std::weak_ptr<T>& a, const std::weak_ptr<T>& b) const {
-            return !a.owner_before(b) && !b.owner_before(a);
-        }
-    };
-
-
 private:
-    // Weak reference set for Colliders
-    std::unordered_set<std::weak_ptr<Collider>, WeakPtrHash, WeakPtrEqual> m_Colliders;
+    std::vector<std::weak_ptr<Collider>> m_Colliders;
 };

@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <gamemaps>
     <!-- FirstMap -->
-    <maps source="Assets/Maps/ScenarioTest2..tmx" type="0" />
+    <maps source="Assets/Maps/ScenarioTest2.tmx" type="0" />
     <!-- <maps source="Assets/Maps/map.tmx" type="0" /> -->
 
     <!-- MiddleMap -->
-    <maps source="Assets/Maps/ScenarioTest2..tmx" type="1" />
+    <maps source="Assets/Maps/ScenarioTest3.tmx" type="1" />
     <!-- <maps source="Assets/Maps/map2.tmx" type="1" /> -->
 
 
