@@ -20,6 +20,11 @@ bool Engine::Init() {
         return false;
     }
 
+    if (TTF_Init() == -1) {
+        std::cerr << "Failed to initialize SDL_ttf: " << TTF_GetError() << std::endl;
+        return 1;
+    }
+
     SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
 
     m_Window = SDL_CreateWindow("Custom Engine", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, window_flags);
@@ -99,6 +104,7 @@ bool Engine::Clean() {
     SDL_DestroyRenderer(m_Renderer);
     SDL_DestroyWindow(m_Window);
     IMG_Quit();
+    TTF_Quit();
     SDL_Quit();
     return true;
 }

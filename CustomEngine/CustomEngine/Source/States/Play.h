@@ -17,6 +17,8 @@
 #include "../Collision/CollisionHandler.h"
 #include "../Map/ImgLayer.h"
 #include "../Parser/Parser.h"
+#include "../GameMode/GameMode.h"
+#include "../Timer/FPSCounter.h"
 
 class Play : public GameState{
 
@@ -26,6 +28,7 @@ class Play : public GameState{
 		virtual bool Init();
 		virtual bool Exit();
 		virtual void Update();
+		void RemoveInactiveObjects();
 		virtual void Render();
 
 		void DestroyPlayer();
@@ -75,7 +78,6 @@ class Play : public GameState{
 
 		void RemoveOutOfScreenCollectibles();
 
-
 	private:
 		bool m_EditMode;
 		TileMap* m_LevelMap;
@@ -89,5 +91,7 @@ class Play : public GameState{
 		/*std::vector<std::unique_ptr<GameObject>> m_SceneObjects;*/
 
 		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
+
+		FPSCounter fpsCounter;
 };
 

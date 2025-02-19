@@ -44,10 +44,14 @@ class GameObject : public IObject, public std::enable_shared_from_this<GameObjec
             return m_Transform;
         }
 
+        bool IsActive() const { return m_IsActive; }
+
     protected:
         Transform m_Transform;
         SDL_RendererFlip m_Flip = SDL_FLIP_NONE;
         Properties m_Properties;
+
+        bool m_IsActive = true;
 };
 
 

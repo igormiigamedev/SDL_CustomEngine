@@ -4,6 +4,7 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
+#include <SDL_ttf.h>
 #include "../Object/GameObject.h"
 #include "../Factory/ObjectFactory.h"
 #include "../States/GameState.h"

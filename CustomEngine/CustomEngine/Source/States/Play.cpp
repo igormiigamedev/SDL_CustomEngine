@@ -121,6 +121,14 @@ void Play::Update(){
 
 		PhysicsWorld::GetInstance()->Update();
 
+		RemoveInactiveObjects();
+
+		if (PlayerInstance && PlayerInstance->IsDead()) {
+			std::cout << "Morreu" << std::endl;
+
+			/*DestroyPlayer();*/
+		}
+
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
 			if (auto gameobj = it->lock()) { // Checks if the object still exists
 				gameobj->Update(dt);
@@ -131,12 +139,18 @@ void Play::Update(){
 			}
 		}
 
-		if (PlayerInstance && PlayerInstance->IsDead()) {
-			std::cout << "Morreu" << std::endl;
-
-			/*DestroyPlayer();*/
-		}
+		/*fpsCounter.Update();*/
 	}
+}
+
+void Play::RemoveInactiveObjects() {
+	// Remove Collectibles inativos
+	CollectibleList.erase(
+		std::remove_if(CollectibleList.begin(), CollectibleList.end(),
+			[](const std::shared_ptr<Collectible>& collectible) {
+				return !collectible->IsActive();
+			}),
+		CollectibleList.end());
 }
 
 void Play::DestroyPlayer() {
@@ -194,6 +208,8 @@ void Play::Render(){
 			it = m_GameObjects.erase(it); // Remove references to destroyed objects
 		}
 	}
+
+	GameMode::GetInstance()->RenderHUD(m_Ctxt);
 
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();
 
@@ -352,7 +368,7 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 }
 
 void Play::SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	//SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 1, 3);
+	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 1, 3);
 }
 
 template<typename T>

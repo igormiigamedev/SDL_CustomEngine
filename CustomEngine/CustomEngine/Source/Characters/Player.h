@@ -3,6 +3,7 @@
 #include "Character.h"
 #include "../Animation/SpriteAnimation.h"
 #include "../Physics/Vector2D.h"
+#include "../GameMode/GameMode.h"
 
 #define JUMP_VELOCITY 750.0f  //680.0f 
 

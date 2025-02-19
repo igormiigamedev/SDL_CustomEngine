@@ -180,12 +180,17 @@ void Player::HandlePlayerDeath() {
 	if (m_IsJumping) {
 		GetRigidBody().SetVelocityY(GetRigidBody().GetVelocity().Y/2);
 	}
+	GameMode::GetInstance()->SaveHighScore();
+	GameMode::GetInstance()->ResetScore();
 }
 
 void Player::OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction) {
 	if (target->GetType() == GameObjectType::FLOOR && direction == CollisionDirection::BELOW) {
 		/*std::cout << "Player colidiu com chao!" << std::endl;*/
 		GetRigidBody().ResolveGroundCollision();
+	}
+	if (target->GetType() == GameObjectType::COLLECTIBLE) {
+		GameMode::GetInstance()->IncreaseScore(1);
 	}
 
 }

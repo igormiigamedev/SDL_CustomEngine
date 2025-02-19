@@ -30,7 +30,7 @@ void Collectible::InitGameObject() {
 
 void Collectible::Draw() {
     m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
-    m_Collider->DrawDebugCollider();
+    /*m_Collider->DrawDebugCollider();*/
 
    /* std::cout << "Drawing collectible at (" << m_Transform.X << ", " << m_Transform.Y << ")\n";*/
 }
@@ -68,7 +68,7 @@ void Collectible::OnCollision(std::shared_ptr<GameObject> target) {
         HandleCollection();
 
         // Mark for removal
-        /*m_IsActive = false;*/
+        m_IsActive = false;
     }
 }
 
