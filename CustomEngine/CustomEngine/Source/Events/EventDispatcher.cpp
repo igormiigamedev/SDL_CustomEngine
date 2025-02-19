@@ -27,7 +27,7 @@ void EventDispatcher::DispatchCollisionEvent(const CollisionEvent& event) {
                 if (auto objectA = event.objectA.lock()) {
                     if (auto objectB = event.objectB.lock()) {
                         GameObject* otherObject = (objectA.get() == owner.get()) ? objectB.get() : objectA.get();
-                        entry.callback(otherObject);
+                        entry.callback(otherObject, event.collisionDirection);
                     }
                 }
             }

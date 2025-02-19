@@ -13,7 +13,20 @@ void Collider::Update() {
     case BLOCK:
         break;
     case OVERLAP:
-        CollisionHandler::GetInstance()->CheckCollisionsWithColliders(*this);
+        CollisionHandler::GetInstance()->CheckCollisionsWithCollidersOfType(*this, PhysicsBody);
+        break;
+    default:
+        break;
+    }
+
+    switch (this->GetCollisionResponse(WorldFloor)) {
+    case IGNORE:
+        break;
+    case BLOCK:
+        CollisionHandler::GetInstance()->CheckCollisionsWithCollidersOfType(*this, WorldFloor);
+        break;
+    case OVERLAP:
+        // Handle overlap case if needed
         break;
     default:
         break;

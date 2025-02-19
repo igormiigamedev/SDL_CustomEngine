@@ -4,6 +4,12 @@
 #include <memory>
 #include "TileLayer.h"
 #include "../Physics/Transform.h"
+#include "../Floor/FloorObject.h"
+#include "../Physics/Collider.h"
+#include "../Physics/RectCollider.h"
+#include "../Physics/CircleCollider.h"
+#include "../Collision/PhysicsWorld.h"
+#include "../Collision/CollisionTypes.h"
 
 class TileMap {
 public:
@@ -18,6 +24,7 @@ public:
             m_MapLayers.push_back(std::unique_ptr<Layer>(layer->Clone()));
         }
         dynamic_cast<TileLayer*>(GetMapCollisionLayer().get())->UpdateFloorCollisionInformations();
+        m_FloorGameObject = std::make_shared<FloorObject>(Properties(), Transform());
     }
 
     TileMap& operator=(const TileMap& other) {
@@ -31,9 +38,35 @@ public:
         return *this;
     }
 
+    void SetCollider(std::shared_ptr<Collider> collider) {
+        m_ColliderList.push_back(std::move(collider));
+        m_ColliderList.back()->SetOwner(m_FloorGameObject);
+        PhysicsWorld::GetInstance()->RegisterCollider(m_ColliderList.back());
+        m_ColliderList.back()->SetCollisionResponse(WorldFloor, IGNORE);
+        m_ColliderList.back()->SetCollisionResponse(PhysicsBody, IGNORE);
+    }
+
+    void SetMapColliders() {
+        Transform transform;
+
+        TileLayer* collisionLayer = dynamic_cast<TileLayer*>(GetMapCollisionLayer().get());
+        
+        for (int floor = 1; floor <= collisionLayer->GetAmountOfFloorCollision(); floor++) {
+            transform = collisionLayer->GetFloorCenterPosition(floor);
+            int floorHeight = collisionLayer->GetFloorSize(floor);
+            transform.Y = transform.Y - floorHeight/2;
+            Transform mapPosition = collisionLayer->GetLayerPosition();
+
+            SetCollider(std::make_shared<RectCollider>(0, mapPosition.Y + transform.Y, collisionLayer->GetTileWidth() * collisionLayer->GetTileSize(), floorHeight, WorldFloor));
+        }
+    }
+
     void Render() {
         for (const auto& layer : m_MapLayers) {
             layer->Render();
+        }
+        for (const auto& collider : m_ColliderList) {
+            collider->DrawDebugCollider();
         }
     }
 
@@ -44,8 +77,15 @@ public:
     }
 
     void Clean() {
-        m_MapLayers.clear(); 
+        m_ColliderList.clear();
+
+        m_MapLayers.clear();
+
+        m_FloorGameObject.reset();
+
+        std::cout << "TileMap cleaned.\n";
     }
+
 
     void SetPosition(int x, int y) {
         Transform tempPos;
@@ -54,6 +94,7 @@ public:
         for (auto& layer : m_MapLayers) {
             layer->SetLayerPosition(tempPos);
         }
+        SetMapColliders();
     }
 
     Transform GetPosition() {
@@ -76,4 +117,7 @@ public:
 private:
     std::vector<std::unique_ptr<Layer>> m_MapLayers;
     int width{}, height{};
+
+    std::vector < std::shared_ptr<Collider>> m_ColliderList;
+    std::shared_ptr<GameObject> m_FloorGameObject;
 };

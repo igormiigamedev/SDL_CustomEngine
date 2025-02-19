@@ -30,6 +30,8 @@ class TileLayer : public Layer{
 
 		int GetFloorTopPosition(int floorNumber);
 
+		Transform GetFloorCenterPosition(int floorNumber);
+
 		virtual void Render();
 		virtual void Update();
 

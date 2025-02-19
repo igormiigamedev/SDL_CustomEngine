@@ -124,6 +124,7 @@ void Player::StartJump() {
 
 void Player::ApplyJumpForce(float dt) {
 	if (m_IsJumping) {
+		GetRigidBody().UnSetForceY();
 		GetRigidBody().SetVelocityY(UPWARD * JUMP_VELOCITY);
 		GetRigidBody().GetCollider()->SetCollisionResponse(WorldFloor, OVERLAP);
 	}
@@ -181,6 +182,10 @@ void Player::HandlePlayerDeath() {
 	}
 }
 
-void Player::OnCollision(std::shared_ptr<GameObject> target) {
-	
+void Player::OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction) {
+	if (target->GetType() == GameObjectType::FLOOR && direction == CollisionDirection::BELOW) {
+		/*std::cout << "Player colidiu com chao!" << std::endl;*/
+		GetRigidBody().ResolveGroundCollision();
+	}
+
 }

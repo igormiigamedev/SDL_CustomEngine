@@ -30,7 +30,7 @@ class Character : public GameObject, public IDamage
 		virtual void Draw() = 0;
 		virtual void Clean() = 0;
 		virtual void Update(float dt) = 0;
-		virtual void OnCollision(std::shared_ptr<GameObject> target) = 0;
+		virtual void OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction) = 0;
 
 		RigidBody& GetRigidBody() {
 			return m_RigidBody;
@@ -41,13 +41,13 @@ class Character : public GameObject, public IDamage
 			EventDispatcher::GetInstance()->RegisterCollisionCallback(
 				shared_from_this(), // Callback owner (the object that is registering)
 
-				[this](GameObject* otherObject) {
+				[this](GameObject* otherObject, CollisionDirection direction) {
 					// Convert GameObject* to weak_ptr
 					std::weak_ptr<GameObject> weakTarget = otherObject->GetWeakPtr();
 
 					// Promotes to shared_ptr only if still valid
 					if (auto target = weakTarget.lock()) {
-						OnCollision(target); 
+						OnCollision(target, direction); 
 					}
 				},
 
@@ -67,11 +67,11 @@ class Character : public GameObject, public IDamage
 
 		// Method to set Collider type
 		void SetColliderAsCircle(float x, float y, float radius) {
-			m_RigidBody.SetCollider(std::make_unique<CircleCollider>(x, y, radius));
+			m_RigidBody.SetCollider(std::make_unique<CircleCollider>(x, y, radius, PhysicsBody));
 		}
 
 		void SetColliderAsRect(float x, float y, float width, float height) {
-			m_RigidBody.SetCollider(std::make_unique<RectCollider>(x, y, width, height));
+			m_RigidBody.SetCollider(std::make_unique<RectCollider>(x, y, width, height, PhysicsBody));
 		}
 
 	protected:

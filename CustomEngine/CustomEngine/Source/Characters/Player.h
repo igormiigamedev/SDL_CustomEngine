@@ -25,7 +25,7 @@ class Player : public Character{
 		virtual void Update(float dt);
 		Transform GetBodyCenterPosition();
 		virtual void OnTakeDamage(float damage);
-		virtual void OnCollision(std::shared_ptr<GameObject> target);
+		virtual void OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction);
 
 		//Walk
 		void WalkMovement(float dt);

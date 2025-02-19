@@ -55,12 +55,6 @@ class Play : public GameState{
 		static void OpenMenu();
 		static void PauseGame();
 
-		void UpdateCollisionLayers();
-
-		std::pair<int, Tile::Matrix> JoinMatrixOfActiveMaps();
-
-		size_t EstimateMapTotalRows() const;
-
 		TileLayer* GetCollisionLayerFromMap(const std::shared_ptr<TileMap>& map) const;
 
 		void UpdateMaps();

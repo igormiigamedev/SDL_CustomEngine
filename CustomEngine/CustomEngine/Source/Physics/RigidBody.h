@@ -19,7 +19,7 @@ class RigidBody{
 	public:
 		RigidBody()
 			: m_Mass(UNI_MASS), m_Gravity(GRAVITY) {
-			auto collider = std::make_shared<RectCollider>(0, 0, 100, 100); // Initializes a default rectangular collision by default
+			auto collider = std::make_shared<RectCollider>(0, 0, 100, 100, PhysicsBody); // Initializes a default rectangular collision by default
 			SetCollider(collider); 
 		}
 
@@ -72,7 +72,6 @@ class RigidBody{
 		
 		void Update(float dt) {
 			UpdateAcceleration();
-			HandleCollision(dt);
 			UpdateVelocity(dt);
 			UpdatePosition(dt);
 		}
@@ -82,42 +81,12 @@ class RigidBody{
 			m_Acceleration.Y = m_Gravity + (m_Force.Y / m_Mass);
 		}
 
-		// Handle collision response
-		void HandleCollision(float dt) {
-			if (m_ColliderRB == nullptr) return;
-
-			switch (m_ColliderRB->GetCollisionResponse(WorldFloor)) {
-			case IGNORE:
-				break;
-			case BLOCK:
-				CheckMapCollision(dt);
-				break;
-			case OVERLAP:
-				// Handle overlap case if needed
-				break;
-			default:
-				break;
-			}
-		}
-
-		void CheckMapCollision(float dt) {
-			switch (CollisionHandler::GetInstance()->DetectTileCollision(*m_ColliderRB)) {
-			case CollisionLocation::Below:
-				ResolveGroundCollision(dt);
-				break;
-			case CollisionLocation::Top:
-				ResolveCeilingCollision();
-				break;
-			default:
-				break;
-			}
-		}
-
 		// Stop downward velocity when on the ground
-		void ResolveGroundCollision(float dt) {
+		void ResolveGroundCollision() {
 			if (m_Velocity.Y >= 0) {
 				SetVelocityY(0);
 				SetAccelerationY(0);
+				ApplyForceY((-1)*m_Gravity);
 			}
 		}
 

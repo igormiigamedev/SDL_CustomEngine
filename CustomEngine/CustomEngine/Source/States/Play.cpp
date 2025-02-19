@@ -101,6 +101,8 @@ bool Play::Exit(){
 	CollectibleList.clear();
 
 	TextureManager::GetInstance()->Clean();
+	PhysicsWorld::GetInstance()->Reset();
+
 	std::cout << "Exit Play" << std::endl;
 
 	return true;
@@ -212,73 +214,6 @@ void Play::PauseGame()
 {
 }
 
-void Play::UpdateCollisionLayers() {
-	std::pair<int, Tile::Matrix> result = JoinMatrixOfActiveMaps();
-	int tileSize = result.first;
-	Tile::Matrix matrixOfCurrentMapsOnScreen = result.second;
-	
-	if (tileSize == -1) {
-		return; 
-	}
-
-	CollisionHandler::GetInstance()->SetCollisionMap(matrixOfCurrentMapsOnScreen, tileSize);
-}
-
-std::pair<int, Tile::Matrix> Play::JoinMatrixOfActiveMaps() {
-	Tile::Matrix matrixOfCurrentMapsOnScreen;
-	int tileSize = -1;  // Invalid value to signal error
-
-	// Estimate the total number of rows to avoid reallocations
-	size_t totalRows = EstimateMapTotalRows();
-
-	matrixOfCurrentMapsOnScreen.reserve(totalRows);
-
-	// Iterate over active maps
-	for (const auto& map : m_ActiveMaps) {
-		if (map == nullptr) {
-			std::cerr << "Null map encountered in active maps!" << std::endl;
-			continue;
-		}
-
-		TileLayer* collisionLayer = GetCollisionLayerFromMap(map);
-		if (collisionLayer == nullptr) {
-			continue;
-		}
-
-		// Checks if the tile size is consistent
-		if (tileSize == -1) {
-			tileSize = collisionLayer->GetTileSize();
-		}
-		else if (tileSize != collisionLayer->GetTileSize()) {
-			std::cerr << "Inconsistent tile sizes between maps!" << std::endl;
-			return { -1, Tile::Matrix() };  // Returns error with empty matrix
-		}
-
-		// Adds the tilemap matrix to the total matrix
-		const auto& tileMapMatrix = collisionLayer->GetTileMapMatrix();
-		if (!tileMapMatrix.empty()) {
-			matrixOfCurrentMapsOnScreen.insert(matrixOfCurrentMapsOnScreen.end(), tileMapMatrix.begin(), tileMapMatrix.end());
-		}
-	}
-
-	return { tileSize, matrixOfCurrentMapsOnScreen };
-}
-
-size_t Play::EstimateMapTotalRows() const {
-	size_t totalRows = 0;
-
-	for (const auto& map : m_ActiveMaps) {
-		if (map && !map->GetMapLayers().empty()) {
-			TileLayer* layer = dynamic_cast<TileLayer*>(map->GetMapLayers().back().get());
-			if (layer) {
-				totalRows += layer->GetTileMapMatrix().size();
-			}
-		}
-	}
-
-	return totalRows;
-}
-
 TileLayer* Play::GetCollisionLayerFromMap(const std::shared_ptr<TileMap>& map) const {
 	if (map && !map->GetMapLayers().empty()) {
 		return dynamic_cast<TileLayer*>(map->GetMapCollisionLayer().get());
@@ -295,20 +230,20 @@ void Play::UpdateMaps() {
 	if (!m_ActiveMaps.empty()) {
 		std::shared_ptr<TileMap> topMap = m_ActiveMaps.back();
 
+		// Check the bottom map for removal
+		std::shared_ptr<TileMap> bottomMap = m_ActiveMaps.front();
+		if (bottomMap->GetPosition().Y - bottomMap->GetHeight() > Camera::GetInstance()->GetPosition().Y) {
+			m_ActiveMaps.erase(m_ActiveMaps.begin());
+			RemoveOutOfScreenEnemies();
+			RemoveOutOfScreenCollectibles();
+		}
+
 		// If the top of the map is off screen, load a new one above
 		if (Camera::GetInstance()->GetPosition().Y < topMap->GetPosition().Y) {
 			int positionY = topMap->GetPosition().Y - topMap->GetHeight();
  			AddMapAtPosition(1, positionY);
 		}
 
-		// Check the bottom map for removal
-		std::shared_ptr<TileMap> bottomMap = m_ActiveMaps.front();
-		if (bottomMap->GetPosition().Y - bottomMap->GetHeight() > Camera::GetInstance()->GetPosition().Y) {
-			m_ActiveMaps.erase(m_ActiveMaps.begin());
-			UpdateCollisionLayers();
-			RemoveOutOfScreenEnemies();
-			RemoveOutOfScreenCollectibles();
-		}
 	}
 }
 
@@ -317,9 +252,6 @@ void Play::AddMapAtPosition(int type, int YPosition) {
 	std::shared_ptr<TileMap> newMap = MapParser::GetInstance()->getRandomTileMapOfType(type);
  	newMap->SetPosition(0, YPosition);
 	m_ActiveMaps.push_back(newMap);
-
-	// Updates the active map's collision layers
-	UpdateCollisionLayers();
 
 	// Sets the first available floor depending on the map type
 	int firstAvailableFloor = (type == 0) ? 2 : 1;
@@ -416,11 +348,11 @@ void Play::SpawnObjectsOnFloors(
 }
 
 void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	SpawnObjectsOnFloors<Enemy>(GameObjectType::ENEMY, firstAvailableFloor, map, 1, 1);
+	SpawnObjectsOnFloors<Enemy>(GameObjectType::ENEMY, firstAvailableFloor, map, 1, 2);
 }
 
 void Play::SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 1, 3);
+	//SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 1, 3);
 }
 
 template<typename T>
@@ -436,13 +368,14 @@ void Play::RemoveOutOfScreenObjects(std::vector<std::shared_ptr<T>>& objectList)
 
 		// Checks if the object is below the screen
 		if (objectY > cameraBottom) {
-			it = objectList.erase(it);  // Remove the object
+			it = objectList.erase(it);  // Remove the object	
 			std::cout << "Objeto removido" << std::endl;
 		}
 		else {
 			++it;
 		}
 	}
+ 	PhysicsWorld::GetInstance()->CleanUpInvalidColliders();
 }
 
 void Play::RemoveOutOfScreenEnemies() {

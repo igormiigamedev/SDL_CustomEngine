@@ -4,8 +4,10 @@
 
 class RectCollider : public Collider {
 public:
-    RectCollider(int x, int y, int w, int h)
-        : m_Box({ x, y, w, h}) {}
+    RectCollider(int x, int y, int w, int h, const ObjectResponses typeOfCollision)
+        : m_Box({ x, y, w, h }) {
+        SetTypeOfCollision(typeOfCollision);
+    }
 
 
     void DrawDebugCollider() override {
@@ -21,7 +23,7 @@ public:
 
     SDL_Rect &GetBox() { return m_Box; }
     const SDL_Rect& GetBox() const { return m_Box; }
-    ColliderType GetType() const override { return RECTANGLE; }
+    ColliderShape GetShape() const override { return RECTANGLE; }
 
     inline float GetCenterPositionX() { return m_Box.x + (m_Box.w / 2); }
     inline float GetCenterPositionY() { return m_Box.y + (m_Box.h / 2); }

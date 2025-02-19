@@ -4,7 +4,6 @@
 #include "../Camera/Camera.h"
 #include <cmath>
 #include <algorithm>
-#include "../Core/Engine.h"
 #include "../Collision/CollisionManager.h"
 
 class Collider : public CollisionManager {
@@ -30,15 +29,24 @@ public:
         m_Owner = owner; // Sets the owner to weak_ptr
     }
 
+    void SetTypeOfCollision(ObjectResponses typeOfCollision) {
+        m_TypeOfCollision = typeOfCollision;
+    }
+
+    ObjectResponses GetTypeOfCollision() const {
+        return m_TypeOfCollision;
+    }
+
     std::shared_ptr<GameObject> GetOwner() const {
         return m_Owner.lock(); // Promotes weak_ptr to shared_ptr if valid
     }
 
-    enum ColliderType { RECTANGLE, CIRCLE };
-    virtual ColliderType GetType() const = 0;
+    enum ColliderShape { RECTANGLE, CIRCLE };
+    virtual ColliderShape GetShape() const = 0;
 
     void Update();
 
 private:
     std::weak_ptr<GameObject> m_Owner;
+    ObjectResponses m_TypeOfCollision;
 };

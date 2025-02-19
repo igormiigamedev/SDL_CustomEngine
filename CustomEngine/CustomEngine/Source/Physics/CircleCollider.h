@@ -5,8 +5,10 @@
 
 class CircleCollider : public Collider {
 public:
-    CircleCollider(float x, float y, float radius)
-        : m_Circle({ x, y, radius }) {}
+    CircleCollider(float x, float y, float radius, const ObjectResponses typeOfCollision)
+        : m_Circle({ x, y, radius }) {
+        SetTypeOfCollision(typeOfCollision);
+    }
 
     void DrawDebugCollider() override {
         const Vector2D& cameraPosition = Camera::GetInstance()->GetPosition();
@@ -35,7 +37,7 @@ public:
     void SetPositionX(float x) override { m_Circle.x = x; }
     void SetPositionY(float y) override { m_Circle.y = y; }
 
-    ColliderType GetType() const override { return CIRCLE; }
+    ColliderShape GetShape() const override { return CIRCLE; }
 
     Circle GetCircle() const { return m_Circle; }
     inline float GetCenterPositionX() { return m_Circle.x;}

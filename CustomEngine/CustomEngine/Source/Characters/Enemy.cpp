@@ -98,7 +98,12 @@ void Enemy::UpdateCharacterPositionY(float dt) {
 	GetRigidBody().GetCollider()->SetPositionY(GetBodyCenterPosition().Y);
 }
 
-void Enemy::OnCollision(std::shared_ptr<GameObject> target) {
+void Enemy::OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction) {
+	if (target->GetType() == GameObjectType::FLOOR && direction == CollisionDirection::BELOW) {
+		/*std::cout << "Enemy colidiu com chao!" << std::endl;*/
+		GetRigidBody().ResolveGroundCollision();
+	}
+
 	if (target) {
 		auto character = std::dynamic_pointer_cast<Character>(target);
 		if (character && character->GetType() == GameObjectType::PLAYER) {

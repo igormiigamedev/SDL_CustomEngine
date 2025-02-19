@@ -4,13 +4,12 @@
 
 #include "SDL.h"
 #include "SDL_image.h"
-#include "../Map/TileMap.h"
 #include "../Object/GameObject.h"
 #include "../Factory/ObjectFactory.h"
 #include "../States/GameState.h"
 
 #define SCREEN_WIDTH 960
-#define SCREEN_HEIGHT 980 //750 //980
+#define SCREEN_HEIGHT 750 //750 //980
 
 class Engine {
 
@@ -31,7 +30,6 @@ public:
     void PushState(GameState* current);
     void ChangeState(GameState* target);
 
-    inline TileMap* GetMap() { return m_LevelMap; }
     inline bool IsRunning() { return m_IsRunning; }
     inline SDL_Renderer* GetRenderer() { return m_Renderer; }
     inline SDL_Window* GetMainWindow() { return m_Window; }
@@ -40,7 +38,6 @@ private:
     Engine() {}
     bool m_IsRunning;
 
-    TileMap* m_LevelMap;
     SDL_Window* m_Window;
     SDL_Renderer* m_Renderer;
     static Engine* s_Instance;

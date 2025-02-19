@@ -3,6 +3,7 @@
 #include <vector>
 #include <memory>
 #include "../Object/GameObject.h"
+#include "../../ECollisionDirection.h"
 
 // Forward declaration to avoid circular dependencies
 class RigidBody;
@@ -10,14 +11,15 @@ class RigidBody;
 struct CollisionEvent {
     std::weak_ptr<GameObject> objectA;
     std::weak_ptr<GameObject> objectB;
+    CollisionDirection collisionDirection;
 
-    CollisionEvent(const std::weak_ptr<GameObject>& a, const std::weak_ptr<GameObject>& b)
-        : objectA(a), objectB(b) {}
+    CollisionEvent(const std::weak_ptr<GameObject>& a, const std::weak_ptr<GameObject>& b, CollisionDirection direction)
+        : objectA(a), objectB(b), collisionDirection(direction) {}
 };
 
 class EventDispatcher {
 public:
-    using CollisionCallback = std::function<void(GameObject*)>;
+    using CollisionCallback = std::function<void(GameObject*, CollisionDirection)>;
     using CollisionFilter = std::function<bool(const CollisionEvent&)>;
 
     static EventDispatcher* GetInstance();

@@ -111,6 +111,19 @@ int TileLayer::GetFloorTopPosition(int floorNumber) {
 	return (floorCollisionIndexGroups[index].back() - 1) * GetTileSize();
 }
 
+Transform TileLayer::GetFloorCenterPosition(int floorNumber) {
+	int index = 0;
+	if (floorNumber > 0) {
+		index = floorNumber - 1;
+	}
+	int middle = floorCollisionIndexGroups[index].size() / 2;
+	Transform transform;
+	transform.Y = (floorCollisionIndexGroups[index][middle]) * GetTileSize();
+	transform.X = m_ColCount * GetTileSize()/2;
+
+	return transform;
+}
+
 void TileLayer::Render(){
 	for (unsigned int row = 0; row < m_RowCount; row++) {
 		for (unsigned int col = 0; col < m_ColCount; col++) {

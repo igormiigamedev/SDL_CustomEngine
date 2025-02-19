@@ -75,7 +75,7 @@ void Collectible::OnCollision(std::shared_ptr<GameObject> target) {
 void Collectible::RegisterCollisionCallback() {
     EventDispatcher::GetInstance()->RegisterCollisionCallback(
         shared_from_this(),
-        [this](GameObject* otherObject) {
+        [this](GameObject* otherObject, CollisionDirection direction) {
             if (auto target = otherObject->GetWeakPtr().lock()) {
                 OnCollision(target);
             }
@@ -101,9 +101,9 @@ void Collectible::SetCollider(std::shared_ptr<Collider> collider) {
 }
 
 void Collectible::SetColliderAsCircle(float x, float y, float radius) {
-    SetCollider(std::make_unique<CircleCollider>(x, y, radius));
+    SetCollider(std::make_unique<CircleCollider>(x, y, radius, WorldDynamic));
 }
 
 void Collectible::SetColliderAsRect(float x, float y, float width, float height) {
-    SetCollider(std::make_unique<RectCollider>(x, y, width, height));
+    SetCollider(std::make_unique<RectCollider>(x, y, width, height, WorldDynamic));
 }
