@@ -5,10 +5,40 @@
 SpriteAnimation::SpriteAnimation(bool repeat) :Animation(repeat) {}
 
 void SpriteAnimation::Update(float dt){
-	m_SpriteFrame = (SDL_GetTicks() / m_CurrentSpriteSheet.Speed) % m_CurrentSpriteSheet.FrameCount;
+	if (m_IsEnded) return; // Se a animação terminou, não atualiza mais
+
+	//m_SpriteFrame = (SDL_GetTicks() / m_CurrentSpriteSheet.Speed) % m_CurrentSpriteSheet.FrameCount;
+
+	// If not to loop, check if the animation has finished
+	//if (!m_Loop && m_SpriteFrame >= m_CurrentSpriteSheet.FrameCount - 1) {
+	//	m_SpriteFrame = m_CurrentSpriteSheet.FrameCount - 1; // Keep on last frame
+	//	m_IsEnded = true; // Mark the animation as finished
+	//}
+
+	// Accumulate past time
+	m_AccumulatedTime += dt;
+	float FrameDuration = m_CurrentSpriteSheet.Speed / 1000.0f;
+
+	// Check if the time required to change the frame has passed
+	if (m_AccumulatedTime >= FrameDuration) {
+		m_AccumulatedTime -= FrameDuration; // Reset the accumulated
+
+		// Update the frame
+		m_SpriteFrame = (m_SpriteFrame + 1) % m_CurrentSpriteSheet.FrameCount;
+
+		// If not to loop, check if the animation has finished
+		if (!m_Loop && m_SpriteFrame >= m_CurrentSpriteSheet.FrameCount - 1) {
+			m_SpriteFrame = m_CurrentSpriteSheet.FrameCount - 1; // Keep on last frame
+			m_IsEnded = true; // Mark the animation as finished
+		}
+	}
+		
 }
 
 void SpriteAnimation::Draw(float x, float y, float scaleX, float scaleY, SDL_RendererFlip flip){
+
+	if (!m_Loop && m_IsEnded) return; // If it's not in a loop and it's already finished, don't draw anymore
+
 	int currentColumn = (m_SpriteFrame % m_CurrentSpriteSheet.ColCount) + 1;
 	int currentRow = (m_SpriteFrame/m_CurrentSpriteSheet.ColCount) + 1;
 
@@ -43,8 +73,7 @@ void SpriteAnimation::Parse() {
 	}
 }
 
-// Função para definir a animação, verificando a validade da textura
-void SpriteAnimation::SetAnimation(const std::string& textureID, int animSpeed) {
+void SpriteAnimation::SetAnimation(const std::string& textureID, int animSpeed, bool loop) {
 
 	if (!IsValidTexture(textureID)) { return; }
 
@@ -53,6 +82,8 @@ void SpriteAnimation::SetAnimation(const std::string& textureID, int animSpeed) 
 	if (animSpeed != 0) {
 		m_CurrentSpriteSheet.Speed = animSpeed;
 	}
+
+	m_Loop = loop;
 }
 
 bool SpriteAnimation::IsValidTexture(const std::string& textureID) {

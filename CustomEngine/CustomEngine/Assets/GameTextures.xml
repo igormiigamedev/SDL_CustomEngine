@@ -8,6 +8,10 @@
     <texture id="Pigeon_Walk" source="Assets/Player/Pigeon/Walk/Pigeon_Walk_Atlas.png"/>
     <texture id="Pigeon_Jump" source="Assets/Player/Pigeon/Jump/Pigeon_Jump_Atlas.png"/>
 
+    <!-- Collectible -->
+    <texture id="Bread_Idle" source="Assets/Collectible/Bread/Bread_Idle/Bread_Idle_Atlas.png"/>
+    <texture id="Bread_Collected" source="Assets/Collectible/Bread/Bread_Collected/Bread_Collected_Atlas.png"/>
+
     <!-- Scenario -->
     <texture id="bg" source="Assets/Images/BackGround.png"/>
 

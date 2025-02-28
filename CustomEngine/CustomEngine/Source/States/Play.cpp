@@ -1,6 +1,7 @@
 #include "Play.h"
 #include <random>
 #include "../Collision/PhysicsWorld.h"
+#include "../Effects/ParticleManager.h"
 //#include "Gui.h"
 
 Play::Play(){}
@@ -47,7 +48,7 @@ bool Play::Init() {
 	// add map above the first
 	std::shared_ptr<TileMap> initialMap;
 	initialMap = m_ActiveMaps.front();
-	int positionY = -initialMap->GetHeight();
+	int positionY = initialMap->GetPosition().Y;
 	AddMapAtPosition(1, positionY);
 	//---------------------
 
@@ -139,7 +140,9 @@ void Play::Update(){
 			}
 		}
 
-		/*fpsCounter.Update();*/
+		ParticleManager::GetInstance()->UpdateParticles(dt);
+
+		fpsCounter.Update();
 	}
 }
 
@@ -209,6 +212,8 @@ void Play::Render(){
 		}
 	}
 
+	ParticleManager::GetInstance()->RenderParticles();
+
 	GameMode::GetInstance()->RenderHUD(m_Ctxt);
 
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();
@@ -256,7 +261,7 @@ void Play::UpdateMaps() {
 
 		// If the top of the map is off screen, load a new one above
 		if (Camera::GetInstance()->GetPosition().Y < topMap->GetPosition().Y) {
-			int positionY = topMap->GetPosition().Y - topMap->GetHeight();
+			int positionY = topMap->GetPosition().Y;
  			AddMapAtPosition(1, positionY);
 		}
 
@@ -266,7 +271,11 @@ void Play::UpdateMaps() {
 void Play::AddMapAtPosition(int type, int YPosition) {
 	// Creates a new map of the specified type and adjusts its position
 	std::shared_ptr<TileMap> newMap = MapParser::GetInstance()->getRandomTileMapOfType(type);
- 	newMap->SetPosition(0, YPosition);
+	int newMapPositionY = YPosition;
+	if (type != 0) {
+		newMapPositionY = YPosition - newMap->GetHeight();
+	}
+ 	newMap->SetPosition(0, newMapPositionY);
 	m_ActiveMaps.push_back(newMap);
 
 	// Sets the first available floor depending on the map type
@@ -339,7 +348,7 @@ void Play::SpawnObjectsOnFloors(
 			}
 
 			// Random positioning on the X axis
-			std::uniform_int_distribution<> xPositionDistribution(1, SCREEN_WIDTH);
+			std::uniform_int_distribution<> xPositionDistribution(1, SCREEN_WIDTH - 90);
 			int randomXPosition = xPositionDistribution(randomGenerator);
 
 			// Calculates position at the top of the floor
@@ -368,7 +377,7 @@ void Play::SpawnNewEnemyList(int firstAvailableFloor, std::shared_ptr<TileMap>& 
 }
 
 void Play::SpawnNewCollectibleList(int firstAvailableFloor, std::shared_ptr<TileMap>& map) {
-	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 1, 3);
+	SpawnObjectsOnFloors<Collectible>(GameObjectType::COLLECTIBLE, firstAvailableFloor, map, 1, 4, 2, 4);
 }
 
 template<typename T>

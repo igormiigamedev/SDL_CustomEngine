@@ -116,7 +116,7 @@ Transform TileLayer::GetFloorCenterPosition(int floorNumber) {
 	if (floorNumber > 0) {
 		index = floorNumber - 1;
 	}
-	int middle = floorCollisionIndexGroups[index].size() / 2;
+	int middle = (floorCollisionIndexGroups[index].size() - 1) / 2;
 	Transform transform;
 	transform.Y = (floorCollisionIndexGroups[index][middle]) * GetTileSize();
 	transform.X = m_ColCount * GetTileSize()/2;

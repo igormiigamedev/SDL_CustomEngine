@@ -11,7 +11,7 @@ Collectible::Collectible(const Properties& props, Transform transform)
     m_Animation = new SpriteAnimation();
     m_Animation->Parse();
     m_Flip = SDL_FLIP_HORIZONTAL;
-    m_Animation->SetAnimation("Pigeon_Walk");
+    m_Animation->SetAnimation("Bread_Idle");
 
     collectibleConfig.m_CollectibleWidth = m_Properties.ScaleX * m_Animation->GetCurrentSpriteWidth();
     collectibleConfig.m_CollectibleHeight = m_Properties.ScaleY * m_Animation->GetCurrentSpriteHeight();
@@ -31,7 +31,6 @@ void Collectible::InitGameObject() {
 void Collectible::Draw() {
     m_Animation->Draw(m_Transform.X, m_Transform.Y, m_Properties.ScaleX, m_Properties.ScaleY, m_Flip);
     /*m_Collider->DrawDebugCollider();*/
-
    /* std::cout << "Drawing collectible at (" << m_Transform.X << ", " << m_Transform.Y << ")\n";*/
 }
 
@@ -88,7 +87,10 @@ void Collectible::RegisterCollisionCallback() {
 }
 
 void Collectible::HandleCollection() {
-    std::cout << "Handle collection logic here (e.g., increase score).\n";
+    std::cout << "Handle collection logic here.\n";
+
+    std::shared_ptr<ParticleEffects> particle = std::make_shared<ParticleEffects>();
+    particle->SpawnParticle(m_Transform, "Bread_Collected", m_Properties.ScaleX, m_Properties.ScaleY, false);
 }
 
 bool Collectible::IsSameObject(const std::weak_ptr<GameObject>& a, const std::weak_ptr<GameObject>& b) {

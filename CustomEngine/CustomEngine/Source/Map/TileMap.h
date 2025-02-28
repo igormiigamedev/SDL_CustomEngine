@@ -54,6 +54,9 @@ public:
         for (int floor = 1; floor <= collisionLayer->GetAmountOfFloorCollision(); floor++) {
             transform = collisionLayer->GetFloorCenterPosition(floor);
             int floorHeight = collisionLayer->GetFloorSize(floor);
+            if (floorHeight == collisionLayer->GetTileSize()) {
+                floorHeight = floorHeight + collisionLayer->GetTileSize() / 2;
+            }
             transform.Y = transform.Y - floorHeight/2;
             Transform mapPosition = collisionLayer->GetLayerPosition();
 

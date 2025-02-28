@@ -19,6 +19,7 @@
 #include "../Parser/Parser.h"
 #include "../GameMode/GameMode.h"
 #include "../Timer/FPSCounter.h"
+#include "../Effects/ParticleEffects.h"
 
 class Play : public GameState{
 

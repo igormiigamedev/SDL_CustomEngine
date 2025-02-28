@@ -22,7 +22,7 @@ class SpriteAnimation : public Animation {
 		virtual void Update(float dt);
 		void Draw(float x, float y, float scaleX = 1.0f, float scaleY = 1.0f, SDL_RendererFlip flip = SDL_FLIP_NONE);
 		void Parse();
-		void SetAnimation(const std::string& textureID, int animSpeed = 0);
+		void SetAnimation(const std::string& textureID, int animSpeed = 0, bool loop = true);
 
 		bool IsValidTexture(const std::string& textureID);
 		void HandleInvalidTexture(const std::string& textureID);
@@ -34,5 +34,8 @@ class SpriteAnimation : public Animation {
 		int m_SpriteFrame;
 		SpriteSheet m_CurrentSpriteSheet;
 		std::map<std::string, SpriteSheet> m_SpriteSheetMap;
+
+		bool m_Loop = true;
+		float m_AccumulatedTime = 0.0f;
 
 };

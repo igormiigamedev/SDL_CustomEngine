@@ -5,6 +5,7 @@
 #include "../Collision/CollisionTypes.h"
 #include "../Physics/Collider.h"
 #include "../Animation/SpriteAnimation.h"
+#include "../Effects/ParticleEffects.h"
 
 struct CollectibleConfig {
     float m_CollectibleWidth;
