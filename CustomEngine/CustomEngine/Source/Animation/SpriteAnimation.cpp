@@ -65,8 +65,9 @@ void SpriteAnimation::Parse() {
 			e->Attribute("rowCount", &spriteSheet.RowCount);
 			e->Attribute("colCount", &spriteSheet.ColCount);
 			e->Attribute("speed", &spriteSheet.Speed);
-			e->Attribute("width", &spriteSheet.Width);
-			e->Attribute("height", &spriteSheet.Height);
+
+			spriteSheet.Width = TextureManager::GetInstance()->GetTextureSize(spriteSheet.TextureID).width;
+			spriteSheet.Height = TextureManager::GetInstance()->GetTextureSize(spriteSheet.TextureID).height;
 
 			m_SpriteSheetMap[spriteSheetID] = spriteSheet;
 		}

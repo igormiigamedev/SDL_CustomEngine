@@ -2,6 +2,7 @@
 #include <random>
 #include "../Collision/PhysicsWorld.h"
 #include "../Effects/ParticleManager.h"
+#include "../Graphics/Hud.h"
 //#include "Gui.h"
 
 Play::Play(){}
@@ -143,43 +144,9 @@ void Play::Update(){
 
 void Play::HandlePlayerDeath() {
 	if (PlayerInstance && PlayerInstance->IsDead()) {
-		if (!waitingForGameOver) {
-			// Save death time and activate standby
-			deathTime = SDL_GetTicks();
-			waitingForGameOver = true;
-			fadeAlpha = 0;
+		if (Hud::GetInstance()->PlayFadeOut(5)) {
+			OpenGameOver();
 		}
-		else {
-			// Calculates elapsed time
-			Uint32 elapsed = SDL_GetTicks() - deathTime;
-			int timeLimit = 5000; //5000 milliseconds = 5 seconds
-
-			// If less than the time limit has passed, we increase the transparency of the fade
-			if (elapsed < timeLimit) {
-				fadeAlpha = static_cast<int>((elapsed / timeLimit) * 255);  // Maps time -> opacity
-			}
-			else {
-				OpenGameOver();  // After time limit, it calls Game Over
-				waitingForGameOver = false;
-			}
-		}
-	}
-}
-
-void Play::RenderFadeOut(SDL_Renderer* renderer) const {
-	if (fadeAlpha > 0) {  
-		std::cout << "fadeAlpha: " << fadeAlpha << std::endl;
-		SDL_Rect fadeRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
-
-		// Enables blending to allow transparency
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-
-		SDL_SetRenderDrawColor(renderer, 0, 0, 0, fadeAlpha);  // Black color with variable alpha
-
-		SDL_RenderFillRect(renderer, &fadeRect);
-
-		// Restores the default blending mode (optional)
-		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	}
 }
 
@@ -230,7 +197,6 @@ void Play::Render(){
 	SDL_RenderClear(m_Ctxt);
 
 	//TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
-
 	/*for (auto imgLayer : m_ParalaxBg)
 		imgLayer->Render();*/
 
@@ -249,17 +215,20 @@ void Play::Render(){
 		}
 	}
 
+	//Particles
 	ParticleManager::GetInstance()->RenderParticles();
 
-	GameMode::GetInstance()->RenderScoreHUDInGame(m_Ctxt);
+	//HUD
+	Hud::GetInstance()->RenderScoreHUDInGame(m_Ctxt);
+	Hud::GetInstance()->RenderFadeOut(m_Ctxt);
 
+	//Camera
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();
 
 	if (m_EditMode) {
 		/*Gui::GetInstance()->draw(m_Ctxt);*/
 	}
 
-	RenderFadeOut(m_Ctxt);
 
 	SDL_RenderCopy(m_Ctxt, nullptr, &camera, nullptr);
 	SDL_RenderPresent(m_Ctxt);

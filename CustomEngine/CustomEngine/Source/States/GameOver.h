@@ -14,12 +14,7 @@ public:
 	virtual void Update();
 	virtual void Render();
 
-	void DrawGameOverBaseHud();
-
-	void LoadUI();
-
 private:
-	void RenderTopHighScoresHUD() const;
 	static void StartGame();
 	static void Settings();
 	static void Editor();

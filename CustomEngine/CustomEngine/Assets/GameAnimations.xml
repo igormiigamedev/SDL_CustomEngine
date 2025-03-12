@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <animations>
     <!-- spritesheet info:
-    - speed: represents the duration of each frame in milliseconds 
+    - speed: represents the duration of each frame in milliseconds (The higher the speed, the slower the animation).
     -->
 
     <!-- Player Pigeon -->
-    <spriteSheet id="Pigeon_Walk" frameCount="12" rowCount="2" colCount="7" speed="50" width="980" height="504"> </spriteSheet> 
-    <spriteSheet id="Pigeon_Jump" frameCount="9" rowCount="2" colCount="7" speed="50" width="980" height="544"> </spriteSheet> 
+    <spriteSheet id="Pigeon_Walk" frameCount="12" rowCount="2" colCount="7" speed="50" > </spriteSheet> 
+    <spriteSheet id="Pigeon_Jump" frameCount="9" rowCount="2" colCount="7" speed="50" > </spriteSheet> 
     
     
     <!-- Player Coelhovo -->
-    <spriteSheet id="Player_Walk" frameCount="2" rowCount="1" colCount="2" speed="100" width="240" height="207"> </spriteSheet>
-    <spriteSheet id="Player_Jump" frameCount="2" rowCount="1" colCount="2" speed="100" width="270" height="191"> </spriteSheet>
+    <spriteSheet id="Player_Walk" frameCount="2" rowCount="1" colCount="2" speed="100" > </spriteSheet>
+    <spriteSheet id="Player_Jump" frameCount="2" rowCount="1" colCount="2" speed="100" > </spriteSheet>
 
     <!-- Collectible - Bread -->
-    <spriteSheet id="Bread_Idle" frameCount="16" rowCount="3" colCount="6" speed="60" width="1050" height="753"> </spriteSheet>
-    <spriteSheet id="Bread_Collected" frameCount="9" rowCount="2" colCount="5" speed="70" width="1055" height="674"> </spriteSheet>
+    <spriteSheet id="Bread_Idle" frameCount="16" rowCount="3" colCount="6" speed="60" > </spriteSheet>
+    <spriteSheet id="Bread_Collected" frameCount="9" rowCount="2" colCount="5" speed="70" > </spriteSheet>
 
 
     <!-- Enemy -->
-    <sequence id="Enemy_Walk" frameCount="12" speed="90" width="394" height="158">
+    <sequence id="Enemy_Walk" frameCount="12" speed="90" >
         <frame textureID="Enemy_Walk00"/>
         <frame textureID="Enemy_Walk01"/>
         <frame textureID="Enemy_Walk02"/>
@@ -33,7 +33,7 @@
         <frame textureID="Enemy_Walk10"/>
         <frame textureID="Enemy_Walk11"/>
     </sequence>
-    <!-- <sequence id="Pombo_Jump" frameCount="60" speed="100" width="500" height="500">
+    <!-- <sequence id="Pombo_Jump" frameCount="60" speed="100" >
         <frame textureID="00"/>
         <frame textureID="01"/>
         <frame textureID="02"/>

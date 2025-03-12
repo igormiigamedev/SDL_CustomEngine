@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <textures>
+    <!-- Scenario -->
+    <texture id="bg" source="Assets/Images/BackGround.png"/>
+
     <!-- Player CoelhOvo -->
     <texture id="Player_Walk" source="Assets/Player/CoelhOvo/Walk/PlayerWalk.png"/>
     <texture id="Player_Jump" source="Assets/Player/CoelhOvo/Jump/PlayerJump.png"/>
@@ -11,9 +14,6 @@
     <!-- Collectible -->
     <texture id="Bread_Idle" source="Assets/Collectible/Bread/Bread_Idle/Bread_Idle_Atlas.png"/>
     <texture id="Bread_Collected" source="Assets/Collectible/Bread/Bread_Collected/Bread_Collected_Atlas.png"/>
-
-    <!-- Scenario -->
-    <texture id="bg" source="Assets/Images/BackGround.png"/>
 
     <!-- Enemy SpikeMan -->
     <!-- <texture id="spikeMan_Walk1" source="Assets/Enemy/SpikeMan/Walk/spikeMan_walk1.png"/>
@@ -33,6 +33,12 @@
     <texture id="Enemy_Walk10" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk10.png"/>
     <texture id="Enemy_Walk11" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk11.png"/>
 
+
+    <!-- ________________________________ HUD ________________________________ -->
+
+    <!-- GameOver -->
+    <texture id="GameOver_Base_UI" source="Assets/UI/BaseUI.png"/>
+    <texture id="GameOver_Top_Highscores_UI" source="Assets/UI/TopHighScores.png"/>
 
 
 </textures>

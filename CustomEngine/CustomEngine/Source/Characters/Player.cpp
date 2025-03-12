@@ -175,12 +175,14 @@ void Player::AnimationState(){
 }
 
 void Player::HandlePlayerDeath() {
-	m_IsDead = true;
-	GetRigidBody().SetVelocityX(0);
-	if (m_IsJumping) {
-		GetRigidBody().SetVelocityY(GetRigidBody().GetVelocity().Y/2);
+	if (!m_IsDead) {
+		m_IsDead = true;
+		GetRigidBody().SetVelocityX(0);
+		if (m_IsJumping) {
+			GetRigidBody().SetVelocityY(GetRigidBody().GetVelocity().Y/2);
+		}
+		GameMode::GetInstance()->SaveHighScore();
 	}
-	GameMode::GetInstance()->SaveHighScore();
 }
 
 void Player::OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction) {
@@ -189,7 +191,9 @@ void Player::OnCollision(std::shared_ptr<GameObject> target, CollisionDirection 
 		GetRigidBody().ResolveGroundCollision();
 	}
 	if (target->GetType() == GameObjectType::COLLECTIBLE) {
-		GameMode::GetInstance()->IncreaseScore(1);
+		if (!m_IsDead) {
+			GameMode::GetInstance()->IncreaseScore(1);
+		}
 	}
 
 }

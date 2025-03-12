@@ -64,31 +64,6 @@ void GameMode::ResetScore() {
     playerScore = 0;
 }
 
-void GameMode::RenderScoreHUDInGame(SDL_Renderer* renderer) const {
-    int textHeight = 70; // height of the rectangle where the text will be drawn
-    int textWidth = 350; // width of the rectangle where the text will be drawn
-    int ptsize = 0;
-    if (textHeight < textWidth) {
-        ptsize = textHeight * 1.5;
-    }
-    else {
-        ptsize = textWidth * 1.5;
-    }
-
-    std::string scoreText = "Score: " + std::to_string(playerScore) + "  High Score: " + std::to_string(highScores.empty() ? 0 : highScores[0]);
-
-    // Set position and size of text on screen
-    SDL_Rect textRect;
-    textRect.w = textWidth;
-    textRect.h = textHeight;
-    textRect.x = SCREEN_WIDTH / 2 - textRect.w / 2;
-    textRect.y = 20;
-
-    SDL_Color textColor = { 255, 255, 255, 255 };
-
-    TextManager::GetInstance()->RenderText(renderer, scoreText, textRect, textColor, ptsize);
-}
-
 int GameMode::GetScore() const {
     return playerScore;
 }

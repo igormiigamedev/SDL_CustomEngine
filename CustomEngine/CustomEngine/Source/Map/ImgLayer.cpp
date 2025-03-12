@@ -18,7 +18,7 @@ void ImgLayer::QueryImage(std::string textureID){
 }
 
 void ImgLayer::Render(){
-	TextureManager::GetInstance()->Draw(m_TextureID, m_OffsetX, m_OffsetY, m_ImgWidth, m_ImgHeight, m_ScaleX, m_ScaleY, m_ScrollRatio, m_Flip);
+	TextureManager::GetInstance()->Draw(m_TextureID, m_OffsetX, m_OffsetY, m_ScaleX, m_ScaleY, m_ScrollRatio, m_Flip);
 }
 
 void ImgLayer::Update(){

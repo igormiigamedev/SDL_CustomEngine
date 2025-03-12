@@ -32,13 +32,15 @@ void SequenceAnimation::Parse(std::string source){
 			Sequence seq;
 			std::string seqID = e->Attribute("id");
 			e->Attribute("speed", &seq.Speed);
-			e->Attribute("width", &seq.Width);
-			e->Attribute("height", &seq.Height);
 			e->Attribute("frameCount", &seq.FrameCount);
 
 			for (TiXmlElement* frame = e->FirstChildElement(); frame != nullptr; frame = frame->NextSiblingElement()) {
 				seq.TextureIDs.push_back(frame->Attribute("textureID"));
 			}
+
+			seq.Width = TextureManager::GetInstance()->GetTextureSize(seq.TextureIDs[0]).width;
+			seq.Height = TextureManager::GetInstance()->GetTextureSize(seq.TextureIDs[0]).height;
+
 			m_SeqMap[seqID] = seq;
 		}
 	}
@@ -54,6 +56,6 @@ void SequenceAnimation::SetCurrentSequence(std::string seqID){
 }
 
 void SequenceAnimation::DrawFrame(float x, float y, float xScale, float yScale, SDL_RendererFlip flip){
-	TextureManager::GetInstance()->Draw(m_CurrentSeq.TextureIDs[m_CurrentFrame], x, y, m_CurrentSeq.Width, m_CurrentSeq.Height, xScale, yScale, 1,flip); 
+	TextureManager::GetInstance()->Draw(m_CurrentSeq.TextureIDs[m_CurrentFrame], x, y, xScale, yScale, 1,flip); 
 }
 

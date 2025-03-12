@@ -31,7 +31,6 @@ class Play : public GameState{
 		virtual bool Exit();
 		virtual void Update();
 		void HandlePlayerDeath();
-		void RenderFadeOut(SDL_Renderer* renderer) const;
 		void RemoveInactiveObjects();
 		virtual void Render();
 
@@ -98,9 +97,5 @@ class Play : public GameState{
 		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
 
 		FPSCounter fpsCounter;
-
-		Uint32 deathTime = 0; // Time the player died
-		bool waitingForGameOver = false; // If are waiting for the Game Over screen to appear
-		int fadeAlpha = 0;  // Fade opacity level (0 = invisible, 255 = completely black)
 };
 
