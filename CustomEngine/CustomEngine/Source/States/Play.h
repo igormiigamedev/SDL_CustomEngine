@@ -7,6 +7,7 @@
 #include "../Collectibles/Collectible.h"
 #include "../Timer/Timer.h"
 #include "Menu.h"
+#include "GameOver.h"
 #include "../Inputs/InputHandler.h"
 #include "../Camera/Camera.h"
 #include "../Map/TileMap.h"
@@ -29,6 +30,8 @@ class Play : public GameState{
 		virtual bool Init();
 		virtual bool Exit();
 		virtual void Update();
+		void HandlePlayerDeath();
+		void RenderFadeOut(SDL_Renderer* renderer) const;
 		void RemoveInactiveObjects();
 		virtual void Render();
 
@@ -57,6 +60,7 @@ class Play : public GameState{
 
 	private:
 		static void OpenMenu();
+		static void OpenGameOver();
 		static void PauseGame();
 
 		TileLayer* GetCollisionLayerFromMap(const std::shared_ptr<TileMap>& map) const;
@@ -94,5 +98,9 @@ class Play : public GameState{
 		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
 
 		FPSCounter fpsCounter;
+
+		Uint32 deathTime = 0; // Time the player died
+		bool waitingForGameOver = false; // If are waiting for the Game Over screen to appear
+		int fadeAlpha = 0;  // Fade opacity level (0 = invisible, 255 = completely black)
 };
 

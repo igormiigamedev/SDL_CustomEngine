@@ -11,7 +11,6 @@ void Play::Events(){
 		Play::Exit();
 		Play::Init();
 	}
-
 	/*if (!m_EditMode && InputHandler::GetInstance()->GetKeyDown(SDL_SCANCODE_M)) {
 		OpenMenu();
 	}*/
@@ -29,7 +28,7 @@ void Play::Events(){
 bool Play::Init() {
 	m_EditMode = false;
 	m_Ctxt = Engine::GetInstance()->GetRenderer();
-
+	GameMode::GetInstance()->ResetScore();
 
 	// --------- Parse Textures
 
@@ -124,12 +123,6 @@ void Play::Update(){
 
 		RemoveInactiveObjects();
 
-		if (PlayerInstance && PlayerInstance->IsDead()) {
-			std::cout << "Morreu" << std::endl;
-
-			/*DestroyPlayer();*/
-		}
-
 		for (auto it = m_GameObjects.begin(); it != m_GameObjects.end(); ) {
 			if (auto gameobj = it->lock()) { // Checks if the object still exists
 				gameobj->Update(dt);
@@ -142,7 +135,51 @@ void Play::Update(){
 
 		ParticleManager::GetInstance()->UpdateParticles(dt);
 
-		fpsCounter.Update();
+		/*fpsCounter.Update();*/
+
+		HandlePlayerDeath();
+	}
+}
+
+void Play::HandlePlayerDeath() {
+	if (PlayerInstance && PlayerInstance->IsDead()) {
+		if (!waitingForGameOver) {
+			// Save death time and activate standby
+			deathTime = SDL_GetTicks();
+			waitingForGameOver = true;
+			fadeAlpha = 0;
+		}
+		else {
+			// Calculates elapsed time
+			Uint32 elapsed = SDL_GetTicks() - deathTime;
+			int timeLimit = 5000; //5000 milliseconds = 5 seconds
+
+			// If less than the time limit has passed, we increase the transparency of the fade
+			if (elapsed < timeLimit) {
+				fadeAlpha = static_cast<int>((elapsed / timeLimit) * 255);  // Maps time -> opacity
+			}
+			else {
+				OpenGameOver();  // After time limit, it calls Game Over
+				waitingForGameOver = false;
+			}
+		}
+	}
+}
+
+void Play::RenderFadeOut(SDL_Renderer* renderer) const {
+	if (fadeAlpha > 0) {  
+		std::cout << "fadeAlpha: " << fadeAlpha << std::endl;
+		SDL_Rect fadeRect = { 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT };
+
+		// Enables blending to allow transparency
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
+
+		SDL_SetRenderDrawColor(renderer, 0, 0, 0, fadeAlpha);  // Black color with variable alpha
+
+		SDL_RenderFillRect(renderer, &fadeRect);
+
+		// Restores the default blending mode (optional)
+		SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_NONE);
 	}
 }
 
@@ -189,7 +226,7 @@ void Play::DestroyCollectible(std::shared_ptr<Collectible> collectible) {
 
 
 void Play::Render(){
-	SDL_SetRenderDrawColor(m_Ctxt, 48, 96, 130, 255); //SDL_SetRenderDrawColor(m_Ctxt, 124, 218, 254, 255);
+	SDL_SetRenderDrawColor(m_Ctxt, 48, 96, 130, 255); 
 	SDL_RenderClear(m_Ctxt);
 
 	//TextureManager::GetInstance()->Draw("bg", 0, -90, 1280, 960, 1.0, 1.0, 0.5f); //BackGround with Parallax
@@ -214,13 +251,15 @@ void Play::Render(){
 
 	ParticleManager::GetInstance()->RenderParticles();
 
-	GameMode::GetInstance()->RenderHUD(m_Ctxt);
+	GameMode::GetInstance()->RenderScoreHUDInGame(m_Ctxt);
 
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();
 
 	if (m_EditMode) {
 		/*Gui::GetInstance()->draw(m_Ctxt);*/
 	}
+
+	RenderFadeOut(m_Ctxt);
 
 	SDL_RenderCopy(m_Ctxt, nullptr, &camera, nullptr);
 	SDL_RenderPresent(m_Ctxt);
@@ -229,6 +268,16 @@ void Play::Render(){
 //CallBack Actions
 void Play::OpenMenu(){
 	Engine::GetInstance()->ChangeState(new Menu());
+}
+
+void Play::OpenGameOver() {
+	GameOver* gameOverState = new GameOver();
+	//if (!gameOverState->Init()) {
+	//	std::cout << "Failed to initialize GameOver state!" << std::endl;
+	//	return;
+	//}
+	Engine::GetInstance()->ChangeState(gameOverState);
+	gameOverState->Init();
 }
 
 void Play::PauseGame()

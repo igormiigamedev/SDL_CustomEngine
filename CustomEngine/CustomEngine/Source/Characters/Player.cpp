@@ -181,7 +181,6 @@ void Player::HandlePlayerDeath() {
 		GetRigidBody().SetVelocityY(GetRigidBody().GetVelocity().Y/2);
 	}
 	GameMode::GetInstance()->SaveHighScore();
-	GameMode::GetInstance()->ResetScore();
 }
 
 void Player::OnCollision(std::shared_ptr<GameObject> target, CollisionDirection direction) {
