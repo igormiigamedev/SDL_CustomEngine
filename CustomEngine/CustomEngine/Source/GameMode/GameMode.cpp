@@ -4,6 +4,8 @@
 #include <fstream>
 #include <algorithm>
 #include "../Text/TextManager.h"
+#include "../Graphics/HudPlay.h"
+#include "../States/GameStateManager.h"
 
 const std::string HIGHSCORE_FILE = "highscores.dat";
 
@@ -19,6 +21,11 @@ GameMode* GameMode::GetInstance() {
 
 void GameMode::IncreaseScore(int amount) {
     playerScore += amount;
+
+    HudPlay* hud = dynamic_cast<HudPlay*>(GameStateManager::GetInstance()->GetCurrentHud());
+    if (hud) {
+        hud->SetScoreText(std::to_string(playerScore));
+    }
 }
 
 void GameMode::SaveHighScore() {

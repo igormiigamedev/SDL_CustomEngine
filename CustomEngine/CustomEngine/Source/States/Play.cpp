@@ -3,7 +3,7 @@
 #include "../Collision/PhysicsWorld.h"
 #include "../Effects/ParticleManager.h"
 #include "../Graphics/Hud.h"
-//#include "Gui.h"
+#include "../States/GameStateManager.h"
 
 Play::Play(){}
 
@@ -26,14 +26,20 @@ void Play::Events(){
 	SDL_Delay(100);*/
 }
 
+void Play::SetHud() {
+	hud = new HudPlay(m_Ctxt);
+	GameStateManager::GetInstance()->SetState(hud);
+}
+
 bool Play::Init() {
 	m_EditMode = false;
-	m_Ctxt = Engine::GetInstance()->GetRenderer();
 	GameMode::GetInstance()->ResetScore();
+
+	GameState::Init();
 
 	// --------- Parse Textures
 
-	TextureManager::GetInstance()->ParseTextures("Assets/GameTextures.xml");
+	TextureManager::GetInstance()->ParseTextures("Assets/GameTextures_Play.xml");
 	/*Parser::GetInstance()->ParseTextures("Assets/GameTextures.xml");*/
 
 	Parser::GetInstance()->ParseGameObjects("Assets/GameObjectsInfos.xml");
@@ -144,7 +150,7 @@ void Play::Update(){
 
 void Play::HandlePlayerDeath() {
 	if (PlayerInstance && PlayerInstance->IsDead()) {
-		if (Hud::GetInstance()->PlayFadeOut(5)) {
+		if (hud->PlayFadeOut(5)) {
 			OpenGameOver();
 		}
 	}
@@ -219,8 +225,7 @@ void Play::Render(){
 	ParticleManager::GetInstance()->RenderParticles();
 
 	//HUD
-	Hud::GetInstance()->RenderScoreHUDInGame(m_Ctxt);
-	Hud::GetInstance()->RenderFadeOut(m_Ctxt);
+	hud->Render(m_Ctxt);
 
 	//Camera
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();

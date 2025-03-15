@@ -1,9 +1,11 @@
 #pragma once
+#include "SDL.h"
+#include <SDL_ttf.h>
 
 class GameState{
 
 	public:
-		virtual bool Init() = 0;
+		virtual bool Init();
 		virtual bool Exit() = 0;
 
 		virtual void Update() = 0;
@@ -11,5 +13,7 @@ class GameState{
 
 	protected:
 		SDL_Renderer* m_Ctxt;
+
+		virtual void SetHud() = 0; // Each state will define its appropriate HUD
 };
 

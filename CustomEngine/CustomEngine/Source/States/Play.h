@@ -21,12 +21,14 @@
 #include "../GameMode/GameMode.h"
 #include "../Timer/FPSCounter.h"
 #include "../Effects/ParticleEffects.h"
+#include "../Graphics/HudPlay.h"
 
 class Play : public GameState{
 
 	public:
 		Play();
 		void Events();
+		virtual void SetHud() override;
 		virtual bool Init();
 		virtual bool Exit();
 		virtual void Update();
@@ -97,5 +99,7 @@ class Play : public GameState{
 		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
 
 		FPSCounter fpsCounter;
+
+		HudPlay* hud;
 };
 

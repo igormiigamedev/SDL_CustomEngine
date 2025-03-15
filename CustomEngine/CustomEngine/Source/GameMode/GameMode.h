@@ -23,9 +23,6 @@ public:
     void SaveHighScore();
     void LoadHighScores();
     void ResetScore();
-    void RenderScoreHUDInGame(SDL_Renderer* renderer) const;
-
-    void RenderTopHighScoresHUD(SDL_Renderer* renderer) const;
 
     int GetScore() const;
     int GetHighScore() const;

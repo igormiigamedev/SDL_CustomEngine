@@ -33,12 +33,4 @@
     <texture id="Enemy_Walk10" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk10.png"/>
     <texture id="Enemy_Walk11" source="Assets/Enemy/Enemy_SemEspaco/Enemy_Walk/Enemy_Walk11.png"/>
 
-
-    <!-- ________________________________ HUD ________________________________ -->
-
-    <!-- GameOver -->
-    <texture id="GameOver_Base_UI" source="Assets/UI/BaseUI.png"/>
-    <texture id="GameOver_Top_Highscores_UI" source="Assets/UI/TopHighScores.png"/>
-
-
 </textures>

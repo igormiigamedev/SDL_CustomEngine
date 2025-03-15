@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<textures>
+    <!-- ________________________________ HUD ________________________________ -->
+
+    <!-- GameOver -->
+    <texture id="GameOver_Base_UI" source="Assets/UI/BaseUI.png"/>
+    <texture id="GameOver_Top_Highscores_UI" source="Assets/UI/TopHighScores.png"/>
+
+
+</textures>

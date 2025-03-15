@@ -4,8 +4,13 @@
 
 Menu::Menu() {}
 
+void Menu::SetHud()
+{
+}
+
 bool Menu::Init(){
-	m_Ctxt = Engine::GetInstance()->GetRenderer();
+	GameState::Init();
+
 	std::cout << "menu initialized" << std::endl;
 	return true;
 }

@@ -6,6 +6,7 @@
 #include "../Inputs/InputHandler.h"
 #include "Play.h"
 #include "../Graphics/Hud.h"
+#include "../States/GameStateManager.h"
 
 GameOver::GameOver() {}
 
@@ -14,20 +15,25 @@ void GameOver::Events() {
         StartGame();
     }
     if (InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_H)) {
-        if (highScoreScreenIsOpen) {
-            highScoreScreenIsOpen = false;
+        if (hud->HighScoreScreenIsOpen()) {
+            hud->SetHighScoreScreenIsOpen(false);
         }
         else {
-            highScoreScreenIsOpen = true;
+            hud->SetHighScoreScreenIsOpen(true);
         }
     }
 }
 
+void GameOver::SetHud() {
+    hud = new HudGameOver(m_Ctxt);
+    GameStateManager::GetInstance()->SetState(hud);
+}
+
 bool GameOver::Init()
 {
-	m_Ctxt = Engine::GetInstance()->GetRenderer();
+    GameState::Init();
 	std::cout << "GameOver initialized" << std::endl;
-    Hud::GetInstance()->LoadTextures();
+
 	return true;
 }
 
@@ -46,12 +52,7 @@ void GameOver::Render() {
     SDL_RenderClear(m_Ctxt);
 
     // Designing the Game Over UI
-    Hud::GetInstance()->RenderGameOverBaseHud(m_Ctxt);
-    
-
-    if (highScoreScreenIsOpen) {
-        Hud::GetInstance()->RenderTopHighScoresHUD(m_Ctxt);
-    }
+    hud->Render(m_Ctxt);
 
     // Update the screen
     SDL_RenderPresent(m_Ctxt);
