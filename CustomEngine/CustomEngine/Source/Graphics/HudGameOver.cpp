@@ -7,13 +7,13 @@ HudGameOver::HudGameOver(SDL_Renderer* renderer) {
 }
 
 void HudGameOver::Render(SDL_Renderer* renderer) {
-	Hud::Render(renderer);
-
 	RenderGameOverBaseHud(renderer);
 
 	if (highScoreScreenIsOpen) {
 		RenderTopHighScoresHUD(renderer);
 	}
+
+	Hud::Render(renderer);
 }
 
 void HudGameOver::Init(SDL_Renderer* renderer) {
@@ -45,6 +45,15 @@ void HudGameOver::Init(SDL_Renderer* renderer) {
 
 	scoreTextBox = std::make_unique<TextBox>(renderer, scoreBoxTextRect, textColor, 200, scoreText);
 
+	//Button
+	buttonList.push_back(std::make_unique<Button>(hudBasePanel.posX + 255, hudBasePanel.posY + 550, 115, 115, SDL_Color{ 0, 255, 0, 255 }, []() {
+		std::cout << "Botão Clicado!" << std::endl;
+		}));
+
+	buttonList.push_back(std::make_unique<Button>(hudBasePanel.posX + 420, hudBasePanel.posY + 550, 115, 115, SDL_Color{ 0, 255, 0, 255 }, []() {
+		std::cout << "Botão Clicado!" << std::endl;
+		}));
+
 	//HighScore Screen
 	highScorePanel.textureID = "GameOver_Top_Highscores_UI";
 	highScorePanel.posX = 70;
@@ -66,6 +75,7 @@ void HudGameOver::Init(SDL_Renderer* renderer) {
 		std::unique_ptr<TextBox> textTeste = std::make_unique<TextBox>(renderer, hsRect, textColor, 200, highScoreText);
 		topHighScores.push_back(std::move(textTeste));
 	}
+
 }
 
 void HudGameOver::LoadTextures() {

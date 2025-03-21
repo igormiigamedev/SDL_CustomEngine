@@ -1,5 +1,6 @@
 #include "InputHandler.h"
 #include "../Core/Engine.h"
+#include "../States/GameStateManager.h"
 
 InputHandler* InputHandler::s_Instance = nullptr;
 
@@ -26,7 +27,16 @@ void InputHandler::Listen(){
 			case SDL_KEYUP:
 				KeyUp();
 				break;
+			case SDL_MOUSEBUTTONDOWN: {
+				const auto& buttons = GameStateManager::GetInstance()->GetCurrentHud()->GetButtonList();
 
+				if (!buttons.empty()) {
+					for (auto& button : buttons) {
+						button->HandleEvent(event);
+					}
+				}
+				break;
+			}
 			default:
 				break;
 		}

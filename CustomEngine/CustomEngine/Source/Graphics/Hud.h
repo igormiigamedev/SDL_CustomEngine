@@ -4,6 +4,7 @@
 #include <iostream>
 #include "../Text/TextBox.h"
 #include "../GameMode/GameMode.h"
+#include "Button.h"
 
 class Hud
 {
@@ -11,12 +12,25 @@ public:
 	virtual ~Hud() = default; 
 	virtual void Render(SDL_Renderer* renderer) {
 		RenderFadeOut(renderer);
+		for (auto& button : buttonList) {
+			button->Render(renderer);
+		}
 	}; 
+
+	void UpdateButtons(SDL_Event& event) {
+		for (auto& button : buttonList) {
+			button->HandleEvent(event);
+		}
+	}
 
 	virtual void LoadTextures() = 0; 
 
 	bool PlayFadeOut(int fadeDuration);
 	void RenderFadeOut(SDL_Renderer* renderer) const;
+
+	const std::vector<std::unique_ptr<Button>>& GetButtonList() const {
+		return buttonList;
+	}
 
 private:
 
@@ -33,5 +47,7 @@ protected:
 		int width;
 		int height;
 	};
+
+	std::vector<std::unique_ptr<Button>> buttonList;
 };
 
