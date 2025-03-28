@@ -1,5 +1,6 @@
 #pragma once
 #include "Hud.h"
+#include "../GameUI/Play/W_InGame.h"
 
 class HudPlay : public Hud {
 public:
@@ -8,14 +9,14 @@ public:
     void LoadTextures() override;
 
     void Init(SDL_Renderer* renderer);
-    void SetScoreText(std::string scoreText) { scoreTextBox->SetText(scoreText); };
-    void SetHighScoreText(std::string highScoreText) { highScoreTextBox->SetText(highScoreText); };
+    void SetScoreText(std::string scoreText) { 
+        if (inGameWidget != nullptr) {
+            inGameWidget->SetScoreText(scoreText); 
+        }
+    };
 
 private:
-    void RenderScore(SDL_Renderer* renderer);
-    std::unique_ptr<TextBox> scoreTextBox;
-    std::unique_ptr<TextBox> highScoreTextBox;
-    PanelInfos scorePanel;
+    W_InGame* inGameWidget;
 };
 
 
