@@ -9,19 +9,18 @@ public:
         return &instance;
     }
 
-    void SetState(Hud* newHud) {
-        if (currentHud) delete currentHud;  //  Frees up memory from previous HUD
-        currentHud = newHud;
+    void SetState(std::unique_ptr<Hud> newHud) {
+        currentHud = std::move(newHud); 
     }
 
     void Render(SDL_Renderer* renderer) {
         if (currentHud) currentHud->Render(renderer);
     }
 
-    Hud* GetCurrentHud() { return currentHud; }
+    Hud* GetCurrentHud() { return currentHud.get(); }
 
 private:
-    Hud* currentHud = nullptr;
+    std::unique_ptr<Hud> currentHud = nullptr;
 };
 
 

@@ -1,4 +1,5 @@
 #include "W_GameOverBase.h"
+#include "../../States/GameStateManager.h"
 
 void W_GameOverBase::Init() {
     // Adds Game Over background image

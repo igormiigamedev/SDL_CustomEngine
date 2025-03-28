@@ -27,8 +27,7 @@ void Play::Events(){
 }
 
 void Play::SetHud() {
-	hud = new HudPlay(m_Ctxt);
-	GameStateManager::GetInstance()->SetState(hud);
+	GameStateManager::GetInstance()->SetState(std::make_unique<HudPlay>(m_Ctxt));
 }
 
 bool Play::Init() {
@@ -150,7 +149,7 @@ void Play::Update(){
 
 void Play::HandlePlayerDeath() {
 	if (PlayerInstance && PlayerInstance->IsDead()) {
-		if (hud->PlayFadeOut(5)) {
+		if (GameStateManager::GetInstance()->GetCurrentHud()->PlayFadeOut(5)) {
 			OpenGameOver();
 		}
 	}
@@ -225,7 +224,7 @@ void Play::Render(){
 	ParticleManager::GetInstance()->RenderParticles();
 
 	//HUD
-	hud->Render(m_Ctxt);
+	GameStateManager::GetInstance()->GetCurrentHud()->Render(m_Ctxt);
 
 	//Camera
 	SDL_Rect camera = Camera::GetInstance()->GetViewBox();

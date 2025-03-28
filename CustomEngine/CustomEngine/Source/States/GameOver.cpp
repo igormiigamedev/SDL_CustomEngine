@@ -1,12 +1,7 @@
 #include "GameOver.h"
 #include "../Core/Engine.h"
-#include "../Graphics/TextureManager.h"
-#include "../Text/TextManager.h"
-#include "../GameMode/GameMode.h"
-#include "../Inputs/InputHandler.h"
 #include "Play.h"
-#include "../Graphics/Hud.h"
-#include "../States/GameStateManager.h"
+
 
 GameOver::GameOver() {}
 
@@ -25,8 +20,7 @@ void GameOver::Events() {
 }
 
 void GameOver::SetHud() {
-    hud = new HudGameOver(m_Ctxt, this);
-    GameStateManager::GetInstance()->SetState(hud);
+    GameStateManager::GetInstance()->SetState(std::make_unique<HudGameOver>(m_Ctxt, this));
 }
 
 bool GameOver::Init()
@@ -52,7 +46,7 @@ void GameOver::Render() {
     SDL_RenderClear(m_Ctxt);
 
     // Designing the Game Over UI
-    hud->Render(m_Ctxt);
+    GameStateManager::GetInstance()->GetCurrentHud()->Render(m_Ctxt);
 
     // Update the screen
     SDL_RenderPresent(m_Ctxt);

@@ -99,7 +99,5 @@ class Play : public GameState{
 		std::vector<std::shared_ptr<TileMap>> m_ActiveMaps;
 
 		FPSCounter fpsCounter;
-
-		HudPlay* hud;
 };
 
