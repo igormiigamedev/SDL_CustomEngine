@@ -11,7 +11,7 @@
 GameOver::GameOver() {}
 
 void GameOver::Events() {
-    if (InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_P)) {
+    /*if (InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_P)) {
         StartGame();
     }
     if (InputHandler::GetInstance()->GetKeyPressed(SDL_SCANCODE_H)) {
@@ -21,11 +21,11 @@ void GameOver::Events() {
         else {
             hud->SetHighScoreScreenIsOpen(true);
         }
-    }
+    }*/
 }
 
 void GameOver::SetHud() {
-    hud = new HudGameOver(m_Ctxt);
+    hud = new HudGameOver(m_Ctxt, this);
     GameStateManager::GetInstance()->SetState(hud);
 }
 

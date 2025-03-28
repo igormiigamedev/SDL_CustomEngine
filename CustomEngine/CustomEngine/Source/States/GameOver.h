@@ -16,8 +16,12 @@ public:
 	virtual void Update();
 	virtual void Render();
 
-private:
+	HudGameOver& GetHud() {
+		return *hud;
+	}
+
 	static void StartGame();
+private:
 	static void Settings();
 	static void Editor();
 	static void Quit();

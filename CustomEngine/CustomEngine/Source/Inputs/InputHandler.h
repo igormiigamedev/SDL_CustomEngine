@@ -22,6 +22,8 @@ class InputHandler
 		void KeyUp();
 		void KeyDown();
 
+		void HandleWidgetButtonEvents(SDL_Event event);
+
 		const Uint8* m_KeyStates;
 		static InputHandler* s_Instance;
 		Uint8 m_PreviousKeyStates[SDL_NUM_SCANCODES];  // Previous key states

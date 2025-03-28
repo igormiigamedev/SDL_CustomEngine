@@ -28,17 +28,28 @@ void InputHandler::Listen(){
 				KeyUp();
 				break;
 			case SDL_MOUSEBUTTONDOWN: {
-				const auto& buttons = GameStateManager::GetInstance()->GetCurrentHud()->GetButtonList();
-
-				if (!buttons.empty()) {
-					for (auto& button : buttons) {
-						button->HandleEvent(event);
-					}
-				}
+				HandleWidgetButtonEvents(event);
 				break;
 			}
 			default:
 				break;
+		}
+	}
+}
+
+void InputHandler::HandleWidgetButtonEvents(SDL_Event event) {
+	const auto& widgets = GameStateManager::GetInstance()->GetCurrentHud()->GetWidgetList();
+	/*const auto& buttons = widgets->GetButtonList();*/
+
+	if (!widgets.empty()) {
+		for (auto& widget : widgets) {
+			if (widget->IsVisible() && !(widget->GetButtonList().empty())) {
+				for (auto& button : widget->GetButtonList()) {
+					if (button->HandleEvent(event)) {
+						return;
+					}
+				}
+			}
 		}
 	}
 }

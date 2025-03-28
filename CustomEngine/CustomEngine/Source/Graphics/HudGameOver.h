@@ -1,26 +1,19 @@
 #pragma once
 #include "Hud.h"
+#include "../GameUI/GameOver/W_TopHighScores.h"
+//#include "../States/GameOver.h"
+
+class GameOver;
 
 class HudGameOver : public Hud {
 public:
-    HudGameOver(SDL_Renderer* renderer);
+    HudGameOver(SDL_Renderer* renderer, GameOver* gameOverInstance);
     void Render(SDL_Renderer* renderer) override;
-    void Init(SDL_Renderer* renderer);
+    void Init(SDL_Renderer* renderer, GameOver* gameOverInstance);
+    void OpenHighScoreScreen();
     void LoadTextures() override;
 
-    void RenderTopHighScoresHUD(SDL_Renderer* renderer);
-    void RenderGameOverBaseHud(SDL_Renderer* renderer);
-
-    void SetHighScoreScreenIsOpen(bool isOpen) { highScoreScreenIsOpen = isOpen; }
-    bool HighScoreScreenIsOpen() const { return highScoreScreenIsOpen; }
-
 private:
-    bool highScoreScreenIsOpen = false;
-    PanelInfos hudBasePanel;
-    PanelInfos scorePanel;
-    PanelInfos highScorePanel;
-
-    std::unique_ptr<TextBox> scoreTextBox;
-    std::vector<std::unique_ptr<TextBox>> topHighScores;
+    W_TopHighScores* topHighScoresWidget = nullptr;
 };
 

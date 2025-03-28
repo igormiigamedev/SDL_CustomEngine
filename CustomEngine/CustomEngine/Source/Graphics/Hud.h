@@ -5,6 +5,7 @@
 #include "../Text/TextBox.h"
 #include "../GameMode/GameMode.h"
 #include "Button.h"
+#include "../Graphics/Widget.h"
 
 class Hud
 {
@@ -12,24 +13,30 @@ public:
 	virtual ~Hud() = default; 
 	virtual void Render(SDL_Renderer* renderer) {
 		RenderFadeOut(renderer);
-		for (auto& button : buttonList) {
-			button->Render(renderer);
+		for (auto& widget : widgets) {
+			if (widget->IsVisible()) {
+				widget->Render();
+			}
 		}
 	}; 
-
-	void UpdateButtons(SDL_Event& event) {
-		for (auto& button : buttonList) {
-			button->HandleEvent(event);
-		}
-	}
 
 	virtual void LoadTextures() = 0; 
 
 	bool PlayFadeOut(int fadeDuration);
 	void RenderFadeOut(SDL_Renderer* renderer) const;
 
-	const std::vector<std::unique_ptr<Button>>& GetButtonList() const {
-		return buttonList;
+	const std::vector<std::unique_ptr<Widget>>& GetWidgetList() const {
+		return widgets;
+	}
+
+
+	template <typename T, typename... Args>
+	T* CreateWidget(SDL_Renderer* renderer, Args&&... args) {
+		static_assert(std::is_base_of<Widget, T>::value, "T must be derived from Widget");
+
+		T* widget = new T(renderer, std::forward<Args>(args)...);
+		widgets.push_back(std::unique_ptr<T>(widget));
+		return widget;
 	}
 
 private:
@@ -48,6 +55,6 @@ protected:
 		int height;
 	};
 
-	std::vector<std::unique_ptr<Button>> buttonList;
+	std::vector<std::unique_ptr<Widget>> widgets;
 };
 

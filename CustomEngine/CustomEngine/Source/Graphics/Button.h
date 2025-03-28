@@ -16,15 +16,17 @@ public:
         SDL_RenderFillRect(renderer, &rect);
     }
 
-    void HandleEvent(SDL_Event& event) {
+    bool HandleEvent(SDL_Event& event) {
         if (event.type == SDL_MOUSEBUTTONDOWN) {
             int mouseX, mouseY;
             SDL_GetMouseState(&mouseX, &mouseY);
 
             if (IsMouseOver(mouseX, mouseY)) {
                 onClick(); 
+                return true;
             }
         }
+        return false;
     }
 
 private:
