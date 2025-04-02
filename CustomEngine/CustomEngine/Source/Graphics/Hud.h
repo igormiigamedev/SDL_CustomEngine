@@ -18,7 +18,7 @@ public:
 				widget->Render();
 			}
 		}
-	}; 
+	}
 
 	virtual void LoadTextures() = 0; 
 
@@ -29,15 +29,26 @@ public:
 		return widgets;
 	}
 
-
 	template <typename T, typename... Args>
 	T* CreateWidget(SDL_Renderer* renderer, Args&&... args) {
 		static_assert(std::is_base_of<Widget, T>::value, "T must be derived from Widget");
 
-		T* widget = new T(renderer, std::forward<Args>(args)...);
-		widgets.push_back(std::unique_ptr<T>(widget));
-		return widget;
+		auto widget = std::make_unique<T>(renderer, std::forward<Args>(args)...);
+		T* widgetPtr = widget.get();
+		widgets.push_back(std::move(widget));
+		return widgetPtr;
 	}
+
+	template <typename T>
+	T* GetWidgetOfClass() {
+		for (const auto& widget : widgets) {
+			if (T* castedWidget = dynamic_cast<T*>(widget.get())) {
+				return castedWidget;
+			}
+		}
+		return nullptr;
+	}
+
 
 private:
 

@@ -9,11 +9,11 @@ public:
     void LoadTextures() override;
 
     void Init(SDL_Renderer* renderer);
-    void SetScoreText(std::string scoreText) { 
-        if (inGameWidget != nullptr) {
-            inGameWidget->SetScoreText(scoreText); 
+    void SetScoreText(const std::string& scoreText) {
+        if (inGameWidget) {
+            inGameWidget->SetScoreText(scoreText);
         }
-    };
+    }
 
 private:
     W_InGame* inGameWidget;

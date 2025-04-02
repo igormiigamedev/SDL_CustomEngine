@@ -14,6 +14,5 @@ public:
     void LoadTextures() override;
 
 private:
-    W_TopHighScores* topHighScoresWidget = nullptr;
 };
 

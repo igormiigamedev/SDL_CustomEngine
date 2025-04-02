@@ -13,14 +13,13 @@ void HudGameOver::Render(SDL_Renderer* renderer) {
 
 void HudGameOver::Init(SDL_Renderer* renderer, GameOver* gameOverInstance) {
 	CreateWidget<W_GameOverBase>(renderer, gameOverInstance);
-	topHighScoresWidget = CreateWidget<W_TopHighScores>(renderer);
+	CreateWidget<W_TopHighScores>(renderer);
 }
 
 void HudGameOver::OpenHighScoreScreen() {
-	if (topHighScoresWidget) {
-		topHighScoresWidget->Show();
+	if (W_TopHighScores* highScoreWidget = GetWidgetOfClass<W_TopHighScores>()) {
+		highScoreWidget->Show();
 	}
-	return;
 }
 
 void HudGameOver::LoadTextures() {
