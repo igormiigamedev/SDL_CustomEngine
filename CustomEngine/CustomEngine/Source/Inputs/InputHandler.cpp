@@ -1,6 +1,7 @@
 #include "InputHandler.h"
 #include "../Core/Engine.h"
 #include "../States/GameStateManager.h"
+#include "../GameUI/GameOver/W_NicknameInput.h"
 
 InputHandler* InputHandler::s_Instance = nullptr;
 
@@ -33,6 +34,10 @@ void InputHandler::Listen(){
 			}
 			default:
 				break;
+		}
+
+		if (W_NicknameInput* nicknameWidget = GameStateManager::GetInstance()->GetCurrentHud()->GetWidgetOfClass<W_NicknameInput>()) {
+			nicknameWidget->HandleEvent(event);
 		}
 	}
 }

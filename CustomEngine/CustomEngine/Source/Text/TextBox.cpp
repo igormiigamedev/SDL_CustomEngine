@@ -33,7 +33,7 @@ void TextBox::UpdateTexture(SDL_Renderer* renderer) {
         textTexture = nullptr;
     }
 
-    int fontSize = AdjustTextSizeToFit(renderer).fontSize;
+    int fontSize = AdjustTextSizeToFit().fontSize;
     // Load font
     TTF_Font* font = TTF_OpenFont(FONT_TYPE, fontSize);
     if (!font) {
@@ -78,7 +78,7 @@ void TextBox::Render(SDL_Renderer* renderer) {
     SDL_RenderCopy(renderer, textTexture, NULL, &textRect);
 }
 
-TextBox::TextProps TextBox::AdjustTextSizeToFit(SDL_Renderer* renderer) {
+TextBox::TextProps TextBox::AdjustTextSizeToFit() {
     TextProps txtPropsDefault = { 5, 0, 0 };
     txtProps.fontSize = maxFontSize;
 

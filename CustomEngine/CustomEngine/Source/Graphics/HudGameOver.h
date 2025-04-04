@@ -1,6 +1,7 @@
 #pragma once
 #include "Hud.h"
 #include "../GameUI/GameOver/W_TopHighScores.h"
+#include "../GameUI/GameOver/W_NicknameInput.h"
 //#include "../States/GameOver.h"
 
 class GameOver;
@@ -14,5 +15,6 @@ public:
     void LoadTextures() override;
 
 private:
+    W_NicknameInput* nicknameWidget;
 };
 

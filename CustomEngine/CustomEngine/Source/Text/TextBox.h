@@ -3,7 +3,7 @@
 #include <SDL_ttf.h>
 #include <string>
 
-constexpr const char* FONT_TYPE = "Assets/Fonts/flying_bubble/Flying Bubble.otf";
+constexpr const char* FONT_TYPE = "Assets/Fonts/montara_bold/montara-bold-gothic.otf";
 
 class TextBox {
 public:
@@ -31,7 +31,7 @@ private:
     TextProps txtProps;
 
     void UpdateTexture(SDL_Renderer* renderer);
-    TextProps AdjustTextSizeToFit(SDL_Renderer* renderer);
+    TextProps AdjustTextSizeToFit();
 
 
 };
