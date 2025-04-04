@@ -9,12 +9,12 @@ void W_GameOverBase::Init() {
     imagePanels.push_back({ hudBasePanel.textureID, hudBasePanel.posX, hudBasePanel.posY });
 
     // Adds a restart button
-    buttonList.push_back(std::make_unique<Button>(hudBasePanel.posX + 255, hudBasePanel.posY + 550, 115, 115, SDL_Color{ 0, 255, 0, 255 }, [this]() {
+    buttonList.push_back(std::make_unique<Button>(hudBasePanel.posX + 255, hudBasePanel.posY + 550, 115, 115, "Button_Retry_UI", [this]() {
         if (gameOverInstance) gameOverInstance->StartGame();
         }));
 
     // Adds a button to open High Scores
-    buttonList.push_back(std::make_unique<Button>(hudBasePanel.posX + 420, hudBasePanel.posY + 550, 115, 115, SDL_Color{ 0, 255, 0, 255 }, [this]() {
+    buttonList.push_back(std::make_unique<Button>(hudBasePanel.posX + 420, hudBasePanel.posY + 550, 115, 115, "Button_Menu_UI", [this]() {
         if (gameOverInstance) gameOverInstance->GetHud().OpenHighScoreScreen();
         }));
 

@@ -11,7 +11,7 @@ void W_TopHighScores::Init(){
     imagePanels.push_back({ highScorePanel.textureID, highScorePanel.posX, highScorePanel.posY });
 
     // Add a close button
-    buttonList.push_back(std::make_unique<Button>(200, 100, 115, 115, SDL_Color{ 0, 255, 0, 255 }, [this]() {
+    buttonList.push_back(std::make_unique<Button>(200, 100, 115, 115, "Button_Retry_UI", [this]() {
         Hide();
         }));
 

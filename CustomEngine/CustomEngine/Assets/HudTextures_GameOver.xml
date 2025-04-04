@@ -5,6 +5,9 @@
     <!-- GameOver -->
     <texture id="GameOver_Base_UI" source="Assets/UI/BaseUI.png"/>
     <texture id="GameOver_Top_Highscores_UI" source="Assets/UI/TopHighScores.png"/>
+    <!-- Buttons -->
+    <texture id="Button_Menu_UI" source="Assets/UI/Button/Button_Menu.png"/>
+    <texture id="Button_Retry_UI" source="Assets/UI/Button/Button_Retry.png"/>
 
 
 </textures>
